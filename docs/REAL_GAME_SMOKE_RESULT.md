@@ -1,13 +1,12 @@
-# Real-game initialization smoke result
+# Standalone smoke evidence
 
-Run `20261027-021239`, isolated cachedir, PID 26012:
+- Game build: Project Zomboid B42 `42.21.0 4a0e9546ec`.
+- Profile: each run uses a fresh disposable profile under `standalone/runtime/build/runs/`.
+- Runtime: own Java premain agent; no Knox or ZombieBuddy runtime dependency.
+- Mod loading: **passed** after seeding `options.ini`; run `034429` reports `loading DC_AIStandalone`, `active mods=[DC_AIStandalone]`, `discovered=true`.
+- Lua loading: **passed**; run `034429` reports `[DCStandaloneTest] bootstrap loaded`.
+- World entry: **not passed**. Runs end after `Game booting` / `STATE: exit zombie.gameStates.TISLogoState`, with no `OnGameStateEnter`, `OnMainMenuEnter`, or world-start evidence. The latest test bootstrap now adds read-only state diagnostics; it does not accept terms or force transitions.
+- Native profile parser: **passed** by `ModProfileProbe` against the actual game JAR.
+- Offline transformer/FSM/source tests: **passed**.
 
-- Loaded the project-owned self-contained Java agent; launch command had no Knox/ZombieBuddy mod or `zbNative` argument.
-- Actual game stdout reported `[DCStandalone] bridge installed on MainThread`.
-- Harness observed the marker after 16.97 seconds and terminated its own process; exit code 1 reflects forced termination, not a clean normal game exit.
-- Raw game stderr also reported missing font-page textures. Those errors are not resolved by the bridge result and healthy visible startup has not been established.
-- An older separate test instance was already running. No operations were sent to it; this result is restricted to class/Lua initialization, not rendering or input acceptance.
-
-Durable raw evidence is generated under `standalone/runtime/build/runs/20261027-021239/` (ignored runtime output): `report.json`, `stdout.log`, `stderr.log`.
-
-**Pass scope:** real B42 Lua initialization invokes our own bridge on MainThread. **Not tested:** gameplay OnTick thread assertion, world actor, appearance, movement, mouse, or save/reload.
+The current evidence is initialization and mod/Lua loading only, not a playable teammate acceptance.
