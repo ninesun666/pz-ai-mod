@@ -42,6 +42,7 @@ def main():
                '--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED', '-Xmx2048m',
                '-Dzomboid.steam=0', '-Djava.library.path=win64/;.',
                '-cp', '.;projectzomboid.jar', 'zombie.gameStates.MainScreenState',
+               '-modfolders', str(profile / 'mods'),
                f'-cachedir={profile}', '-nosteam']
     result = {'command': command, 'scope': 'standalone Lua OnTick callback only; no gameplay acceptance',
               'passed': False, 'profile': str(profile)}
