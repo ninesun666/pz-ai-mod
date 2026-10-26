@@ -13,6 +13,7 @@
 !/tools/
 !/publish-draft/
 !/test-profile/
+!/standalone/
 
 /test-profile/*
 !/test-profile/mods/
