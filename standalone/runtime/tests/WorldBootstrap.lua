@@ -30,7 +30,12 @@ local function tryLaunch()
     print("[DCStandaloneTest] launching disposable world " .. world)
     forceChangeState(LoadingQueueState.new())
 end
+local constructorProbed = false
 Events.OnGameStateEnter.Add(function(s)
+    if not constructorProbed and DCStandaloneProbeConstructor ~= nil then
+        constructorProbed = true
+        DCStandaloneProbeConstructor()
+    end
     local ok1, terms = pcall(function() return instanceof(s, "TermsOfServiceState") end)
     local ok2, main = pcall(function() return instanceof(s, "MainScreenState") end)
     local ok3, ver = pcall(function() return getCore():getTermsOfServiceVersion() end)

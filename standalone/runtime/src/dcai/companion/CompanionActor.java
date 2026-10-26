@@ -6,22 +6,64 @@ import zombie.core.skinnedmodel.visual.HumanVisual;
 import zombie.core.skinnedmodel.visual.IHumanVisual;
 import zombie.core.skinnedmodel.visual.ItemVisuals;
 import zombie.iso.IsoCell;
+import zombie.iso.IsoGridSquare;
+import zombie.iso.IsoWorld;
 
-/** Compilation probe only. Not yet inserted into a world or presented as a character.
- * Uses only base-game types. Lazy visual handles virtual calls from super.
- */
+/** Own actor shell. Detached until an audited world factory attaches it. */
 public final class CompanionActor extends IsoLivingCharacter implements IHumanVisual {
     private HumanVisual humanVisual;
     private ItemVisuals itemVisuals;
+    private CompanionLifecycle lifecycle;
 
-    public CompanionActor(IsoCell cell) {
-        // Nonzero super coordinates auto-register a partially initialized actor.
-        // This constructor deliberately stays detached; a world factory is still required.
+    public CompanionActor(IsoCell ignoredCell) {
         super(null, 0, 0, 0);
         // Worn/attached groups are initialized by the world factory after game data is ready.
-
     }
 
+    /** Main/world-thread only. No inherited physiology or animation update is called. */
+    public boolean attachAt(IsoCell targetCell, float x, float y, float z) {
+        requireGameThread();
+        if (lifecycle == null) lifecycle = new CompanionLifecycle();
+        lifecycle.requireOwnerThread();
+        if (lifecycle.phase() != CompanionLifecycle.Phase.DETACHED || targetCell == null || IsoWorld.instance == null
+                || IsoWorld.instance.currentCell != targetCell || !Float.isFinite(x)
+                || !Float.isFinite(y) || !Float.isFinite(z) || x < 0 || y < 0 || z < 0) return false;
+        IsoGridSquare square = targetCell.getGridSquare((int) x, (int) y, (int) z);
+        if (square == null) return false;
+        setX(x); setY(y); setZ(z);
+        setNextX(x); setNextY(y);
+        setLastX(x); setLastY(y); setLastZ(z);
+        setCurrent(square);
+        setMovingSquareNow();
+        targetCell.addMovingObject(this);
+        lifecycle.attach();
+        return true;
+    }
+
+    /** Idempotent world-thread teardown; no persistence or implicit revival. */
+    public void detach() {
+        if (lifecycle == null) return;
+        requireGameThread();
+        if (lifecycle.phase() != CompanionLifecycle.Phase.ATTACHED) return;
+        if (isAddedToModelManager()) setSceneCulled(true);
+        removeFromWorld();
+        removeFromSquare();
+        setMovingSquare(null);
+        lifecycle.close();
+    }
+
+    public boolean isAttached() {
+        return lifecycle != null && lifecycle.phase() == CompanionLifecycle.Phase.ATTACHED;
+    }
+
+    private static void requireGameThread() {
+        Thread current = Thread.currentThread();
+        if (current != zombie.GameWindow.gameThread)
+            throw new IllegalStateException("companion actor mutation off game thread: " + current.getName());
+    }
+
+    @Override public void update() { /* owned scheduler hook; no bodyDamage path */ }
+    @Override public void postupdate() { /* model path deferred until audited */ }
     @Override public HumanVisual getHumanVisual() {
         if (humanVisual == null) humanVisual = new HumanVisual(this);
         return humanVisual;

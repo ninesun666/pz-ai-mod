@@ -53,7 +53,7 @@ def main():
 
     err = run / 'stderr.log'
     command = [str(args.game / 'jre64/bin/java.exe'), f'-javaagent:{jar}',
-               '-Djava.awt.headless=true', '--enable-native-access=ALL-UNNAMED',
+               '-Ddcai.constructorProbe=true', '-Djava.awt.headless=true', '--enable-native-access=ALL-UNNAMED',
                '--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED', '-Xmx2048m',
                '-Dzomboid.steam=0', '-Djava.library.path=win64/;.',
                '-cp', '.;projectzomboid.jar', 'zombie.gameStates.MainScreenState',

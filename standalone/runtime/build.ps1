@@ -33,6 +33,8 @@ if ($LASTEXITCODE -ne 0) { throw "Behavior probe failed: $LASTEXITCODE" }
 if ($LASTEXITCODE -ne 0) { throw "Profile parser probe failed: $LASTEXITCODE" }
 & $java -cp "$out;$cp" dcai.companion.ActorConstructionProbe
 if ($LASTEXITCODE -ne 0) { throw "Actor construction probe failed: $LASTEXITCODE" }
+& $java -cp "$out;$cp" dcai.companion.CompanionLifecycleProbe
+if ($LASTEXITCODE -ne 0) { throw "Lifecycle probe failed: $LASTEXITCODE" }
 $manifest = Join-Path $root "standalone\runtime\build\MANIFEST.MF"
 @"
 Manifest-Version: 1.0

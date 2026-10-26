@@ -27,6 +27,21 @@ public final class CompanionBridge {
                 return frame.push((double) ticks);
             }
         });
+        if (Boolean.getBoolean("dcai.constructorProbe")) {
+            LuaManager.env.rawset("DCStandaloneProbeConstructor", new JavaFunction() {
+                @Override public int call(LuaCallFrame frame, int count) {
+                    if (Thread.currentThread() != GameWindow.gameThread)
+                        throw new IllegalStateException("constructor probe off game thread");
+                    CompanionActor actor = new CompanionActor(null);
+                    if (actor.isAttached() || actor.getCurrentSquare() != null)
+                        throw new IllegalStateException("constructor registered actor into world");
+                    if (actor.getHumanVisual() == null || actor.getItemVisuals() == null)
+                        throw new IllegalStateException("constructor missing own visual interface");
+                    System.out.println("[DCStandaloneTest] detached constructor PASS on " + Thread.currentThread().getName());
+                    return frame.push(true);
+                }
+            });
+        }
         System.out.println("[DCStandalone] bridge installed on " + installThread.getName());
         System.out.println("[DCStandalone] active mods=" + zombie.modding.ActiveMods.getById("default").getMods());
         System.out.println("[DCStandalone] discovered=" + (zombie.gameStates.ChooseGameInfo.getModDetails("DC_AIStandalone") != null));
