@@ -14,6 +14,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--game', type=Path, default=Path(r'D:\SteamLibrary\steamapps\common\ProjectZomboid'))
     parser.add_argument('--timeout', type=int, default=120)
+    parser.add_argument('--world', action='store_true', help='create a fresh disposable world automatically')
     args = parser.parse_args()
     jar = ROOT / 'standalone/runtime/build/DC_AIStandaloneRuntime.jar'
     if not jar.is_file():
@@ -26,6 +27,9 @@ def main():
     import shutil
     shutil.copytree(ROOT / 'standalone/common', mods / 'common')
     shutil.copytree(ROOT / 'standalone/42', mods / '42')
+    if args.world:
+        shutil.copyfile(ROOT / 'standalone/runtime/tests/WorldBootstrap.lua',
+                        mods / '42/media/lua/client/DCStandaloneTestBootstrap.lua')
     (profile / 'mods/default.txt').write_text(
         'VERSION = 1,\n\nmods\n{\n    mod = DC_AIStandalone,\n}\n\nmaps\n{\n}\n',
         encoding='utf-8')
