@@ -5,6 +5,7 @@ $aimod = Split-Path $PSScriptRoot -Parent
 $jdk   = 'C:\Users\gjx\Desktop\workspace\workspace\envronment\jdk-17.0.8\bin'
 $build = Join-Path $PSScriptRoot 'build'
 $mods  = Join-Path $aimod 'test-profile\mods\DC_Toolkit\42\media\java'
+$driverMods = Join-Path $aimod 'driver-profile\mods\DC_Toolkit\42\media\java'
 
 Remove-Item $build -Recurse -Force -ErrorAction SilentlyContinue
 New-Item $build -ItemType Directory | Out-Null
@@ -21,4 +22,6 @@ if ($LASTEXITCODE -ne 0) { throw "jar failed ($LASTEXITCODE)" }
 
 New-Item $mods -ItemType Directory -Force | Out-Null
 Copy-Item "$PSScriptRoot\dctoolkit.jar" "$mods\dctoolkit.jar" -Force
+New-Item $driverMods -ItemType Directory -Force | Out-Null
+Copy-Item "$PSScriptRoot\dctoolkit.jar" "$driverMods\dctoolkit.jar" -Force
 Write-Host "OK: $((Get-Item "$mods\dctoolkit.jar").Length) bytes -> $mods\dctoolkit.jar"

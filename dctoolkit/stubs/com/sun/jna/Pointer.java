@@ -2,5 +2,6 @@
 package com.sun.jna;
 
 public class Pointer {
-    public static int nativeValue(Pointer p) { return 0; }
+    public Pointer(long value) {}
+    public static long nativeValue(Pointer p) { return 0; }
 }
