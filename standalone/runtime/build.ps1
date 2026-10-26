@@ -18,6 +18,15 @@ $java = Join-Path $GameDir "jre64\bin\java.exe"
 $files = Get-ChildItem (Join-Path $src "dcai\companion") -Filter "*.java" | ForEach-Object FullName
 & $java -jar $Ecj -17 -proc:none -encoding UTF-8 -classpath $cp -d $out $files
 if ($LASTEXITCODE -ne 0) { throw "ECJ failed: $LASTEXITCODE" }
+$testSrc = Join-Path $root "standalone\runtime\tests"
+$testFiles = Get-ChildItem $testSrc -Filter "*.java" -Recurse | ForEach-Object FullName
+if ($testFiles) {
+    & $java -jar $Ecj -17 -proc:none -encoding UTF-8 -classpath "$cp;$out" -d $out $testFiles
+    if ($LASTEXITCODE -ne 0) { throw "ECJ tests failed: $LASTEXITCODE" }
+}
+$gameJar = Join-Path $GameDir "projectzomboid.jar"
+& $java -cp "$out;$cp" dcai.companion.TransformProbe $gameJar
+if ($LASTEXITCODE -ne 0) { throw "Transform probe failed: $LASTEXITCODE" }
 $manifest = Join-Path $root "standalone\runtime\build\MANIFEST.MF"
 @"
 Manifest-Version: 1.0
