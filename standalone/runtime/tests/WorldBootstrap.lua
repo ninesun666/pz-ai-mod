@@ -11,13 +11,10 @@ local scenario = {
     end,
     onStart = function() print("[DCStandaloneTest] world started") end,
 }
-Events.OnMainMenuEnter.Add(function()
+local function tryLaunch()
     if launched or isClient() or isServer() then return end
     local menu = MainScreen and MainScreen.instance
-    if not (menu and menu.desc and CharacterCreationMain.instance) then
-        print("[DCStandaloneTest] missing menu character setup")
-        return
-    end
+    if not (menu and menu.desc and CharacterCreationMain.instance) then return end
     launched = true
     local world = "DCStandaloneProbe_" .. tostring(ZombRand(1000000000))
     ActiveMods.getById("currentGame"):copyFrom(ActiveMods.getById("default"))
@@ -32,5 +29,7 @@ Events.OnMainMenuEnter.Add(function()
     Events.LoadGridsquare.Add(DebugScenarios.onloadgs)
     print("[DCStandaloneTest] launching disposable world " .. world)
     forceChangeState(LoadingQueueState.new())
-end)
+end
+Events.OnMainMenuEnter.Add(tryLaunch)
+Events.OnTick.Add(tryLaunch)
 print("[DCStandaloneTest] bootstrap loaded")
