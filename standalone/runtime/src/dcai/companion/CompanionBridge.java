@@ -11,6 +11,7 @@ public final class CompanionBridge {
     private static KahluaTable installedEnvironment;
     private static Thread installThread;
     private static long ticks;
+    private static WorldActorProbe worldProbe;
 
     public static void install() {
         if (LuaManager.env == null) throw new IllegalStateException("Lua env missing");
@@ -24,7 +25,19 @@ public final class CompanionBridge {
                     throw new IllegalStateException("companion tick called off game thread");
                 ticks++;
                 if (ticks == 1) System.out.println("[DCStandalone] first game-thread tick");
+                if (Boolean.getBoolean("dcai.worldActorProbe")) {
+                    if (worldProbe == null) worldProbe = new WorldActorProbe();
+                    worldProbe.tick();
+                }
                 return frame.push((double) ticks);
+            }
+        });
+        LuaManager.env.rawset("DCStandaloneClose", new JavaFunction() {
+            @Override public int call(LuaCallFrame frame, int count) {
+                if (Thread.currentThread() != GameWindow.gameThread)
+                    throw new IllegalStateException("companion close off game thread");
+                if (worldProbe != null) worldProbe.close();
+                return 0;
             }
         });
         if (Boolean.getBoolean("dcai.constructorProbe")) {

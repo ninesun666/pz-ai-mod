@@ -17,11 +17,11 @@ def main():
     parser.add_argument('--timeout', type=int, default=120)
     parser.add_argument('--world', action='store_true', help='create a fresh disposable world automatically')
     parser.add_argument('--profile', type=Path, help='reuse only a harness-marked disposable profile')
-    parser.add_argument('--gate', choices=('tick', 'visual-setup'), default='tick',
-                        help='visual-setup proves initialized detached placeholder only, not rendering')
+    parser.add_argument('--gate', choices=('tick', 'visual-setup', 'world-actor'), default='tick',
+                        help='world-actor is a disposable stationary attachment/model probe')
     args = parser.parse_args()
-    if args.gate == 'visual-setup' and not args.world:
-        parser.error('visual-setup requires --world test bootstrap')
+    if args.gate != 'tick' and not args.world:
+        parser.error('actor gates require --world test bootstrap')
     jar = ROOT / 'standalone/runtime/build/DC_AIStandaloneRuntime.jar'
     if not jar.is_file():
         raise SystemExit('Build runtime first')
@@ -56,15 +56,16 @@ def main():
     out = run / 'stdout.log'
 
     err = run / 'stderr.log'
+    probe_property = '-Ddcai.worldActorProbe=true' if args.gate == 'world-actor' else '-Ddcai.constructorProbe=true'
     command = [str(args.game / 'jre64/bin/java.exe'), f'-javaagent:{jar}',
-               '-Ddcai.constructorProbe=true', '-Djava.awt.headless=true', '--enable-native-access=ALL-UNNAMED',
+               probe_property, '-Djava.awt.headless=true', '--enable-native-access=ALL-UNNAMED',
                '--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED', '-Xmx2048m',
                '-Dzomboid.steam=0', '-Djava.library.path=win64/;.',
                '-cp', '.;projectzomboid.jar', 'zombie.gameStates.MainScreenState',
                '-modfolders', 'mods',
                f'-cachedir={profile}', '-nosteam']
-    result = {'command': command, 'scope': 'standalone Lua OnTick callback only; no gameplay acceptance',
-              'passed': False, 'profile': str(profile)}
+    result = {'command': command, 'scope': f'{args.gate} probe only; no gameplay acceptance',
+              'gate': args.gate, 'passed': False, 'profile': str(profile)}
     started = time.monotonic()
     with out.open('wb') as stdout, err.open('wb') as stderr:
         proc = subprocess.Popen(command, cwd=args.game, stdout=stdout, stderr=stderr)
@@ -72,6 +73,10 @@ def main():
         try:
             while time.monotonic() - started < args.timeout:
                 text = out.read_text(encoding='utf-8', errors='replace') + err.read_text(encoding='utf-8', errors='replace')
+                if args.gate == 'world-actor' and '[DCStandaloneTest] model membership active' in text:
+                    result['passed'] = True
+                    result['reason'] = 'stationary own actor attached with active model; pixels and gameplay unverified'
+                    break
                 if args.gate == 'visual-setup' and '[DCStandaloneTest] placeholder visual setup PASS' in text:
                     result['passed'] = True
                     result['reason'] = 'initialized detached placeholder visual setup reached game thread; not rendering acceptance'

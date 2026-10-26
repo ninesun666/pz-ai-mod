@@ -15,6 +15,30 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
     private ItemVisuals itemVisuals;
     private CompanionLifecycle lifecycle;
     private boolean visualsReady;
+    private boolean modelRequested;
+    private boolean actionGroupReady;
+
+    public boolean isActionGroupReady() { return actionGroupReady; }
+    /** Explicit model request; a returned true is membership, not visible-pixel proof. */
+    public boolean requestPlaceholderModel() {
+        requireGameThread();
+        if (!isAttached() || !isPlaceholderVisualReady()) return false;
+        if (!modelRequested) {
+            setSceneCulled(false);
+            modelRequested = isAddedToModelManager();
+        }
+        return modelRequested && hasActiveModel();
+    }
+
+    @Override public void render(float x, float y, float z,
+            zombie.core.textures.ColorInfo color, boolean a, boolean b,
+            zombie.core.opengl.Shader shader) {
+        if (modelRequested && hasActiveModel()) super.render(x, y, z, color, a, b, shader);
+    }
+
+    @Override public void renderlast() {
+        if (modelRequested && hasActiveModel()) super.renderlast();
+    }
 
     /** Placeholder human model only; not the final whale-girl asset. */
     public void initializePlaceholderVisuals() {
@@ -32,6 +56,12 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
         setFemale(true);
         getHumanVisual().copyFrom(desc.getHumanVisual());
         initSpritePartsEmpty();
+        zombie.characters.action.ActionGroup group =
+                zombie.characters.action.ActionGroup.getActionGroup("player");
+        if (group == null || group.getInitialState() == null)
+            throw new IllegalStateException("player action group missing idle state");
+        getActionContext().setGroup(group);
+        actionGroupReady = true;
         setVariable("bMoving", false);
         setVariable("bPathfind", false);
         visualsReady = true;
@@ -44,7 +74,8 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
 
     public boolean isPlaceholderVisualReady() {
         return visualsReady && getDescriptor() != null && isFemale()
-                && getWornItems() != null && getAttachedItems() != null && legsSprite != null;
+                && getWornItems() != null && getAttachedItems() != null && legsSprite != null
+                && actionGroupReady;
     }
 
     /** Main/world-thread only. No inherited physiology or animation update is called. */
@@ -90,7 +121,14 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
     }
 
     @Override public void update() { /* owned scheduler hook; no bodyDamage path */ }
-    @Override public void postupdate() { /* model path deferred until audited */ }
+    @Override public void postupdate() {
+        if (!isAttached() || !modelRequested || !actionGroupReady || !hasActiveModel()) return;
+        requireGameThread();
+        getActionContext().update();
+        // Public vanilla wrapper updates animator, animation player/model slot and lighting.
+        // This does not implement locomotion/root-motion or prove visible pixels.
+        updateForServerGui();
+    }
     @Override public HumanVisual getHumanVisual() {
         if (humanVisual == null) humanVisual = new HumanVisual(this);
         return humanVisual;
