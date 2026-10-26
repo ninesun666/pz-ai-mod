@@ -21,7 +21,16 @@ def main():
     run = ROOT / 'standalone/runtime/build/runs' / time.strftime('%Y%m%d-%H%M%S')
     profile = run / 'profile'
     profile.mkdir(parents=True)
+    mods = profile / 'mods' / 'DC_AIStandalone'
+    mods.mkdir(parents=True)
+    import shutil
+    shutil.copytree(ROOT / 'standalone/common', mods / 'common')
+    shutil.copytree(ROOT / 'standalone/42', mods / '42')
+    (profile / 'mods/default.txt').write_text(
+        'VERSION = 1,\n\nmods\n{\n    mod = DC_AIStandalone,\n}\n\nmaps\n{\n}\n',
+        encoding='utf-8')
     out = run / 'stdout.log'
+
     err = run / 'stderr.log'
     command = [str(args.game / 'jre64/bin/java.exe'), f'-javaagent:{jar}',
                '-Djava.awt.headless=true', '--enable-native-access=ALL-UNNAMED',
@@ -29,7 +38,7 @@ def main():
                '-Dzomboid.steam=0', '-Djava.library.path=win64/;.',
                '-cp', '.;projectzomboid.jar', 'zombie.gameStates.MainScreenState',
                f'-cachedir={profile}', '-nosteam']
-    result = {'command': command, 'scope': 'Lua initialization only; no gameplay acceptance',
+    result = {'command': command, 'scope': 'standalone Lua OnTick callback only; no gameplay acceptance',
               'passed': False, 'profile': str(profile)}
     started = time.monotonic()
     with out.open('wb') as stdout, err.open('wb') as stderr:
@@ -38,16 +47,16 @@ def main():
         try:
             while time.monotonic() - started < args.timeout:
                 text = out.read_text(encoding='utf-8', errors='replace') + err.read_text(encoding='utf-8', errors='replace')
-                if '[DCStandalone] bridge installed on ' in text:
+                if '[DCStandalone] first game-thread tick' in text:
                     result['passed'] = True
-                    result['reason'] = 'own bridge installed from real LuaManager.init'
+                    result['reason'] = 'standalone Lua OnTick reached Java game-thread callback'
                     break
                 if proc.poll() is not None:
                     result['reason'] = f'game exited {proc.returncode}'
                     break
                 time.sleep(0.5)
             else:
-                result['reason'] = 'timeout awaiting bridge installation'
+                result['reason'] = 'timeout awaiting standalone Lua OnTick game-thread callback'
         finally:
             result['terminatedByHarness'] = proc.poll() is None
             if proc.poll() is None:

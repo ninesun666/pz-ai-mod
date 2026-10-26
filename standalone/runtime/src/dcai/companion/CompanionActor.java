@@ -14,8 +14,10 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
     private HumanVisual humanVisual;
     private ItemVisuals itemVisuals;
 
-    public CompanionActor(IsoCell cell, float x, float y, float z) {
-        super(cell, x, y, z);
+    public CompanionActor(IsoCell cell) {
+        // Nonzero super coordinates auto-register a partially initialized actor.
+        // This constructor deliberately stays detached; a world factory is still required.
+        super(cell, 0, 0, 0);
         initWornItems("Human");
         initAttachedItems("Human");
     }
