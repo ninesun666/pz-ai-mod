@@ -38,6 +38,6 @@ Can-Retransform-Classes: false
 $env:DC_PROBE_CLASSES = $out
 $env:DC_PROBE_JAR = $jar
 $env:DC_PROBE_MANIFEST = $manifest
-python -c "import os, pathlib, zipfile; root=pathlib.Path(os.environ['DC_PROBE_CLASSES']); z=zipfile.ZipFile(os.environ['DC_PROBE_JAR'],'w',zipfile.ZIP_DEFLATED); z.write(os.environ['DC_PROBE_MANIFEST'],'META-INF/MANIFEST.MF'); [z.write(p,p.relative_to(root).as_posix()) for p in root.rglob('*.class')]; z.close()"
+python -c "import os, pathlib, zipfile; root=pathlib.Path(os.environ['DC_PROBE_CLASSES']); asm=pathlib.Path(r'.local-tools/asm-9.9.jar'); z=zipfile.ZipFile(os.environ['DC_PROBE_JAR'],'w',zipfile.ZIP_DEFLATED); z.write(os.environ['DC_PROBE_MANIFEST'],'META-INF/MANIFEST.MF'); [z.write(p,p.relative_to(root).as_posix()) for p in root.rglob('*.class')]; az=zipfile.ZipFile(asm); [z.writestr(i,az.read(i)) for i in az.namelist() if i.startswith('org/objectweb/asm/') and i.endswith('.class')]; z.writestr('THIRD-PARTY-NOTICES/ASM-LICENSE.txt', pathlib.Path('.local-tools/ASM-LICENSE.txt').read_bytes()); az.close(); z.close()"
 if ($LASTEXITCODE -ne 0) { throw "packaging failed: $LASTEXITCODE" }
 Write-Output "Built probe jar: $jar"
