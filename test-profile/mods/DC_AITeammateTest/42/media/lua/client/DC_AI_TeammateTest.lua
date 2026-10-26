@@ -1,3 +1,6 @@
+-- Retired Knox live bootstrap: never auto-load old worlds during rework.
+do return end
+
 -- DC_AI_Teammate live test bootstrap.
 -- Disposable world only; install only in ai-mod/test-profile.
 require "OptionScreens/MainScreen"

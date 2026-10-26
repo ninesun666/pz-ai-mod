@@ -1,3 +1,7 @@
+-- Retired prototype: disabled before requires, UI creation or event registration.
+-- Preserved in Git history for reference; not part of the standalone companion.
+do return end
+
 -- Opt-in teammate UI. Numeric Unicode avoids native Lua compiler corruption.
 require "ISUI/ISTextBox"
 require "DC_AI_Teammate"

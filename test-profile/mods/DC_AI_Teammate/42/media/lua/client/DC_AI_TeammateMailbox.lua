@@ -1,3 +1,7 @@
+-- Retired prototype: disabled before requires, UI creation or event registration.
+-- Preserved in Git history for reference; not part of the standalone companion.
+do return end
+
 -- Opt-in, main-thread mailbox. Never starts/spawns/recruits a teammate.
 DC_AI_TeammateMailbox = {}
 local M = DC_AI_TeammateMailbox

@@ -1,3 +1,7 @@
+-- Retired prototype: disabled before requires, UI creation or event registration.
+-- Preserved in Git history for reference; not part of the standalone companion.
+do return end
+
 -- dsh-pet style companion overlay (assets MIT, github.com/PC2005-cloud/dsh-pet;
 -- whale-girl assets MIT, github.com/huangdsa45/dsh_feiyu).
 -- Draws ONLY the animated pet texture anchored to the AI teammate's screen

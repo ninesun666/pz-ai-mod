@@ -1,3 +1,7 @@
+-- Retired prototype: disabled before requires, UI creation or event registration.
+-- Preserved in Git history for reference; not part of the standalone companion.
+do return end
+
 -- AI teammate adapter for Knox Event Expanded NPC.
 -- All calls must run on the game's main Lua thread.
 -- This module does not heal, enable god mode, or alter damage.
