@@ -20,4 +20,7 @@ maps
 {
 }
 "@ | Set-Content "$out\mods\default.txt" -Encoding UTF8
+"version=8`nwidth=1280`nheight=720`nfullScreen=false`n" | Set-Content "$out\options.ini" -Encoding UTF8 -NoNewline
+"DCStandalone disposable profile v1`n" | Set-Content "$out\.dc-standalone-disposable" -Encoding UTF8 -NoNewline
+New-Item -ItemType File "$out\mods\reset-mods-42_00.txt" | Out-Null
 Write-Output "Created clean profile: $out"

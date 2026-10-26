@@ -35,8 +35,8 @@ Events.OnGameStateEnter.Add(function(s)
     local ok2, main = pcall(function() return instanceof(s, "MainScreenState") end)
     local ok3, ver = pcall(function() return getCore():getTermsOfServiceVersion() end)
     local function cn()
-        local ok, n = pcall(function() return s:getClass():getName() end)
-        return ok and tostring(n) or "<unknown>"
+        local ok, n = pcall(function() return tostring(s) end)
+        return ok and n or "<unknown>"
     end
     print("[DCStandaloneDiag] OnGameStateEnter class=" .. cn() .. " terms=" .. tostring(ok1 and terms)
         .. " main=" .. tostring(ok2 and main) .. " termsVersion=" .. tostring(ok3 and ver))
