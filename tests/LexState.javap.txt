@@ -1,0 +1,4345 @@
+Compiled from "LexState.java"
+public final class org.luaj.kahluafork.compiler.LexState {
+  public int nCcalls;
+
+  protected static final java.lang.String RESERVED_LOCAL_VAR_FOR_CONTROL;
+
+  protected static final java.lang.String RESERVED_LOCAL_VAR_FOR_STATE;
+
+  protected static final java.lang.String RESERVED_LOCAL_VAR_FOR_GENERATOR;
+
+  protected static final java.lang.String RESERVED_LOCAL_VAR_FOR_STEP;
+
+  protected static final java.lang.String RESERVED_LOCAL_VAR_FOR_LIMIT;
+
+  protected static final java.lang.String RESERVED_LOCAL_VAR_FOR_INDEX;
+
+  protected static final java.lang.String[] RESERVED_LOCAL_VAR_KEYWORDS;
+
+  private static final java.util.Hashtable<java.lang.String, java.lang.Boolean> RESERVED_LOCAL_VAR_KEYWORDS_TABLE;
+
+  private static final int EOZ;
+
+  private static final int MAXSRC;
+
+  private static final int MAX_INT;
+
+  private static final int UCHAR_MAX;
+
+  private static final int LUAI_MAXCCALLS;
+
+  static final int NO_JUMP;
+
+  static final int OPR_ADD;
+
+  static final int OPR_SUB;
+
+  static final int OPR_MUL;
+
+  static final int OPR_DIV;
+
+  static final int OPR_MOD;
+
+  static final int OPR_POW;
+
+  static final int OPR_CONCAT;
+
+  static final int OPR_NE;
+
+  static final int OPR_EQ;
+
+  static final int OPR_LT;
+
+  static final int OPR_LE;
+
+  static final int OPR_GT;
+
+  static final int OPR_GE;
+
+  static final int OPR_AND;
+
+  static final int OPR_OR;
+
+  static final int OPR_NOBINOPR;
+
+  static final int OPR_MINUS;
+
+  static final int OPR_NOT;
+
+  static final int OPR_LEN;
+
+  static final int OPR_NOUNOPR;
+
+  static final int VVOID;
+
+  static final int VNIL;
+
+  static final int VTRUE;
+
+  static final int VFALSE;
+
+  static final int VK;
+
+  static final int VKNUM;
+
+  static final int VLOCAL;
+
+  static final int VUPVAL;
+
+  static final int VGLOBAL;
+
+  static final int VINDEXED;
+
+  static final int VJMP;
+
+  static final int VRELOCABLE;
+
+  static final int VNONRELOC;
+
+  static final int VCALL;
+
+  static final int VVARARG;
+
+  int current;
+
+  int linenumber;
+
+  int lastline;
+
+  final org.luaj.kahluafork.compiler.Token t;
+
+  final org.luaj.kahluafork.compiler.Token lookahead;
+
+  org.luaj.kahluafork.compiler.FuncState fs;
+
+  java.io.Reader z;
+
+  byte[] buff;
+
+  int nbuff;
+
+  java.lang.String source;
+
+  static final java.lang.String[] luaX_tokens;
+
+  static final int TK_AND;
+
+  static final int TK_BREAK;
+
+  static final int TK_DO;
+
+  static final int TK_ELSE;
+
+  static final int TK_ELSEIF;
+
+  static final int TK_END;
+
+  static final int TK_FALSE;
+
+  static final int TK_FOR;
+
+  static final int TK_FUNCTION;
+
+  static final int TK_IF;
+
+  static final int TK_IN;
+
+  static final int TK_LOCAL;
+
+  static final int TK_NIL;
+
+  static final int TK_NOT;
+
+  static final int TK_OR;
+
+  static final int TK_REPEAT;
+
+  static final int TK_RETURN;
+
+  static final int TK_THEN;
+
+  static final int TK_TRUE;
+
+  static final int TK_UNTIL;
+
+  static final int TK_WHILE;
+
+  static final int TK_CONCAT;
+
+  static final int TK_DOTS;
+
+  static final int TK_EQ;
+
+  static final int TK_GE;
+
+  static final int TK_LE;
+
+  static final int TK_NE;
+
+  static final int TK_NUMBER;
+
+  static final int TK_NAME;
+
+  static final int TK_STRING;
+
+  static final int TK_EOS;
+
+  static final int FIRST_RESERVED;
+
+  static final int NUM_RESERVED;
+
+  static final java.util.Hashtable<java.lang.String, java.lang.Integer> RESERVED;
+
+  static final int[] priorityLeft;
+
+  static final int[] priorityRight;
+
+  static final int UNARY_PRIORITY;
+
+  private static final java.lang.String LUA_QS(java.lang.String);
+    Code:
+       0: aload_0
+       1: invokedynamic #5,  0              // InvokeDynamic #0:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+       6: areturn
+
+  private static final java.lang.String LUA_QL(java.lang.Object);
+    Code:
+       0: aload_0
+       1: invokestatic  #9                  // Method java/lang/String.valueOf:(Ljava/lang/Object;)Ljava/lang/String;
+       4: invokestatic  #15                 // Method LUA_QS:(Ljava/lang/String;)Ljava/lang/String;
+       7: areturn
+
+  public static boolean isReservedKeyword(java.lang.String);
+    Code:
+       0: getstatic     #18                 // Field RESERVED_LOCAL_VAR_KEYWORDS_TABLE:Ljava/util/Hashtable;
+       3: aload_0
+       4: invokevirtual #22                 // Method java/util/Hashtable.containsKey:(Ljava/lang/Object;)Z
+       7: ireturn
+
+  private boolean isalnum(int);
+    Code:
+       0: iload_1
+       1: bipush        48
+       3: if_icmplt     12
+       6: iload_1
+       7: bipush        57
+       9: if_icmple     42
+      12: iload_1
+      13: bipush        97
+      15: if_icmplt     24
+      18: iload_1
+      19: bipush        122
+      21: if_icmple     42
+      24: iload_1
+      25: bipush        65
+      27: if_icmplt     36
+      30: iload_1
+      31: bipush        90
+      33: if_icmple     42
+      36: iload_1
+      37: bipush        95
+      39: if_icmpne     46
+      42: iconst_1
+      43: goto          47
+      46: iconst_0
+      47: ireturn
+
+  private boolean isalpha(int);
+    Code:
+       0: iload_1
+       1: bipush        97
+       3: if_icmplt     12
+       6: iload_1
+       7: bipush        122
+       9: if_icmple     24
+      12: iload_1
+      13: bipush        65
+      15: if_icmplt     28
+      18: iload_1
+      19: bipush        90
+      21: if_icmpgt     28
+      24: iconst_1
+      25: goto          29
+      28: iconst_0
+      29: ireturn
+
+  private boolean isdigit(int);
+    Code:
+       0: iload_1
+       1: bipush        48
+       3: if_icmplt     16
+       6: iload_1
+       7: bipush        57
+       9: if_icmpgt     16
+      12: iconst_1
+      13: goto          17
+      16: iconst_0
+      17: ireturn
+
+  private boolean isspace(int);
+    Code:
+       0: iload_1
+       1: bipush        32
+       3: if_icmpgt     10
+       6: iconst_1
+       7: goto          11
+      10: iconst_0
+      11: ireturn
+
+  public static se.krka.kahlua.vm.Prototype compile(int, java.io.Reader, java.lang.String, java.lang.String);
+    Code:
+       0: aload_2
+       1: ifnull        9
+       4: aload_2
+       5: astore_3
+       6: goto          24
+       9: ldc           #28                 // String stdin
+      11: astore_2
+      12: aload_3
+      13: bipush        80
+      15: invokestatic  #30                 // Method trim:(Ljava/lang/String;I)Ljava/lang/String;
+      18: invokedynamic #34,  0             // InvokeDynamic #1:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+      23: astore_3
+      24: new           #3                  // class org/luaj/kahluafork/compiler/LexState
+      27: dup
+      28: aload_1
+      29: iload_0
+      30: aload_3
+      31: invokespecial #35                 // Method "<init>":(Ljava/io/Reader;ILjava/lang/String;)V
+      34: astore        4
+      36: new           #39                 // class org/luaj/kahluafork/compiler/FuncState
+      39: dup
+      40: aload         4
+      42: invokespecial #41                 // Method org/luaj/kahluafork/compiler/FuncState."<init>":(Lorg/luaj/kahluafork/compiler/LexState;)V
+      45: astore        5
+      47: aload         5
+      49: iconst_2
+      50: putfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+      53: aload         5
+      55: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+      58: aload_2
+      59: invokevirtual #52                 // Method java/lang/String.intern:()Ljava/lang/String;
+      62: putfield      #56                 // Field se/krka/kahlua/vm/Prototype.name:Ljava/lang/String;
+      65: aload         4
+      67: invokevirtual #62                 // Method next:()V
+      70: aload         4
+      72: invokevirtual #66                 // Method chunk:()V
+      75: aload         4
+      77: sipush        287
+      80: invokevirtual #69                 // Method check:(I)V
+      83: aload         4
+      85: invokevirtual #73                 // Method close_func:()V
+      88: aload         5
+      90: getfield      #76                 // Field org/luaj/kahluafork/compiler/FuncState.prev:Lorg/luaj/kahluafork/compiler/FuncState;
+      93: ifnonnull     100
+      96: iconst_1
+      97: goto          101
+     100: iconst_0
+     101: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     104: aload         5
+     106: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+     109: getfield      #84                 // Field se/krka/kahlua/vm/Prototype.numUpvalues:I
+     112: ifne          119
+     115: iconst_1
+     116: goto          120
+     119: iconst_0
+     120: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     123: aload         4
+     125: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     128: ifnonnull     135
+     131: iconst_1
+     132: goto          136
+     135: iconst_0
+     136: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     139: aload         5
+     141: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+     144: areturn
+
+  public org.luaj.kahluafork.compiler.LexState(java.io.Reader, int, java.lang.String);
+    Code:
+       0: aload_0
+       1: invokespecial #90                 // Method java/lang/Object."<init>":()V
+       4: aload_0
+       5: new           #94                 // class org/luaj/kahluafork/compiler/Token
+       8: dup
+       9: invokespecial #96                 // Method org/luaj/kahluafork/compiler/Token."<init>":()V
+      12: putfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      15: aload_0
+      16: new           #94                 // class org/luaj/kahluafork/compiler/Token
+      19: dup
+      20: invokespecial #96                 // Method org/luaj/kahluafork/compiler/Token."<init>":()V
+      23: putfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+      26: aload_0
+      27: aload_1
+      28: putfield      #104                // Field z:Ljava/io/Reader;
+      31: aload_0
+      32: bipush        32
+      34: newarray       byte
+      36: putfield      #108                // Field buff:[B
+      39: aload_0
+      40: getfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+      43: sipush        287
+      46: putfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      49: aload_0
+      50: aconst_null
+      51: putfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      54: aload_0
+      55: iconst_1
+      56: putfield      #115                // Field linenumber:I
+      59: aload_0
+      60: iconst_1
+      61: putfield      #118                // Field lastline:I
+      64: aload_0
+      65: aload_3
+      66: putfield      #121                // Field source:Ljava/lang/String;
+      69: aload_0
+      70: iconst_0
+      71: putfield      #124                // Field nbuff:I
+      74: aload_0
+      75: iload_2
+      76: putfield      #127                // Field current:I
+      79: aload_0
+      80: invokevirtual #130                // Method skipShebang:()V
+      83: return
+
+  void nextChar();
+    Code:
+       0: aload_0
+       1: aload_0
+       2: getfield      #104                // Field z:Ljava/io/Reader;
+       5: invokevirtual #133                // Method java/io/Reader.read:()I
+       8: putfield      #127                // Field current:I
+      11: goto          24
+      14: astore_1
+      15: aload_1
+      16: invokevirtual #141                // Method java/io/IOException.printStackTrace:()V
+      19: aload_0
+      20: iconst_m1
+      21: putfield      #127                // Field current:I
+      24: return
+    Exception table:
+       from    to  target type
+           0    11    14   Class java/io/IOException
+
+  boolean currIsNewline();
+    Code:
+       0: aload_0
+       1: getfield      #127                // Field current:I
+       4: bipush        10
+       6: if_icmpeq     18
+       9: aload_0
+      10: getfield      #127                // Field current:I
+      13: bipush        13
+      15: if_icmpne     22
+      18: iconst_1
+      19: goto          23
+      22: iconst_0
+      23: ireturn
+
+  void save_and_next();
+    Code:
+       0: aload_0
+       1: aload_0
+       2: getfield      #127                // Field current:I
+       5: invokevirtual #144                // Method save:(I)V
+       8: aload_0
+       9: invokevirtual #147                // Method nextChar:()V
+      12: return
+
+  void save(int);
+    Code:
+       0: aload_0
+       1: getfield      #108                // Field buff:[B
+       4: ifnull        21
+       7: aload_0
+       8: getfield      #124                // Field nbuff:I
+      11: iconst_1
+      12: iadd
+      13: aload_0
+      14: getfield      #108                // Field buff:[B
+      17: arraylength
+      18: if_icmple     40
+      21: aload_0
+      22: aload_0
+      23: getfield      #108                // Field buff:[B
+      26: aload_0
+      27: getfield      #124                // Field nbuff:I
+      30: iconst_2
+      31: imul
+      32: iconst_1
+      33: iadd
+      34: invokestatic  #150                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([BI)[B
+      37: putfield      #108                // Field buff:[B
+      40: aload_0
+      41: getfield      #108                // Field buff:[B
+      44: aload_0
+      45: dup
+      46: getfield      #124                // Field nbuff:I
+      49: dup_x1
+      50: iconst_1
+      51: iadd
+      52: putfield      #124                // Field nbuff:I
+      55: iload_1
+      56: i2b
+      57: bastore
+      58: return
+
+  java.lang.String token2str(int);
+    Code:
+       0: iload_1
+       1: sipush        257
+       4: if_icmpge     29
+       7: iload_1
+       8: invokestatic  #154                // Method iscntrl:(I)Z
+      11: ifeq          23
+      14: iload_1
+      15: invokedynamic #158,  0            // InvokeDynamic #2:makeConcatWithConstants:(I)Ljava/lang/String;
+      20: goto          28
+      23: iload_1
+      24: i2c
+      25: invokestatic  #161                // Method java/lang/String.valueOf:(C)Ljava/lang/String;
+      28: areturn
+      29: getstatic     #164                // Field luaX_tokens:[Ljava/lang/String;
+      32: iload_1
+      33: sipush        257
+      36: isub
+      37: aaload
+      38: areturn
+
+  private static boolean iscntrl(int);
+    Code:
+       0: iload_0
+       1: bipush        32
+       3: if_icmpge     10
+       6: iconst_1
+       7: goto          11
+      10: iconst_0
+      11: ireturn
+
+  java.lang.String txtToken(int);
+    Code:
+       0: iload_1
+       1: tableswitch   { // 284 to 286
+                   284: 28
+                   285: 28
+                   286: 28
+               default: 45
+          }
+      28: new           #10                 // class java/lang/String
+      31: dup
+      32: aload_0
+      33: getfield      #108                // Field buff:[B
+      36: iconst_0
+      37: aload_0
+      38: getfield      #124                // Field nbuff:I
+      41: invokespecial #168                // Method java/lang/String."<init>":([BII)V
+      44: areturn
+      45: aload_0
+      46: iload_1
+      47: invokevirtual #171                // Method token2str:(I)Ljava/lang/String;
+      50: areturn
+
+  void lexerror(java.lang.String, int);
+    Code:
+       0: aload_0
+       1: getfield      #121                // Field source:Ljava/lang/String;
+       4: astore_3
+       5: iload_2
+       6: ifeq          30
+       9: aload_3
+      10: aload_0
+      11: getfield      #115                // Field linenumber:I
+      14: aload_1
+      15: aload_0
+      16: iload_2
+      17: invokevirtual #174                // Method txtToken:(I)Ljava/lang/String;
+      20: invokedynamic #177,  0            // InvokeDynamic #3:makeConcatWithConstants:(Ljava/lang/String;ILjava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+      25: astore        4
+      27: goto          43
+      30: aload_3
+      31: aload_0
+      32: getfield      #115                // Field linenumber:I
+      35: aload_1
+      36: invokedynamic #180,  0            // InvokeDynamic #4:makeConcatWithConstants:(Ljava/lang/String;ILjava/lang/String;)Ljava/lang/String;
+      41: astore        4
+      43: new           #183                // class se/krka/kahlua/vm/KahluaException
+      46: dup
+      47: aload         4
+      49: aload_3
+      50: aload_0
+      51: getfield      #115                // Field linenumber:I
+      54: invokespecial #185                // Method se/krka/kahlua/vm/KahluaException."<init>":(Ljava/lang/Object;Ljava/lang/String;I)V
+      57: athrow
+
+  private static java.lang.String trim(java.lang.String, int);
+    Code:
+       0: aload_0
+       1: invokevirtual #188                // Method java/lang/String.length:()I
+       4: iload_1
+       5: if_icmple     22
+       8: aload_0
+       9: iconst_0
+      10: iload_1
+      11: iconst_3
+      12: isub
+      13: invokevirtual #191                // Method java/lang/String.substring:(II)Ljava/lang/String;
+      16: invokedynamic #195,  0            // InvokeDynamic #5:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+      21: areturn
+      22: aload_0
+      23: areturn
+
+  void syntaxerror(java.lang.String);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_0
+       3: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+       6: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+       9: invokevirtual #196                // Method lexerror:(Ljava/lang/String;I)V
+      12: return
+
+  java.lang.String newstring(byte[], int, int);
+    Code:
+       0: new           #10                 // class java/lang/String
+       3: dup
+       4: aload_1
+       5: iload_2
+       6: iload_3
+       7: ldc           #200                // String UTF-8
+       9: invokespecial #202                // Method java/lang/String."<init>":([BIILjava/lang/String;)V
+      12: astore        4
+      14: aload         4
+      16: invokevirtual #52                 // Method java/lang/String.intern:()Ljava/lang/String;
+      19: areturn
+      20: astore        4
+      22: aconst_null
+      23: areturn
+    Exception table:
+       from    to  target type
+           0    19    20   Class java/io/UnsupportedEncodingException
+
+  void inclinenumber();
+    Code:
+       0: aload_0
+       1: getfield      #127                // Field current:I
+       4: istore_1
+       5: aload_0
+       6: invokevirtual #207                // Method currIsNewline:()Z
+       9: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+      12: aload_0
+      13: invokevirtual #147                // Method nextChar:()V
+      16: aload_0
+      17: invokevirtual #207                // Method currIsNewline:()Z
+      20: ifeq          35
+      23: aload_0
+      24: getfield      #127                // Field current:I
+      27: iload_1
+      28: if_icmpeq     35
+      31: aload_0
+      32: invokevirtual #147                // Method nextChar:()V
+      35: aload_0
+      36: dup
+      37: getfield      #115                // Field linenumber:I
+      40: iconst_1
+      41: iadd
+      42: dup_x1
+      43: putfield      #115                // Field linenumber:I
+      46: ldc           #211                // int 2147483645
+      48: if_icmplt     57
+      51: aload_0
+      52: ldc           #212                // String chunk has too many lines
+      54: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+      57: return
+
+  private void skipShebang();
+    Code:
+       0: aload_0
+       1: getfield      #127                // Field current:I
+       4: bipush        35
+       6: if_icmpne     31
+       9: aload_0
+      10: invokevirtual #207                // Method currIsNewline:()Z
+      13: ifne          31
+      16: aload_0
+      17: getfield      #127                // Field current:I
+      20: iconst_m1
+      21: if_icmpeq     31
+      24: aload_0
+      25: invokevirtual #147                // Method nextChar:()V
+      28: goto          9
+      31: return
+
+  boolean check_next(java.lang.String);
+    Code:
+       0: aload_1
+       1: aload_0
+       2: getfield      #127                // Field current:I
+       5: invokevirtual #218                // Method java/lang/String.indexOf:(I)I
+       8: ifge          13
+      11: iconst_0
+      12: ireturn
+      13: aload_0
+      14: invokevirtual #222                // Method save_and_next:()V
+      17: iconst_1
+      18: ireturn
+
+  void str2d(java.lang.String, org.luaj.kahluafork.compiler.Token);
+    Code:
+       0: aload_1
+       1: ldc           #225                // String 0x
+       3: invokevirtual #227                // Method java/lang/String.startsWith:(Ljava/lang/String;)Z
+       6: ifeq          24
+       9: aload_1
+      10: iconst_2
+      11: invokevirtual #231                // Method java/lang/String.substring:(I)Ljava/lang/String;
+      14: bipush        16
+      16: invokestatic  #233                // Method java/lang/Long.parseLong:(Ljava/lang/String;I)J
+      19: l2d
+      20: dstore_3
+      21: goto          29
+      24: aload_1
+      25: invokestatic  #239                // Method java/lang/Double.parseDouble:(Ljava/lang/String;)D
+      28: dstore_3
+      29: aload_2
+      30: dload_3
+      31: putfield      #245                // Field org/luaj/kahluafork/compiler/Token.r:D
+      34: goto          47
+      37: astore_3
+      38: aload_0
+      39: ldc           #251                // String malformed number
+      41: sipush        284
+      44: invokevirtual #196                // Method lexerror:(Ljava/lang/String;I)V
+      47: return
+    Exception table:
+       from    to  target type
+           0    34    37   Class java/lang/NumberFormatException
+
+  void read_numeral(org.luaj.kahluafork.compiler.Token);
+    Code:
+       0: aload_0
+       1: aload_0
+       2: getfield      #127                // Field current:I
+       5: invokevirtual #253                // Method isdigit:(I)Z
+       8: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+      11: aload_0
+      12: invokevirtual #222                // Method save_and_next:()V
+      15: aload_0
+      16: aload_0
+      17: getfield      #127                // Field current:I
+      20: invokevirtual #253                // Method isdigit:(I)Z
+      23: ifne          11
+      26: aload_0
+      27: getfield      #127                // Field current:I
+      30: bipush        46
+      32: if_icmpeq     11
+      35: aload_0
+      36: ldc_w         #256                // String Ee
+      39: invokevirtual #258                // Method check_next:(Ljava/lang/String;)Z
+      42: ifeq          53
+      45: aload_0
+      46: ldc_w         #261                // String +-
+      49: invokevirtual #258                // Method check_next:(Ljava/lang/String;)Z
+      52: pop
+      53: aload_0
+      54: aload_0
+      55: getfield      #127                // Field current:I
+      58: invokevirtual #263                // Method isalnum:(I)Z
+      61: ifne          73
+      64: aload_0
+      65: getfield      #127                // Field current:I
+      68: bipush        95
+      70: if_icmpne     80
+      73: aload_0
+      74: invokevirtual #222                // Method save_and_next:()V
+      77: goto          53
+      80: new           #10                 // class java/lang/String
+      83: dup
+      84: aload_0
+      85: getfield      #108                // Field buff:[B
+      88: iconst_0
+      89: aload_0
+      90: getfield      #124                // Field nbuff:I
+      93: invokespecial #168                // Method java/lang/String."<init>":([BII)V
+      96: astore_2
+      97: aload_0
+      98: aload_2
+      99: aload_1
+     100: invokevirtual #266                // Method str2d:(Ljava/lang/String;Lorg/luaj/kahluafork/compiler/Token;)V
+     103: return
+
+  int skip_sep();
+    Code:
+       0: iconst_0
+       1: istore_1
+       2: aload_0
+       3: getfield      #127                // Field current:I
+       6: istore_2
+       7: iload_2
+       8: bipush        91
+      10: if_icmpeq     19
+      13: iload_2
+      14: bipush        93
+      16: if_icmpne     23
+      19: iconst_1
+      20: goto          24
+      23: iconst_0
+      24: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+      27: aload_0
+      28: invokevirtual #222                // Method save_and_next:()V
+      31: aload_0
+      32: getfield      #127                // Field current:I
+      35: bipush        61
+      37: if_icmpne     50
+      40: aload_0
+      41: invokevirtual #222                // Method save_and_next:()V
+      44: iinc          1, 1
+      47: goto          31
+      50: aload_0
+      51: getfield      #127                // Field current:I
+      54: iload_2
+      55: if_icmpne     62
+      58: iload_1
+      59: goto          66
+      62: iload_1
+      63: ineg
+      64: iconst_1
+      65: isub
+      66: ireturn
+
+  void read_long_string(org.luaj.kahluafork.compiler.Token, int);
+    Code:
+       0: iconst_0
+       1: istore_3
+       2: aload_0
+       3: invokevirtual #222                // Method save_and_next:()V
+       6: aload_0
+       7: invokevirtual #207                // Method currIsNewline:()Z
+      10: ifeq          17
+      13: aload_0
+      14: invokevirtual #270                // Method inclinenumber:()V
+      17: iconst_0
+      18: istore        4
+      20: iload         4
+      22: ifne          179
+      25: aload_0
+      26: getfield      #127                // Field current:I
+      29: lookupswitch  { // 5
+                    -1: 80
+                    10: 139
+                    13: 139
+                    91: 103
+                    93: 121
+               default: 161
+          }
+      80: aload_0
+      81: aload_1
+      82: ifnull        91
+      85: ldc_w         #273                // String unfinished long string
+      88: goto          94
+      91: ldc_w         #275                // String unfinished long comment
+      94: sipush        287
+      97: invokevirtual #196                // Method lexerror:(Ljava/lang/String;I)V
+     100: goto          20
+     103: aload_0
+     104: invokevirtual #277                // Method skip_sep:()I
+     107: iload_2
+     108: if_icmpne     20
+     111: aload_0
+     112: invokevirtual #222                // Method save_and_next:()V
+     115: iinc          3, 1
+     118: goto          20
+     121: aload_0
+     122: invokevirtual #277                // Method skip_sep:()I
+     125: iload_2
+     126: if_icmpne     20
+     129: aload_0
+     130: invokevirtual #222                // Method save_and_next:()V
+     133: iconst_1
+     134: istore        4
+     136: goto          20
+     139: aload_0
+     140: bipush        10
+     142: invokevirtual #144                // Method save:(I)V
+     145: aload_0
+     146: invokevirtual #270                // Method inclinenumber:()V
+     149: aload_1
+     150: ifnonnull     20
+     153: aload_0
+     154: iconst_0
+     155: putfield      #124                // Field nbuff:I
+     158: goto          20
+     161: aload_1
+     162: ifnull        172
+     165: aload_0
+     166: invokevirtual #222                // Method save_and_next:()V
+     169: goto          20
+     172: aload_0
+     173: invokevirtual #147                // Method nextChar:()V
+     176: goto          20
+     179: aload_1
+     180: ifnull        208
+     183: aload_1
+     184: aload_0
+     185: aload_0
+     186: getfield      #108                // Field buff:[B
+     189: iconst_2
+     190: iload_2
+     191: iadd
+     192: aload_0
+     193: getfield      #124                // Field nbuff:I
+     196: iconst_2
+     197: iconst_2
+     198: iload_2
+     199: iadd
+     200: imul
+     201: isub
+     202: invokevirtual #280                // Method newstring:([BII)Ljava/lang/String;
+     205: putfield      #284                // Field org/luaj/kahluafork/compiler/Token.ts:Ljava/lang/String;
+     208: return
+
+  void read_string(int, org.luaj.kahluafork.compiler.Token);
+    Code:
+       0: aload_0
+       1: invokevirtual #222                // Method save_and_next:()V
+       4: aload_0
+       5: getfield      #127                // Field current:I
+       8: iload_1
+       9: if_icmpeq     346
+      12: aload_0
+      13: getfield      #127                // Field current:I
+      16: lookupswitch  { // 4
+                    -1: 60
+                    10: 73
+                    13: 73
+                    92: 86
+               default: 339
+          }
+      60: aload_0
+      61: ldc_w         #287                // String unfinished string
+      64: sipush        287
+      67: invokevirtual #196                // Method lexerror:(Ljava/lang/String;I)V
+      70: goto          4
+      73: aload_0
+      74: ldc_w         #287                // String unfinished string
+      77: sipush        286
+      80: invokevirtual #196                // Method lexerror:(Ljava/lang/String;I)V
+      83: goto          4
+      86: aload_0
+      87: invokevirtual #147                // Method nextChar:()V
+      90: aload_0
+      91: getfield      #127                // Field current:I
+      94: lookupswitch  { // 10
+                    -1: 239
+                    10: 226
+                    13: 226
+                    97: 184
+                    98: 190
+                   102: 196
+                   110: 202
+                   114: 208
+                   116: 214
+                   118: 220
+               default: 242
+          }
+     184: bipush        7
+     186: istore_3
+     187: goto          327
+     190: bipush        8
+     192: istore_3
+     193: goto          327
+     196: bipush        12
+     198: istore_3
+     199: goto          327
+     202: bipush        10
+     204: istore_3
+     205: goto          327
+     208: bipush        13
+     210: istore_3
+     211: goto          327
+     214: bipush        9
+     216: istore_3
+     217: goto          327
+     220: bipush        11
+     222: istore_3
+     223: goto          327
+     226: aload_0
+     227: bipush        10
+     229: invokevirtual #144                // Method save:(I)V
+     232: aload_0
+     233: invokevirtual #270                // Method inclinenumber:()V
+     236: goto          4
+     239: goto          4
+     242: aload_0
+     243: aload_0
+     244: getfield      #127                // Field current:I
+     247: invokevirtual #253                // Method isdigit:(I)Z
+     250: ifne          260
+     253: aload_0
+     254: invokevirtual #222                // Method save_and_next:()V
+     257: goto          4
+     260: iconst_0
+     261: istore        4
+     263: iconst_0
+     264: istore_3
+     265: bipush        10
+     267: iload_3
+     268: imul
+     269: aload_0
+     270: getfield      #127                // Field current:I
+     273: iadd
+     274: bipush        48
+     276: isub
+     277: istore_3
+     278: aload_0
+     279: invokevirtual #147                // Method nextChar:()V
+     282: iinc          4, 1
+     285: iload         4
+     287: iconst_3
+     288: if_icmpge     302
+     291: aload_0
+     292: aload_0
+     293: getfield      #127                // Field current:I
+     296: invokevirtual #253                // Method isdigit:(I)Z
+     299: ifne          265
+     302: iload_3
+     303: sipush        255
+     306: if_icmple     319
+     309: aload_0
+     310: ldc_w         #289                // String escape sequence too large
+     313: sipush        286
+     316: invokevirtual #196                // Method lexerror:(Ljava/lang/String;I)V
+     319: aload_0
+     320: iload_3
+     321: invokevirtual #144                // Method save:(I)V
+     324: goto          4
+     327: aload_0
+     328: iload_3
+     329: invokevirtual #144                // Method save:(I)V
+     332: aload_0
+     333: invokevirtual #147                // Method nextChar:()V
+     336: goto          4
+     339: aload_0
+     340: invokevirtual #222                // Method save_and_next:()V
+     343: goto          4
+     346: aload_0
+     347: invokevirtual #222                // Method save_and_next:()V
+     350: aload_2
+     351: aload_0
+     352: aload_0
+     353: getfield      #108                // Field buff:[B
+     356: iconst_1
+     357: aload_0
+     358: getfield      #124                // Field nbuff:I
+     361: iconst_2
+     362: isub
+     363: invokevirtual #280                // Method newstring:([BII)Ljava/lang/String;
+     366: putfield      #284                // Field org/luaj/kahluafork/compiler/Token.ts:Ljava/lang/String;
+     369: return
+
+  int llex(org.luaj.kahluafork.compiler.Token);
+    Code:
+       0: aload_0
+       1: iconst_0
+       2: putfield      #124                // Field nbuff:I
+       5: aload_0
+       6: getfield      #127                // Field current:I
+       9: lookupswitch  { // 12
+                    -1: 403
+                    10: 116
+                    13: 116
+                    34: 335
+                    39: 335
+                    45: 123
+                    46: 348
+                    60: 263
+                    61: 239
+                    62: 287
+                    91: 202
+                   126: 311
+               default: 407
+          }
+     116: aload_0
+     117: invokevirtual #270                // Method inclinenumber:()V
+     120: goto          5
+     123: aload_0
+     124: invokevirtual #147                // Method nextChar:()V
+     127: aload_0
+     128: getfield      #127                // Field current:I
+     131: bipush        45
+     133: if_icmpeq     139
+     136: bipush        45
+     138: ireturn
+     139: aload_0
+     140: invokevirtual #147                // Method nextChar:()V
+     143: aload_0
+     144: getfield      #127                // Field current:I
+     147: bipush        91
+     149: if_icmpne     180
+     152: aload_0
+     153: invokevirtual #277                // Method skip_sep:()I
+     156: istore_2
+     157: aload_0
+     158: iconst_0
+     159: putfield      #124                // Field nbuff:I
+     162: iload_2
+     163: iflt          180
+     166: aload_0
+     167: aconst_null
+     168: iload_2
+     169: invokevirtual #291                // Method read_long_string:(Lorg/luaj/kahluafork/compiler/Token;I)V
+     172: aload_0
+     173: iconst_0
+     174: putfield      #124                // Field nbuff:I
+     177: goto          5
+     180: aload_0
+     181: invokevirtual #207                // Method currIsNewline:()Z
+     184: ifne          5
+     187: aload_0
+     188: getfield      #127                // Field current:I
+     191: iconst_m1
+     192: if_icmpeq     5
+     195: aload_0
+     196: invokevirtual #147                // Method nextChar:()V
+     199: goto          180
+     202: aload_0
+     203: invokevirtual #277                // Method skip_sep:()I
+     206: istore_2
+     207: iload_2
+     208: iflt          221
+     211: aload_0
+     212: aload_1
+     213: iload_2
+     214: invokevirtual #291                // Method read_long_string:(Lorg/luaj/kahluafork/compiler/Token;I)V
+     217: sipush        286
+     220: ireturn
+     221: iload_2
+     222: iconst_m1
+     223: if_icmpne     229
+     226: bipush        91
+     228: ireturn
+     229: aload_0
+     230: ldc_w         #295                // String invalid long string delimiter
+     233: sipush        286
+     236: invokevirtual #196                // Method lexerror:(Ljava/lang/String;I)V
+     239: aload_0
+     240: invokevirtual #147                // Method nextChar:()V
+     243: aload_0
+     244: getfield      #127                // Field current:I
+     247: bipush        61
+     249: if_icmpeq     255
+     252: bipush        61
+     254: ireturn
+     255: aload_0
+     256: invokevirtual #147                // Method nextChar:()V
+     259: sipush        280
+     262: ireturn
+     263: aload_0
+     264: invokevirtual #147                // Method nextChar:()V
+     267: aload_0
+     268: getfield      #127                // Field current:I
+     271: bipush        61
+     273: if_icmpeq     279
+     276: bipush        60
+     278: ireturn
+     279: aload_0
+     280: invokevirtual #147                // Method nextChar:()V
+     283: sipush        282
+     286: ireturn
+     287: aload_0
+     288: invokevirtual #147                // Method nextChar:()V
+     291: aload_0
+     292: getfield      #127                // Field current:I
+     295: bipush        61
+     297: if_icmpeq     303
+     300: bipush        62
+     302: ireturn
+     303: aload_0
+     304: invokevirtual #147                // Method nextChar:()V
+     307: sipush        281
+     310: ireturn
+     311: aload_0
+     312: invokevirtual #147                // Method nextChar:()V
+     315: aload_0
+     316: getfield      #127                // Field current:I
+     319: bipush        61
+     321: if_icmpeq     327
+     324: bipush        126
+     326: ireturn
+     327: aload_0
+     328: invokevirtual #147                // Method nextChar:()V
+     331: sipush        283
+     334: ireturn
+     335: aload_0
+     336: aload_0
+     337: getfield      #127                // Field current:I
+     340: aload_1
+     341: invokevirtual #297                // Method read_string:(ILorg/luaj/kahluafork/compiler/Token;)V
+     344: sipush        286
+     347: ireturn
+     348: aload_0
+     349: invokevirtual #222                // Method save_and_next:()V
+     352: aload_0
+     353: ldc_w         #301                // String .
+     356: invokevirtual #258                // Method check_next:(Ljava/lang/String;)Z
+     359: ifeq          380
+     362: aload_0
+     363: ldc_w         #301                // String .
+     366: invokevirtual #258                // Method check_next:(Ljava/lang/String;)Z
+     369: ifeq          376
+     372: sipush        279
+     375: ireturn
+     376: sipush        278
+     379: ireturn
+     380: aload_0
+     381: aload_0
+     382: getfield      #127                // Field current:I
+     385: invokevirtual #253                // Method isdigit:(I)Z
+     388: ifne          394
+     391: bipush        46
+     393: ireturn
+     394: aload_0
+     395: aload_1
+     396: invokevirtual #303                // Method read_numeral:(Lorg/luaj/kahluafork/compiler/Token;)V
+     399: sipush        284
+     402: ireturn
+     403: sipush        287
+     406: ireturn
+     407: aload_0
+     408: aload_0
+     409: getfield      #127                // Field current:I
+     412: invokevirtual #307                // Method isspace:(I)Z
+     415: ifeq          440
+     418: aload_0
+     419: invokevirtual #207                // Method currIsNewline:()Z
+     422: ifne          429
+     425: iconst_1
+     426: goto          430
+     429: iconst_0
+     430: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     433: aload_0
+     434: invokevirtual #147                // Method nextChar:()V
+     437: goto          5
+     440: aload_0
+     441: aload_0
+     442: getfield      #127                // Field current:I
+     445: invokevirtual #253                // Method isdigit:(I)Z
+     448: ifeq          460
+     451: aload_0
+     452: aload_1
+     453: invokevirtual #303                // Method read_numeral:(Lorg/luaj/kahluafork/compiler/Token;)V
+     456: sipush        284
+     459: ireturn
+     460: aload_0
+     461: aload_0
+     462: getfield      #127                // Field current:I
+     465: invokevirtual #310                // Method isalpha:(I)Z
+     468: ifne          480
+     471: aload_0
+     472: getfield      #127                // Field current:I
+     475: bipush        95
+     477: if_icmpne     551
+     480: aload_0
+     481: invokevirtual #222                // Method save_and_next:()V
+     484: aload_0
+     485: aload_0
+     486: getfield      #127                // Field current:I
+     489: invokevirtual #263                // Method isalnum:(I)Z
+     492: ifne          480
+     495: aload_0
+     496: getfield      #127                // Field current:I
+     499: bipush        95
+     501: if_icmpeq     480
+     504: aload_0
+     505: aload_0
+     506: getfield      #108                // Field buff:[B
+     509: iconst_0
+     510: aload_0
+     511: getfield      #124                // Field nbuff:I
+     514: invokevirtual #280                // Method newstring:([BII)Ljava/lang/String;
+     517: astore_2
+     518: getstatic     #313                // Field RESERVED:Ljava/util/Hashtable;
+     521: aload_2
+     522: invokevirtual #22                 // Method java/util/Hashtable.containsKey:(Ljava/lang/Object;)Z
+     525: ifeq          542
+     528: getstatic     #313                // Field RESERVED:Ljava/util/Hashtable;
+     531: aload_2
+     532: invokevirtual #316                // Method java/util/Hashtable.get:(Ljava/lang/Object;)Ljava/lang/Object;
+     535: checkcast     #1                  // class java/lang/Integer
+     538: invokevirtual #320                // Method java/lang/Integer.intValue:()I
+     541: ireturn
+     542: aload_1
+     543: aload_2
+     544: putfield      #284                // Field org/luaj/kahluafork/compiler/Token.ts:Ljava/lang/String;
+     547: sipush        285
+     550: ireturn
+     551: aload_0
+     552: getfield      #127                // Field current:I
+     555: istore_2
+     556: aload_0
+     557: invokevirtual #147                // Method nextChar:()V
+     560: iload_2
+     561: ireturn
+
+  void next();
+    Code:
+       0: aload_0
+       1: aload_0
+       2: getfield      #115                // Field linenumber:I
+       5: putfield      #118                // Field lastline:I
+       8: aload_0
+       9: getfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+      12: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      15: sipush        287
+      18: if_icmpeq     45
+      21: aload_0
+      22: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      25: aload_0
+      26: getfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+      29: invokevirtual #323                // Method org/luaj/kahluafork/compiler/Token.set:(Lorg/luaj/kahluafork/compiler/Token;)V
+      32: aload_0
+      33: getfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+      36: sipush        287
+      39: putfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      42: goto          60
+      45: aload_0
+      46: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      49: aload_0
+      50: aload_0
+      51: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      54: invokevirtual #326                // Method llex:(Lorg/luaj/kahluafork/compiler/Token;)I
+      57: putfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      60: return
+
+  void lookahead();
+    Code:
+       0: aload_0
+       1: getfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+       4: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+       7: sipush        287
+      10: if_icmpne     17
+      13: iconst_1
+      14: goto          18
+      17: iconst_0
+      18: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+      21: aload_0
+      22: getfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+      25: aload_0
+      26: aload_0
+      27: getfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+      30: invokevirtual #326                // Method llex:(Lorg/luaj/kahluafork/compiler/Token;)I
+      33: putfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      36: return
+
+  boolean hasmultret(int);
+    Code:
+       0: iload_1
+       1: bipush        13
+       3: if_icmpeq     12
+       6: iload_1
+       7: bipush        14
+       9: if_icmpne     16
+      12: iconst_1
+      13: goto          17
+      16: iconst_0
+      17: ireturn
+
+  void error_expected(int);
+    Code:
+       0: aload_0
+       1: aload_0
+       2: iload_1
+       3: invokevirtual #171                // Method token2str:(I)Ljava/lang/String;
+       6: invokestatic  #15                 // Method LUA_QS:(Ljava/lang/String;)Ljava/lang/String;
+       9: invokedynamic #330,  0            // InvokeDynamic #6:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+      14: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+      17: return
+
+  boolean testnext(int);
+    Code:
+       0: aload_0
+       1: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+       4: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+       7: iload_1
+       8: if_icmpne     17
+      11: aload_0
+      12: invokevirtual #62                 // Method next:()V
+      15: iconst_1
+      16: ireturn
+      17: iconst_0
+      18: ireturn
+
+  void check(int);
+    Code:
+       0: aload_0
+       1: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+       4: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+       7: iload_1
+       8: if_icmpeq     16
+      11: aload_0
+      12: iload_1
+      13: invokevirtual #331                // Method error_expected:(I)V
+      16: return
+
+  void checknext(int);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: invokevirtual #69                 // Method check:(I)V
+       5: aload_0
+       6: invokevirtual #62                 // Method next:()V
+       9: return
+
+  void check_condition(boolean, java.lang.String);
+    Code:
+       0: iload_1
+       1: ifne          9
+       4: aload_0
+       5: aload_2
+       6: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+       9: return
+
+  void check_match(int, int, int);
+    Code:
+       0: aload_0
+       1: iload_1
+       2: invokevirtual #334                // Method testnext:(I)Z
+       5: ifne          50
+       8: iload_3
+       9: aload_0
+      10: getfield      #115                // Field linenumber:I
+      13: if_icmpne     24
+      16: aload_0
+      17: iload_1
+      18: invokevirtual #331                // Method error_expected:(I)V
+      21: goto          50
+      24: aload_0
+      25: aload_0
+      26: iload_1
+      27: invokevirtual #171                // Method token2str:(I)Ljava/lang/String;
+      30: invokestatic  #15                 // Method LUA_QS:(Ljava/lang/String;)Ljava/lang/String;
+      33: aload_0
+      34: iload_2
+      35: invokevirtual #171                // Method token2str:(I)Ljava/lang/String;
+      38: invokestatic  #15                 // Method LUA_QS:(Ljava/lang/String;)Ljava/lang/String;
+      41: iload_3
+      42: invokedynamic #337,  0            // InvokeDynamic #7:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;I)Ljava/lang/String;
+      47: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+      50: return
+
+  java.lang.String str_checkname();
+    Code:
+       0: aload_0
+       1: sipush        285
+       4: invokevirtual #69                 // Method check:(I)V
+       7: aload_0
+       8: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      11: getfield      #284                // Field org/luaj/kahluafork/compiler/Token.ts:Ljava/lang/String;
+      14: astore_1
+      15: aload_0
+      16: invokevirtual #62                 // Method next:()V
+      19: aload_1
+      20: areturn
+
+  void codestring(org.luaj.kahluafork.compiler.ExpDesc, java.lang.String);
+    Code:
+       0: aload_1
+       1: iconst_4
+       2: aload_0
+       3: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       6: aload_2
+       7: invokevirtual #340                // Method org/luaj/kahluafork/compiler/FuncState.stringK:(Ljava/lang/String;)I
+      10: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+      13: return
+
+  void checkname(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_0
+       3: invokevirtual #350                // Method str_checkname:()Ljava/lang/String;
+       6: invokevirtual #353                // Method codestring:(Lorg/luaj/kahluafork/compiler/ExpDesc;Ljava/lang/String;)V
+       9: return
+
+  int registerlocalvar(java.lang.String);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: aload_2
+       6: getfield      #357                // Field org/luaj/kahluafork/compiler/FuncState.locvars:[Ljava/lang/String;
+       9: ifnull        26
+      12: aload_2
+      13: getfield      #360                // Field org/luaj/kahluafork/compiler/FuncState.nlocvars:I
+      16: iconst_1
+      17: iadd
+      18: aload_2
+      19: getfield      #357                // Field org/luaj/kahluafork/compiler/FuncState.locvars:[Ljava/lang/String;
+      22: arraylength
+      23: if_icmple     45
+      26: aload_2
+      27: aload_2
+      28: getfield      #357                // Field org/luaj/kahluafork/compiler/FuncState.locvars:[Ljava/lang/String;
+      31: aload_2
+      32: getfield      #360                // Field org/luaj/kahluafork/compiler/FuncState.nlocvars:I
+      35: iconst_2
+      36: imul
+      37: iconst_1
+      38: iadd
+      39: invokestatic  #363                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([Ljava/lang/String;I)[Ljava/lang/String;
+      42: putfield      #357                // Field org/luaj/kahluafork/compiler/FuncState.locvars:[Ljava/lang/String;
+      45: aload_2
+      46: getfield      #357                // Field org/luaj/kahluafork/compiler/FuncState.locvars:[Ljava/lang/String;
+      49: aload_2
+      50: getfield      #360                // Field org/luaj/kahluafork/compiler/FuncState.nlocvars:I
+      53: aload_1
+      54: aastore
+      55: aload_2
+      56: dup
+      57: getfield      #360                // Field org/luaj/kahluafork/compiler/FuncState.nlocvars:I
+      60: dup_x1
+      61: iconst_1
+      62: iadd
+      63: putfield      #360                // Field org/luaj/kahluafork/compiler/FuncState.nlocvars:I
+      66: ireturn
+
+  void new_localvarliteral(java.lang.String, int);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iload_2
+       3: invokevirtual #366                // Method new_localvar:(Ljava/lang/String;I)V
+       6: return
+
+  void new_localvar(java.lang.String, int, int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore        4
+       6: aload         4
+       8: aload         4
+      10: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      13: iload_2
+      14: iadd
+      15: iconst_1
+      16: iadd
+      17: sipush        200
+      20: ldc_w         #372                // String local variables
+      23: invokevirtual #374                // Method org/luaj/kahluafork/compiler/FuncState.checklimit:(IILjava/lang/String;)V
+      26: aload         4
+      28: getfield      #378                // Field org/luaj/kahluafork/compiler/FuncState.actvar:[S
+      31: aload         4
+      33: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      36: iload_2
+      37: iadd
+      38: aload_0
+      39: aload_1
+      40: invokevirtual #382                // Method registerlocalvar:(Ljava/lang/String;)I
+      43: i2s
+      44: sastore
+      45: getstatic     #385                // Field zombie/core/Core.debug:Z
+      48: ifeq          102
+      51: aload         4
+      53: getfield      #391                // Field org/luaj/kahluafork/compiler/FuncState.actvarline:[I
+      56: aload         4
+      58: getfield      #378                // Field org/luaj/kahluafork/compiler/FuncState.actvar:[S
+      61: aload         4
+      63: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      66: iload_2
+      67: iadd
+      68: saload
+      69: aload_0
+      70: getfield      #115                // Field linenumber:I
+      73: iastore
+      74: aload         4
+      76: aload         4
+      78: getfield      #395                // Field org/luaj/kahluafork/compiler/FuncState.nactvarline:I
+      81: aload         4
+      83: getfield      #378                // Field org/luaj/kahluafork/compiler/FuncState.actvar:[S
+      86: aload         4
+      88: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      91: iload_2
+      92: iadd
+      93: saload
+      94: iconst_1
+      95: iadd
+      96: invokestatic  #398                // Method java/lang/Math.max:(II)I
+      99: putfield      #395                // Field org/luaj/kahluafork/compiler/FuncState.nactvarline:I
+     102: return
+
+  void new_localvar(java.lang.String, int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_3
+       5: aload_3
+       6: aload_3
+       7: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      10: iload_2
+      11: iadd
+      12: iconst_1
+      13: iadd
+      14: sipush        200
+      17: ldc_w         #372                // String local variables
+      20: invokevirtual #374                // Method org/luaj/kahluafork/compiler/FuncState.checklimit:(IILjava/lang/String;)V
+      23: aload_3
+      24: getfield      #378                // Field org/luaj/kahluafork/compiler/FuncState.actvar:[S
+      27: aload_3
+      28: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      31: iload_2
+      32: iadd
+      33: aload_0
+      34: aload_1
+      35: invokevirtual #382                // Method registerlocalvar:(Ljava/lang/String;)I
+      38: i2s
+      39: sastore
+      40: getstatic     #385                // Field zombie/core/Core.debug:Z
+      43: ifeq          90
+      46: aload_3
+      47: getfield      #391                // Field org/luaj/kahluafork/compiler/FuncState.actvarline:[I
+      50: aload_3
+      51: getfield      #378                // Field org/luaj/kahluafork/compiler/FuncState.actvar:[S
+      54: aload_3
+      55: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      58: iload_2
+      59: iadd
+      60: saload
+      61: aload_0
+      62: getfield      #115                // Field linenumber:I
+      65: iastore
+      66: aload_3
+      67: aload_3
+      68: getfield      #395                // Field org/luaj/kahluafork/compiler/FuncState.nactvarline:I
+      71: aload_3
+      72: getfield      #378                // Field org/luaj/kahluafork/compiler/FuncState.actvar:[S
+      75: aload_3
+      76: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      79: iload_2
+      80: iadd
+      81: saload
+      82: iconst_1
+      83: iadd
+      84: invokestatic  #398                // Method java/lang/Math.max:(II)I
+      87: putfield      #395                // Field org/luaj/kahluafork/compiler/FuncState.nactvarline:I
+      90: return
+
+  void adjustlocalvars(int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: aload_2
+       6: aload_2
+       7: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      10: iload_1
+      11: iadd
+      12: putfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      15: return
+
+  void removevars(int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: aload_2
+       6: iload_1
+       7: putfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      10: return
+
+  void singlevar(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: invokevirtual #350                // Method str_checkname:()Ljava/lang/String;
+       4: astore_2
+       5: aload_0
+       6: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       9: astore_3
+      10: aload_3
+      11: aload_2
+      12: aload_1
+      13: iconst_1
+      14: invokevirtual #404                // Method org/luaj/kahluafork/compiler/FuncState.singlevaraux:(Ljava/lang/String;Lorg/luaj/kahluafork/compiler/ExpDesc;I)I
+      17: bipush        8
+      19: if_icmpne     31
+      22: aload_1
+      23: aload_3
+      24: aload_2
+      25: invokevirtual #340                // Method org/luaj/kahluafork/compiler/FuncState.stringK:(Ljava/lang/String;)I
+      28: putfield      #408                // Field org/luaj/kahluafork/compiler/ExpDesc.info:I
+      31: return
+
+  void adjust_assign(int, int, org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore        4
+       6: iload_1
+       7: iload_2
+       8: isub
+       9: istore        5
+      11: aload_0
+      12: aload_3
+      13: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      16: invokevirtual #414                // Method hasmultret:(I)Z
+      19: ifeq          59
+      22: iinc          5, 1
+      25: iload         5
+      27: ifge          33
+      30: iconst_0
+      31: istore        5
+      33: aload         4
+      35: aload_3
+      36: iload         5
+      38: invokevirtual #417                // Method org/luaj/kahluafork/compiler/FuncState.setreturns:(Lorg/luaj/kahluafork/compiler/ExpDesc;I)V
+      41: iload         5
+      43: iconst_1
+      44: if_icmple     100
+      47: aload         4
+      49: iload         5
+      51: iconst_1
+      52: isub
+      53: invokevirtual #421                // Method org/luaj/kahluafork/compiler/FuncState.reserveregs:(I)V
+      56: goto          100
+      59: aload_3
+      60: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      63: ifeq          72
+      66: aload         4
+      68: aload_3
+      69: invokevirtual #424                // Method org/luaj/kahluafork/compiler/FuncState.exp2nextreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      72: iload         5
+      74: ifle          100
+      77: aload         4
+      79: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+      82: istore        6
+      84: aload         4
+      86: iload         5
+      88: invokevirtual #421                // Method org/luaj/kahluafork/compiler/FuncState.reserveregs:(I)V
+      91: aload         4
+      93: iload         6
+      95: iload         5
+      97: invokevirtual #431                // Method org/luaj/kahluafork/compiler/FuncState.nil:(II)V
+     100: return
+
+  void enterlevel();
+    Code:
+       0: aload_0
+       1: dup
+       2: getfield      #434                // Field nCcalls:I
+       5: iconst_1
+       6: iadd
+       7: dup_x1
+       8: putfield      #434                // Field nCcalls:I
+      11: sipush        200
+      14: if_icmple     25
+      17: aload_0
+      18: ldc_w         #437                // String chunk has too many syntax levels
+      21: iconst_0
+      22: invokevirtual #196                // Method lexerror:(Ljava/lang/String;I)V
+      25: return
+
+  void leavelevel();
+    Code:
+       0: aload_0
+       1: dup
+       2: getfield      #434                // Field nCcalls:I
+       5: iconst_1
+       6: isub
+       7: putfield      #434                // Field nCcalls:I
+      10: return
+
+  void pushclosure(org.luaj.kahluafork.compiler.FuncState, org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_3
+       5: aload_3
+       6: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+       9: astore        4
+      11: aload         4
+      13: getfield      #439                // Field se/krka/kahlua/vm/Prototype.prototypes:[Lse/krka/kahlua/vm/Prototype;
+      16: ifnull        34
+      19: aload_3
+      20: getfield      #443                // Field org/luaj/kahluafork/compiler/FuncState.np:I
+      23: iconst_1
+      24: iadd
+      25: aload         4
+      27: getfield      #439                // Field se/krka/kahlua/vm/Prototype.prototypes:[Lse/krka/kahlua/vm/Prototype;
+      30: arraylength
+      31: if_icmple     55
+      34: aload         4
+      36: aload         4
+      38: getfield      #439                // Field se/krka/kahlua/vm/Prototype.prototypes:[Lse/krka/kahlua/vm/Prototype;
+      41: aload_3
+      42: getfield      #443                // Field org/luaj/kahluafork/compiler/FuncState.np:I
+      45: iconst_2
+      46: imul
+      47: iconst_1
+      48: iadd
+      49: invokestatic  #446                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([Lse/krka/kahlua/vm/Prototype;I)[Lse/krka/kahlua/vm/Prototype;
+      52: putfield      #439                // Field se/krka/kahlua/vm/Prototype.prototypes:[Lse/krka/kahlua/vm/Prototype;
+      55: aload         4
+      57: getfield      #439                // Field se/krka/kahlua/vm/Prototype.prototypes:[Lse/krka/kahlua/vm/Prototype;
+      60: aload_3
+      61: dup
+      62: getfield      #443                // Field org/luaj/kahluafork/compiler/FuncState.np:I
+      65: dup_x1
+      66: iconst_1
+      67: iadd
+      68: putfield      #443                // Field org/luaj/kahluafork/compiler/FuncState.np:I
+      71: aload_1
+      72: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+      75: aastore
+      76: aload_2
+      77: bipush        11
+      79: aload_3
+      80: bipush        36
+      82: iconst_0
+      83: aload_3
+      84: getfield      #443                // Field org/luaj/kahluafork/compiler/FuncState.np:I
+      87: iconst_1
+      88: isub
+      89: invokevirtual #449                // Method org/luaj/kahluafork/compiler/FuncState.codeABx:(III)I
+      92: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+      95: iconst_0
+      96: istore        5
+      98: iload         5
+     100: aload_1
+     101: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+     104: getfield      #84                 // Field se/krka/kahlua/vm/Prototype.numUpvalues:I
+     107: if_icmpge     151
+     110: aload_1
+     111: getfield      #453                // Field org/luaj/kahluafork/compiler/FuncState.upvaluesK:[I
+     114: iload         5
+     116: iaload
+     117: bipush        6
+     119: if_icmpne     126
+     122: iconst_0
+     123: goto          127
+     126: iconst_4
+     127: istore        6
+     129: aload_3
+     130: iload         6
+     132: iconst_0
+     133: aload_1
+     134: getfield      #456                // Field org/luaj/kahluafork/compiler/FuncState.upvaluesInfo:[I
+     137: iload         5
+     139: iaload
+     140: iconst_0
+     141: invokevirtual #459                // Method org/luaj/kahluafork/compiler/FuncState.codeABC:(IIII)I
+     144: pop
+     145: iinc          5, 1
+     148: goto          98
+     151: return
+
+  void close_func();
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_1
+       5: aload_1
+       6: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+       9: astore_2
+      10: aload_2
+      11: aload_1
+      12: getfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+      15: ifeq          22
+      18: iconst_1
+      19: goto          23
+      22: iconst_0
+      23: putfield      #463                // Field se/krka/kahlua/vm/Prototype.isVararg:Z
+      26: aload_0
+      27: iconst_0
+      28: invokevirtual #465                // Method removevars:(I)V
+      31: aload_1
+      32: iconst_0
+      33: iconst_0
+      34: invokevirtual #468                // Method org/luaj/kahluafork/compiler/FuncState.ret:(II)V
+      37: aload_2
+      38: aload_2
+      39: getfield      #471                // Field se/krka/kahlua/vm/Prototype.code:[I
+      42: aload_1
+      43: getfield      #474                // Field org/luaj/kahluafork/compiler/FuncState.pc:I
+      46: invokestatic  #477                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([II)[I
+      49: putfield      #471                // Field se/krka/kahlua/vm/Prototype.code:[I
+      52: aload_2
+      53: aload_2
+      54: getfield      #480                // Field se/krka/kahlua/vm/Prototype.lines:[I
+      57: aload_1
+      58: getfield      #474                // Field org/luaj/kahluafork/compiler/FuncState.pc:I
+      61: invokestatic  #477                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([II)[I
+      64: putfield      #480                // Field se/krka/kahlua/vm/Prototype.lines:[I
+      67: aload_2
+      68: aload_2
+      69: getfield      #483                // Field se/krka/kahlua/vm/Prototype.constants:[Ljava/lang/Object;
+      72: aload_1
+      73: getfield      #487                // Field org/luaj/kahluafork/compiler/FuncState.nk:I
+      76: invokestatic  #490                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([Ljava/lang/Object;I)[Ljava/lang/Object;
+      79: putfield      #483                // Field se/krka/kahlua/vm/Prototype.constants:[Ljava/lang/Object;
+      82: aload_2
+      83: aload_2
+      84: getfield      #439                // Field se/krka/kahlua/vm/Prototype.prototypes:[Lse/krka/kahlua/vm/Prototype;
+      87: aload_1
+      88: getfield      #443                // Field org/luaj/kahluafork/compiler/FuncState.np:I
+      91: invokestatic  #446                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([Lse/krka/kahlua/vm/Prototype;I)[Lse/krka/kahlua/vm/Prototype;
+      94: putfield      #439                // Field se/krka/kahlua/vm/Prototype.prototypes:[Lse/krka/kahlua/vm/Prototype;
+      97: aload_1
+      98: aload_1
+      99: getfield      #357                // Field org/luaj/kahluafork/compiler/FuncState.locvars:[Ljava/lang/String;
+     102: aload_1
+     103: getfield      #360                // Field org/luaj/kahluafork/compiler/FuncState.nlocvars:I
+     106: invokestatic  #363                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([Ljava/lang/String;I)[Ljava/lang/String;
+     109: putfield      #357                // Field org/luaj/kahluafork/compiler/FuncState.locvars:[Ljava/lang/String;
+     112: aload_2
+     113: aload_1
+     114: getfield      #357                // Field org/luaj/kahluafork/compiler/FuncState.locvars:[Ljava/lang/String;
+     117: putfield      #493                // Field se/krka/kahlua/vm/Prototype.locvars:[Ljava/lang/String;
+     120: getstatic     #385                // Field zombie/core/Core.debug:Z
+     123: ifeq          148
+     126: aload_1
+     127: getfield      #395                // Field org/luaj/kahluafork/compiler/FuncState.nactvarline:I
+     130: ifle          148
+     133: aload_2
+     134: aload_1
+     135: getfield      #391                // Field org/luaj/kahluafork/compiler/FuncState.actvarline:[I
+     138: aload_1
+     139: getfield      #395                // Field org/luaj/kahluafork/compiler/FuncState.nactvarline:I
+     142: invokestatic  #477                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([II)[I
+     145: putfield      #494                // Field se/krka/kahlua/vm/Prototype.locvarlines:[I
+     148: aload_1
+     149: aload_1
+     150: getfield      #497                // Field org/luaj/kahluafork/compiler/FuncState.upvalues:[Ljava/lang/String;
+     153: aload_2
+     154: getfield      #84                 // Field se/krka/kahlua/vm/Prototype.numUpvalues:I
+     157: invokestatic  #363                // Method org/luaj/kahluafork/compiler/FuncState.realloc:([Ljava/lang/String;I)[Ljava/lang/String;
+     160: putfield      #497                // Field org/luaj/kahluafork/compiler/FuncState.upvalues:[Ljava/lang/String;
+     163: aload_1
+     164: getfield      #500                // Field org/luaj/kahluafork/compiler/FuncState.bl:Lorg/luaj/kahluafork/compiler/BlockCnt;
+     167: ifnonnull     174
+     170: iconst_1
+     171: goto          175
+     174: iconst_0
+     175: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     178: aload_0
+     179: aload_1
+     180: getfield      #76                 // Field org/luaj/kahluafork/compiler/FuncState.prev:Lorg/luaj/kahluafork/compiler/FuncState;
+     183: putfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     186: return
+
+  void field(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       8: dup
+       9: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      12: astore_3
+      13: aload_2
+      14: aload_1
+      15: invokevirtual #505                // Method org/luaj/kahluafork/compiler/FuncState.exp2anyreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+      18: pop
+      19: aload_0
+      20: invokevirtual #62                 // Method next:()V
+      23: aload_0
+      24: aload_3
+      25: invokevirtual #509                // Method checkname:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      28: aload_2
+      29: aload_1
+      30: aload_3
+      31: invokevirtual #512                // Method org/luaj/kahluafork/compiler/FuncState.indexed:(Lorg/luaj/kahluafork/compiler/ExpDesc;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      34: return
+
+  void yindex(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: invokevirtual #62                 // Method next:()V
+       4: aload_0
+       5: aload_1
+       6: invokevirtual #516                // Method expr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+       9: aload_0
+      10: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      13: aload_1
+      14: invokevirtual #519                // Method org/luaj/kahluafork/compiler/FuncState.exp2val:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      17: aload_0
+      18: bipush        93
+      20: invokevirtual #522                // Method checknext:(I)V
+      23: return
+
+  void recfield(org.luaj.kahluafork.compiler.ConsControl);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: aload_0
+       6: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       9: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+      12: istore_3
+      13: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+      16: dup
+      17: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      20: astore        4
+      22: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+      25: dup
+      26: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      29: astore        5
+      31: aload_0
+      32: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      35: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      38: sipush        285
+      41: if_icmpne     66
+      44: aload_2
+      45: aload_1
+      46: getfield      #525                // Field org/luaj/kahluafork/compiler/ConsControl.nh:I
+      49: ldc           #211                // int 2147483645
+      51: ldc_w         #530                // String items in a constructor
+      54: invokevirtual #374                // Method org/luaj/kahluafork/compiler/FuncState.checklimit:(IILjava/lang/String;)V
+      57: aload_0
+      58: aload         4
+      60: invokevirtual #509                // Method checkname:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      63: goto          72
+      66: aload_0
+      67: aload         4
+      69: invokevirtual #532                // Method yindex:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      72: aload_1
+      73: dup
+      74: getfield      #525                // Field org/luaj/kahluafork/compiler/ConsControl.nh:I
+      77: iconst_1
+      78: iadd
+      79: putfield      #525                // Field org/luaj/kahluafork/compiler/ConsControl.nh:I
+      82: aload_0
+      83: bipush        61
+      85: invokevirtual #522                // Method checknext:(I)V
+      88: aload_2
+      89: aload         4
+      91: invokevirtual #535                // Method org/luaj/kahluafork/compiler/FuncState.exp2RK:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+      94: istore        6
+      96: aload_0
+      97: aload         5
+      99: invokevirtual #516                // Method expr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     102: aload_2
+     103: bipush        9
+     105: aload_1
+     106: getfield      #538                // Field org/luaj/kahluafork/compiler/ConsControl.t:Lorg/luaj/kahluafork/compiler/ExpDesc;
+     109: getfield      #408                // Field org/luaj/kahluafork/compiler/ExpDesc.info:I
+     112: iload         6
+     114: aload_2
+     115: aload         5
+     117: invokevirtual #535                // Method org/luaj/kahluafork/compiler/FuncState.exp2RK:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+     120: invokevirtual #459                // Method org/luaj/kahluafork/compiler/FuncState.codeABC:(IIII)I
+     123: pop
+     124: aload_2
+     125: iload_3
+     126: putfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+     129: return
+
+  void listfield(org.luaj.kahluafork.compiler.ConsControl);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: getfield      #541                // Field org/luaj/kahluafork/compiler/ConsControl.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+       5: invokevirtual #516                // Method expr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+       8: aload_0
+       9: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      12: aload_1
+      13: getfield      #544                // Field org/luaj/kahluafork/compiler/ConsControl.na:I
+      16: ldc           #211                // int 2147483645
+      18: ldc_w         #530                // String items in a constructor
+      21: invokevirtual #374                // Method org/luaj/kahluafork/compiler/FuncState.checklimit:(IILjava/lang/String;)V
+      24: aload_1
+      25: dup
+      26: getfield      #544                // Field org/luaj/kahluafork/compiler/ConsControl.na:I
+      29: iconst_1
+      30: iadd
+      31: putfield      #544                // Field org/luaj/kahluafork/compiler/ConsControl.na:I
+      34: aload_1
+      35: dup
+      36: getfield      #547                // Field org/luaj/kahluafork/compiler/ConsControl.tostore:I
+      39: iconst_1
+      40: iadd
+      41: putfield      #547                // Field org/luaj/kahluafork/compiler/ConsControl.tostore:I
+      44: return
+
+  void constructor(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: aload_0
+       6: getfield      #115                // Field linenumber:I
+       9: istore_3
+      10: aload_2
+      11: bipush        10
+      13: iconst_0
+      14: iconst_0
+      15: iconst_0
+      16: invokevirtual #459                // Method org/luaj/kahluafork/compiler/FuncState.codeABC:(IIII)I
+      19: istore        4
+      21: new           #526                // class org/luaj/kahluafork/compiler/ConsControl
+      24: dup
+      25: invokespecial #550                // Method org/luaj/kahluafork/compiler/ConsControl."<init>":()V
+      28: astore        5
+      30: aload         5
+      32: aload         5
+      34: aload         5
+      36: iconst_0
+      37: dup_x1
+      38: putfield      #547                // Field org/luaj/kahluafork/compiler/ConsControl.tostore:I
+      41: dup_x1
+      42: putfield      #525                // Field org/luaj/kahluafork/compiler/ConsControl.nh:I
+      45: putfield      #544                // Field org/luaj/kahluafork/compiler/ConsControl.na:I
+      48: aload         5
+      50: aload_1
+      51: putfield      #538                // Field org/luaj/kahluafork/compiler/ConsControl.t:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      54: aload_1
+      55: bipush        11
+      57: iload         4
+      59: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+      62: aload         5
+      64: getfield      #541                // Field org/luaj/kahluafork/compiler/ConsControl.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      67: iconst_0
+      68: iconst_0
+      69: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+      72: aload_2
+      73: aload_1
+      74: invokevirtual #424                // Method org/luaj/kahluafork/compiler/FuncState.exp2nextreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      77: aload_0
+      78: bipush        123
+      80: invokevirtual #522                // Method checknext:(I)V
+      83: aload         5
+      85: getfield      #541                // Field org/luaj/kahluafork/compiler/ConsControl.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      88: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      91: ifeq          102
+      94: aload         5
+      96: getfield      #547                // Field org/luaj/kahluafork/compiler/ConsControl.tostore:I
+      99: ifle          106
+     102: iconst_1
+     103: goto          107
+     106: iconst_0
+     107: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     110: aload_0
+     111: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+     114: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+     117: bipush        125
+     119: if_icmpne     125
+     122: goto          231
+     125: aload_2
+     126: aload         5
+     128: invokevirtual #551                // Method org/luaj/kahluafork/compiler/FuncState.closelistfield:(Lorg/luaj/kahluafork/compiler/ConsControl;)V
+     131: aload_0
+     132: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+     135: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+     138: lookupswitch  { // 2
+                    91: 198
+                   285: 164
+               default: 207
+          }
+     164: aload_0
+     165: invokevirtual #555                // Method lookahead:()V
+     168: aload_0
+     169: getfield      #101                // Field lookahead:Lorg/luaj/kahluafork/compiler/Token;
+     172: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+     175: bipush        61
+     177: if_icmpeq     189
+     180: aload_0
+     181: aload         5
+     183: invokevirtual #557                // Method listfield:(Lorg/luaj/kahluafork/compiler/ConsControl;)V
+     186: goto          213
+     189: aload_0
+     190: aload         5
+     192: invokevirtual #560                // Method recfield:(Lorg/luaj/kahluafork/compiler/ConsControl;)V
+     195: goto          213
+     198: aload_0
+     199: aload         5
+     201: invokevirtual #560                // Method recfield:(Lorg/luaj/kahluafork/compiler/ConsControl;)V
+     204: goto          213
+     207: aload_0
+     208: aload         5
+     210: invokevirtual #557                // Method listfield:(Lorg/luaj/kahluafork/compiler/ConsControl;)V
+     213: aload_0
+     214: bipush        44
+     216: invokevirtual #334                // Method testnext:(I)Z
+     219: ifne          83
+     222: aload_0
+     223: bipush        59
+     225: invokevirtual #334                // Method testnext:(I)Z
+     228: ifne          83
+     231: aload_0
+     232: bipush        125
+     234: bipush        123
+     236: iload_3
+     237: invokevirtual #563                // Method check_match:(III)V
+     240: aload_2
+     241: aload         5
+     243: invokevirtual #567                // Method org/luaj/kahluafork/compiler/FuncState.lastlistfield:(Lorg/luaj/kahluafork/compiler/ConsControl;)V
+     246: new           #570                // class org/luaj/kahluafork/compiler/InstructionPtr
+     249: dup
+     250: aload_2
+     251: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+     254: getfield      #471                // Field se/krka/kahlua/vm/Prototype.code:[I
+     257: iload         4
+     259: invokespecial #572                // Method org/luaj/kahluafork/compiler/InstructionPtr."<init>":([II)V
+     262: astore        6
+     264: aload         6
+     266: aload         5
+     268: getfield      #544                // Field org/luaj/kahluafork/compiler/ConsControl.na:I
+     271: invokestatic  #575                // Method luaO_int2fb:(I)I
+     274: invokestatic  #578                // Method org/luaj/kahluafork/compiler/FuncState.SETARG_B:(Lorg/luaj/kahluafork/compiler/InstructionPtr;I)V
+     277: aload         6
+     279: aload         5
+     281: getfield      #525                // Field org/luaj/kahluafork/compiler/ConsControl.nh:I
+     284: invokestatic  #575                // Method luaO_int2fb:(I)I
+     287: invokestatic  #582                // Method org/luaj/kahluafork/compiler/FuncState.SETARG_C:(Lorg/luaj/kahluafork/compiler/InstructionPtr;I)V
+     290: return
+
+  static int luaO_int2fb(int);
+    Code:
+       0: iconst_0
+       1: istore_1
+       2: iload_0
+       3: bipush        16
+       5: if_icmplt     20
+       8: iload_0
+       9: iconst_1
+      10: iadd
+      11: iconst_1
+      12: ishr
+      13: istore_0
+      14: iinc          1, 1
+      17: goto          2
+      20: iload_0
+      21: bipush        8
+      23: if_icmpge     28
+      26: iload_0
+      27: ireturn
+      28: iload_1
+      29: iconst_1
+      30: iadd
+      31: iconst_3
+      32: ishl
+      33: iload_0
+      34: bipush        8
+      36: isub
+      37: ior
+      38: ireturn
+
+  void parlist();
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_1
+       5: aload_1
+       6: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+       9: astore_2
+      10: iconst_0
+      11: istore_3
+      12: aload_1
+      13: iconst_0
+      14: putfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+      17: aload_0
+      18: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      21: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      24: bipush        41
+      26: if_icmpeq     127
+      29: aload_0
+      30: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      33: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      36: lookupswitch  { // 2
+                   279: 79
+                   285: 64
+               default: 96
+          }
+      64: aload_0
+      65: aload_0
+      66: invokevirtual #350                // Method str_checkname:()Ljava/lang/String;
+      69: iload_3
+      70: iinc          3, 1
+      73: invokevirtual #366                // Method new_localvar:(Ljava/lang/String;I)V
+      76: goto          111
+      79: aload_0
+      80: invokevirtual #62                 // Method next:()V
+      83: aload_1
+      84: dup
+      85: getfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+      88: iconst_2
+      89: ior
+      90: putfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+      93: goto          111
+      96: aload_0
+      97: ldc_w         #585                // String ...
+     100: invokestatic  #587                // Method LUA_QL:(Ljava/lang/Object;)Ljava/lang/String;
+     103: invokedynamic #590,  0            // InvokeDynamic #8:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+     108: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+     111: aload_1
+     112: getfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+     115: ifne          127
+     118: aload_0
+     119: bipush        44
+     121: invokevirtual #334                // Method testnext:(I)Z
+     124: ifne          29
+     127: aload_0
+     128: iload_3
+     129: invokevirtual #591                // Method adjustlocalvars:(I)V
+     132: aload_2
+     133: aload_1
+     134: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+     137: aload_1
+     138: getfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+     141: iconst_1
+     142: iand
+     143: isub
+     144: putfield      #594                // Field se/krka/kahlua/vm/Prototype.numParams:I
+     147: aload_1
+     148: aload_1
+     149: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+     152: invokevirtual #421                // Method org/luaj/kahluafork/compiler/FuncState.reserveregs:(I)V
+     155: return
+
+  void body(org.luaj.kahluafork.compiler.ExpDesc, boolean, int);
+    Code:
+       0: new           #39                 // class org/luaj/kahluafork/compiler/FuncState
+       3: dup
+       4: aload_0
+       5: aload_0
+       6: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+       9: getfield      #284                // Field org/luaj/kahluafork/compiler/Token.ts:Ljava/lang/String;
+      12: invokespecial #597                // Method org/luaj/kahluafork/compiler/FuncState."<init>":(Lorg/luaj/kahluafork/compiler/LexState;Ljava/lang/String;)V
+      15: astore        4
+      17: aload         4
+      19: iload_3
+      20: putfield      #600                // Field org/luaj/kahluafork/compiler/FuncState.linedefined:I
+      23: aload_0
+      24: bipush        40
+      26: invokevirtual #522                // Method checknext:(I)V
+      29: iload_2
+      30: ifeq          46
+      33: aload_0
+      34: ldc_w         #603                // String self
+      37: iconst_0
+      38: invokevirtual #605                // Method new_localvarliteral:(Ljava/lang/String;I)V
+      41: aload_0
+      42: iconst_1
+      43: invokevirtual #591                // Method adjustlocalvars:(I)V
+      46: aload_0
+      47: invokevirtual #608                // Method parlist:()V
+      50: aload_0
+      51: bipush        41
+      53: invokevirtual #522                // Method checknext:(I)V
+      56: aload_0
+      57: invokevirtual #66                 // Method chunk:()V
+      60: aload         4
+      62: aload_0
+      63: getfield      #115                // Field linenumber:I
+      66: putfield      #611                // Field org/luaj/kahluafork/compiler/FuncState.lastlinedefined:I
+      69: aload_0
+      70: sipush        262
+      73: sipush        265
+      76: iload_3
+      77: invokevirtual #563                // Method check_match:(III)V
+      80: aload_0
+      81: invokevirtual #73                 // Method close_func:()V
+      84: aload_0
+      85: aload         4
+      87: aload_1
+      88: invokevirtual #614                // Method pushclosure:(Lorg/luaj/kahluafork/compiler/FuncState;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      91: return
+
+  int explist1(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: iconst_1
+       1: istore_2
+       2: aload_0
+       3: aload_1
+       4: invokevirtual #516                // Method expr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+       7: aload_0
+       8: bipush        44
+      10: invokevirtual #334                // Method testnext:(I)Z
+      13: ifeq          35
+      16: aload_0
+      17: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      20: aload_1
+      21: invokevirtual #424                // Method org/luaj/kahluafork/compiler/FuncState.exp2nextreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      24: aload_0
+      25: aload_1
+      26: invokevirtual #516                // Method expr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      29: iinc          2, 1
+      32: goto          7
+      35: iload_2
+      36: ireturn
+
+  void funcargs(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       8: dup
+       9: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      12: astore_3
+      13: aload_0
+      14: getfield      #115                // Field linenumber:I
+      17: istore        6
+      19: aload_0
+      20: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      23: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      26: lookupswitch  { // 3
+                    40: 60
+                   123: 124
+                   286: 132
+               default: 151
+          }
+      60: iload         6
+      62: aload_0
+      63: getfield      #118                // Field lastline:I
+      66: if_icmpeq     76
+      69: aload_0
+      70: ldc_w         #618                // String ambiguous syntax (function call x new statement)
+      73: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+      76: aload_0
+      77: invokevirtual #62                 // Method next:()V
+      80: aload_0
+      81: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      84: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      87: bipush        41
+      89: if_icmpne     100
+      92: aload_3
+      93: iconst_0
+      94: putfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      97: goto          111
+     100: aload_0
+     101: aload_3
+     102: invokevirtual #620                // Method explist1:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+     105: pop
+     106: aload_2
+     107: aload_3
+     108: invokevirtual #623                // Method org/luaj/kahluafork/compiler/FuncState.setmultret:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     111: aload_0
+     112: bipush        41
+     114: bipush        40
+     116: iload         6
+     118: invokevirtual #563                // Method check_match:(III)V
+     121: goto          159
+     124: aload_0
+     125: aload_3
+     126: invokevirtual #626                // Method constructor:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     129: goto          159
+     132: aload_0
+     133: aload_3
+     134: aload_0
+     135: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+     138: getfield      #284                // Field org/luaj/kahluafork/compiler/Token.ts:Ljava/lang/String;
+     141: invokevirtual #353                // Method codestring:(Lorg/luaj/kahluafork/compiler/ExpDesc;Ljava/lang/String;)V
+     144: aload_0
+     145: invokevirtual #62                 // Method next:()V
+     148: goto          159
+     151: aload_0
+     152: ldc_w         #629                // String function arguments expected
+     155: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+     158: return
+     159: aload_1
+     160: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+     163: bipush        12
+     165: if_icmpne     172
+     168: iconst_1
+     169: goto          173
+     172: iconst_0
+     173: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     176: aload_1
+     177: getfield      #408                // Field org/luaj/kahluafork/compiler/ExpDesc.info:I
+     180: istore        4
+     182: aload_0
+     183: aload_3
+     184: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+     187: invokevirtual #414                // Method hasmultret:(I)Z
+     190: ifeq          199
+     193: iconst_m1
+     194: istore        5
+     196: goto          222
+     199: aload_3
+     200: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+     203: ifeq          211
+     206: aload_2
+     207: aload_3
+     208: invokevirtual #424                // Method org/luaj/kahluafork/compiler/FuncState.exp2nextreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     211: aload_2
+     212: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+     215: iload         4
+     217: iconst_1
+     218: iadd
+     219: isub
+     220: istore        5
+     222: aload_1
+     223: bipush        13
+     225: aload_2
+     226: bipush        28
+     228: iload         4
+     230: iload         5
+     232: iconst_1
+     233: iadd
+     234: iconst_2
+     235: invokevirtual #459                // Method org/luaj/kahluafork/compiler/FuncState.codeABC:(IIII)I
+     238: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+     241: aload_2
+     242: iload         6
+     244: invokevirtual #631                // Method org/luaj/kahluafork/compiler/FuncState.fixline:(I)V
+     247: aload_2
+     248: iload         4
+     250: iconst_1
+     251: iadd
+     252: putfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+     255: return
+
+  void prefixexp(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+       4: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+       7: lookupswitch  { // 2
+                    40: 32
+                   285: 64
+               default: 70
+          }
+      32: aload_0
+      33: getfield      #115                // Field linenumber:I
+      36: istore_2
+      37: aload_0
+      38: invokevirtual #62                 // Method next:()V
+      41: aload_0
+      42: aload_1
+      43: invokevirtual #516                // Method expr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      46: aload_0
+      47: bipush        41
+      49: bipush        40
+      51: iload_2
+      52: invokevirtual #563                // Method check_match:(III)V
+      55: aload_0
+      56: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      59: aload_1
+      60: invokevirtual #634                // Method org/luaj/kahluafork/compiler/FuncState.dischargevars:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      63: return
+      64: aload_0
+      65: aload_1
+      66: invokevirtual #637                // Method singlevar:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      69: return
+      70: aload_0
+      71: ldc_w         #640                // String unexpected symbol
+      74: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+      77: return
+
+  void primaryexp(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: aload_0
+       6: aload_1
+       7: invokevirtual #642                // Method prefixexp:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      10: aload_0
+      11: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      14: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      17: lookupswitch  { // 6
+                    40: 143
+                    46: 76
+                    58: 112
+                    91: 84
+                   123: 143
+                   286: 143
+               default: 156
+          }
+      76: aload_0
+      77: aload_1
+      78: invokevirtual #645                // Method field:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      81: goto          10
+      84: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+      87: dup
+      88: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      91: astore_3
+      92: aload_2
+      93: aload_1
+      94: invokevirtual #505                // Method org/luaj/kahluafork/compiler/FuncState.exp2anyreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+      97: pop
+      98: aload_0
+      99: aload_3
+     100: invokevirtual #532                // Method yindex:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     103: aload_2
+     104: aload_1
+     105: aload_3
+     106: invokevirtual #512                // Method org/luaj/kahluafork/compiler/FuncState.indexed:(Lorg/luaj/kahluafork/compiler/ExpDesc;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     109: goto          10
+     112: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+     115: dup
+     116: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+     119: astore_3
+     120: aload_0
+     121: invokevirtual #62                 // Method next:()V
+     124: aload_0
+     125: aload_3
+     126: invokevirtual #509                // Method checkname:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     129: aload_2
+     130: aload_1
+     131: aload_3
+     132: invokevirtual #648                // Method org/luaj/kahluafork/compiler/FuncState.self:(Lorg/luaj/kahluafork/compiler/ExpDesc;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     135: aload_0
+     136: aload_1
+     137: invokevirtual #650                // Method funcargs:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     140: goto          10
+     143: aload_2
+     144: aload_1
+     145: invokevirtual #424                // Method org/luaj/kahluafork/compiler/FuncState.exp2nextreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     148: aload_0
+     149: aload_1
+     150: invokevirtual #650                // Method funcargs:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     153: goto          10
+     156: return
+
+  void simpleexp(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+       4: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+       7: lookupswitch  { // 8
+                   123: 203
+                   263: 133
+                   265: 209
+                   269: 115
+                   275: 124
+                   279: 142
+                   284: 80
+                   286: 100
+               default: 224
+          }
+      80: aload_1
+      81: iconst_5
+      82: iconst_0
+      83: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+      86: aload_1
+      87: aload_0
+      88: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      91: getfield      #245                // Field org/luaj/kahluafork/compiler/Token.r:D
+      94: invokevirtual #653                // Method org/luaj/kahluafork/compiler/ExpDesc.setNval:(D)V
+      97: goto          230
+     100: aload_0
+     101: aload_1
+     102: aload_0
+     103: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+     106: getfield      #284                // Field org/luaj/kahluafork/compiler/Token.ts:Ljava/lang/String;
+     109: invokevirtual #353                // Method codestring:(Lorg/luaj/kahluafork/compiler/ExpDesc;Ljava/lang/String;)V
+     112: goto          230
+     115: aload_1
+     116: iconst_1
+     117: iconst_0
+     118: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+     121: goto          230
+     124: aload_1
+     125: iconst_2
+     126: iconst_0
+     127: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+     130: goto          230
+     133: aload_1
+     134: iconst_3
+     135: iconst_0
+     136: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+     139: goto          230
+     142: aload_0
+     143: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     146: astore_2
+     147: aload_0
+     148: aload_2
+     149: getfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+     152: ifeq          159
+     155: iconst_1
+     156: goto          160
+     159: iconst_0
+     160: ldc_w         #585                // String ...
+     163: invokestatic  #587                // Method LUA_QL:(Ljava/lang/Object;)Ljava/lang/String;
+     166: invokedynamic #657,  0            // InvokeDynamic #9:makeConcatWithConstants:(Ljava/lang/String;)Ljava/lang/String;
+     171: invokevirtual #658                // Method check_condition:(ZLjava/lang/String;)V
+     174: aload_2
+     175: dup
+     176: getfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+     179: bipush        -5
+     181: iand
+     182: putfield      #44                 // Field org/luaj/kahluafork/compiler/FuncState.isVararg:I
+     185: aload_1
+     186: bipush        14
+     188: aload_2
+     189: bipush        37
+     191: iconst_0
+     192: iconst_1
+     193: iconst_0
+     194: invokevirtual #459                // Method org/luaj/kahluafork/compiler/FuncState.codeABC:(IIII)I
+     197: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+     200: goto          230
+     203: aload_0
+     204: aload_1
+     205: invokevirtual #626                // Method constructor:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     208: return
+     209: aload_0
+     210: invokevirtual #62                 // Method next:()V
+     213: aload_0
+     214: aload_1
+     215: iconst_0
+     216: aload_0
+     217: getfield      #115                // Field linenumber:I
+     220: invokevirtual #662                // Method body:(Lorg/luaj/kahluafork/compiler/ExpDesc;ZI)V
+     223: return
+     224: aload_0
+     225: aload_1
+     226: invokevirtual #666                // Method primaryexp:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     229: return
+     230: aload_0
+     231: invokevirtual #62                 // Method next:()V
+     234: return
+
+  int getunopr(int);
+    Code:
+       0: iload_1
+       1: lookupswitch  { // 3
+                    35: 40
+                    45: 38
+                   270: 36
+               default: 42
+          }
+      36: iconst_1
+      37: ireturn
+      38: iconst_0
+      39: ireturn
+      40: iconst_2
+      41: ireturn
+      42: iconst_3
+      43: ireturn
+
+  int getbinopr(int);
+    Code:
+       0: iload_1
+       1: lookupswitch  { // 15
+                    37: 140
+                    42: 136
+                    43: 132
+                    45: 134
+                    47: 138
+                    60: 153
+                    62: 159
+                    94: 142
+                   257: 165
+                   271: 168
+                   278: 144
+                   280: 150
+                   281: 162
+                   282: 156
+                   283: 147
+               default: 171
+          }
+     132: iconst_0
+     133: ireturn
+     134: iconst_1
+     135: ireturn
+     136: iconst_2
+     137: ireturn
+     138: iconst_3
+     139: ireturn
+     140: iconst_4
+     141: ireturn
+     142: iconst_5
+     143: ireturn
+     144: bipush        6
+     146: ireturn
+     147: bipush        7
+     149: ireturn
+     150: bipush        8
+     152: ireturn
+     153: bipush        9
+     155: ireturn
+     156: bipush        10
+     158: ireturn
+     159: bipush        11
+     161: ireturn
+     162: bipush        12
+     164: ireturn
+     165: bipush        13
+     167: ireturn
+     168: bipush        14
+     170: ireturn
+     171: bipush        15
+     173: ireturn
+
+  int subexpr(org.luaj.kahluafork.compiler.ExpDesc, int);
+    Code:
+       0: aload_0
+       1: invokevirtual #669                // Method enterlevel:()V
+       4: aload_0
+       5: aload_0
+       6: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+       9: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      12: invokevirtual #672                // Method getunopr:(I)I
+      15: istore        4
+      17: iload         4
+      19: iconst_3
+      20: if_icmpeq     48
+      23: aload_0
+      24: invokevirtual #62                 // Method next:()V
+      27: aload_0
+      28: aload_1
+      29: bipush        8
+      31: invokevirtual #675                // Method subexpr:(Lorg/luaj/kahluafork/compiler/ExpDesc;I)I
+      34: pop
+      35: aload_0
+      36: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      39: iload         4
+      41: aload_1
+      42: invokevirtual #679                // Method org/luaj/kahluafork/compiler/FuncState.prefix:(ILorg/luaj/kahluafork/compiler/ExpDesc;)V
+      45: goto          53
+      48: aload_0
+      49: aload_1
+      50: invokevirtual #683                // Method simpleexp:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      53: aload_0
+      54: aload_0
+      55: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      58: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      61: invokevirtual #686                // Method getbinopr:(I)I
+      64: istore_3
+      65: iload_3
+      66: bipush        15
+      68: if_icmpeq     132
+      71: getstatic     #689                // Field priorityLeft:[I
+      74: iload_3
+      75: iaload
+      76: iload_2
+      77: if_icmple     132
+      80: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+      83: dup
+      84: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      87: astore        5
+      89: aload_0
+      90: invokevirtual #62                 // Method next:()V
+      93: aload_0
+      94: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      97: iload_3
+      98: aload_1
+      99: invokevirtual #692                // Method org/luaj/kahluafork/compiler/FuncState.infix:(ILorg/luaj/kahluafork/compiler/ExpDesc;)V
+     102: aload_0
+     103: aload         5
+     105: getstatic     #695                // Field priorityRight:[I
+     108: iload_3
+     109: iaload
+     110: invokevirtual #675                // Method subexpr:(Lorg/luaj/kahluafork/compiler/ExpDesc;I)I
+     113: istore        6
+     115: aload_0
+     116: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     119: iload_3
+     120: aload_1
+     121: aload         5
+     123: invokevirtual #698                // Method org/luaj/kahluafork/compiler/FuncState.posfix:(ILorg/luaj/kahluafork/compiler/ExpDesc;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     126: iload         6
+     128: istore_3
+     129: goto          65
+     132: aload_0
+     133: invokevirtual #702                // Method leavelevel:()V
+     136: iload_3
+     137: ireturn
+
+  void expr(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iconst_0
+       3: invokevirtual #675                // Method subexpr:(Lorg/luaj/kahluafork/compiler/ExpDesc;I)I
+       6: pop
+       7: return
+
+  boolean block_follow(int);
+    Code:
+       0: iload_1
+       1: lookupswitch  { // 5
+                   260: 52
+                   261: 52
+                   262: 52
+                   276: 52
+                   287: 52
+               default: 54
+          }
+      52: iconst_1
+      53: ireturn
+      54: iconst_0
+      55: ireturn
+
+  void block();
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_1
+       5: new           #705                // class org/luaj/kahluafork/compiler/BlockCnt
+       8: dup
+       9: invokespecial #707                // Method org/luaj/kahluafork/compiler/BlockCnt."<init>":()V
+      12: astore_2
+      13: aload_1
+      14: aload_2
+      15: iconst_0
+      16: invokevirtual #708                // Method org/luaj/kahluafork/compiler/FuncState.enterblock:(Lorg/luaj/kahluafork/compiler/BlockCnt;Z)V
+      19: aload_0
+      20: invokevirtual #66                 // Method chunk:()V
+      23: aload_2
+      24: getfield      #712                // Field org/luaj/kahluafork/compiler/BlockCnt.breaklist:I
+      27: iconst_m1
+      28: if_icmpne     35
+      31: iconst_1
+      32: goto          36
+      35: iconst_0
+      36: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+      39: aload_1
+      40: invokevirtual #715                // Method org/luaj/kahluafork/compiler/FuncState.leaveblock:()V
+      43: return
+
+  void check_conflict(org.luaj.kahluafork.compiler.LHS_assign, org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_3
+       5: aload_3
+       6: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+       9: istore        4
+      11: iconst_0
+      12: istore        5
+      14: aload_1
+      15: ifnull        90
+      18: aload_1
+      19: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      22: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      25: bipush        9
+      27: if_icmpne     82
+      30: aload_1
+      31: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      34: getfield      #408                // Field org/luaj/kahluafork/compiler/ExpDesc.info:I
+      37: aload_2
+      38: getfield      #408                // Field org/luaj/kahluafork/compiler/ExpDesc.info:I
+      41: if_icmpne     56
+      44: iconst_1
+      45: istore        5
+      47: aload_1
+      48: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      51: iload         4
+      53: putfield      #408                // Field org/luaj/kahluafork/compiler/ExpDesc.info:I
+      56: aload_1
+      57: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      60: getfield      #721                // Field org/luaj/kahluafork/compiler/ExpDesc.aux:I
+      63: aload_2
+      64: getfield      #408                // Field org/luaj/kahluafork/compiler/ExpDesc.info:I
+      67: if_icmpne     82
+      70: iconst_1
+      71: istore        5
+      73: aload_1
+      74: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      77: iload         4
+      79: putfield      #721                // Field org/luaj/kahluafork/compiler/ExpDesc.aux:I
+      82: aload_1
+      83: getfield      #724                // Field org/luaj/kahluafork/compiler/LHS_assign.prev:Lorg/luaj/kahluafork/compiler/LHS_assign;
+      86: astore_1
+      87: goto          14
+      90: iload         5
+      92: ifeq          115
+      95: aload_3
+      96: iconst_0
+      97: aload_3
+      98: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+     101: aload_2
+     102: getfield      #408                // Field org/luaj/kahluafork/compiler/ExpDesc.info:I
+     105: iconst_0
+     106: invokevirtual #459                // Method org/luaj/kahluafork/compiler/FuncState.codeABC:(IIII)I
+     109: pop
+     110: aload_3
+     111: iconst_1
+     112: invokevirtual #421                // Method org/luaj/kahluafork/compiler/FuncState.reserveregs:(I)V
+     115: return
+
+  void assignment(org.luaj.kahluafork.compiler.LHS_assign, int);
+    Code:
+       0: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       3: dup
+       4: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+       7: astore_3
+       8: aload_0
+       9: bipush        6
+      11: aload_1
+      12: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      15: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      18: if_icmpgt     37
+      21: aload_1
+      22: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      25: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      28: bipush        9
+      30: if_icmpgt     37
+      33: iconst_1
+      34: goto          38
+      37: iconst_0
+      38: ldc_w         #727                // String syntax error
+      41: invokevirtual #658                // Method check_condition:(ZLjava/lang/String;)V
+      44: aload_0
+      45: bipush        44
+      47: invokevirtual #334                // Method testnext:(I)Z
+      50: ifeq          112
+      53: new           #719                // class org/luaj/kahluafork/compiler/LHS_assign
+      56: dup
+      57: invokespecial #729                // Method org/luaj/kahluafork/compiler/LHS_assign."<init>":()V
+      60: astore        4
+      62: aload         4
+      64: aload_1
+      65: putfield      #724                // Field org/luaj/kahluafork/compiler/LHS_assign.prev:Lorg/luaj/kahluafork/compiler/LHS_assign;
+      68: aload_0
+      69: aload         4
+      71: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      74: invokevirtual #666                // Method primaryexp:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      77: aload         4
+      79: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      82: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      85: bipush        6
+      87: if_icmpne     100
+      90: aload_0
+      91: aload_1
+      92: aload         4
+      94: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      97: invokevirtual #730                // Method check_conflict:(Lorg/luaj/kahluafork/compiler/LHS_assign;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     100: aload_0
+     101: aload         4
+     103: iload_2
+     104: iconst_1
+     105: iadd
+     106: invokevirtual #734                // Method assignment:(Lorg/luaj/kahluafork/compiler/LHS_assign;I)V
+     109: goto          185
+     112: aload_0
+     113: bipush        61
+     115: invokevirtual #522                // Method checknext:(I)V
+     118: aload_0
+     119: aload_3
+     120: invokevirtual #620                // Method explist1:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+     123: istore        4
+     125: iload         4
+     127: iload_2
+     128: if_icmpeq     164
+     131: aload_0
+     132: iload_2
+     133: iload         4
+     135: aload_3
+     136: invokevirtual #738                // Method adjust_assign:(IILorg/luaj/kahluafork/compiler/ExpDesc;)V
+     139: iload         4
+     141: iload_2
+     142: if_icmple     185
+     145: aload_0
+     146: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     149: dup
+     150: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+     153: iload         4
+     155: iload_2
+     156: isub
+     157: isub
+     158: putfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+     161: goto          185
+     164: aload_0
+     165: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     168: aload_3
+     169: invokevirtual #742                // Method org/luaj/kahluafork/compiler/FuncState.setoneret:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     172: aload_0
+     173: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     176: aload_1
+     177: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+     180: aload_3
+     181: invokevirtual #745                // Method org/luaj/kahluafork/compiler/FuncState.storevar:(Lorg/luaj/kahluafork/compiler/ExpDesc;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     184: return
+     185: aload_3
+     186: bipush        12
+     188: aload_0
+     189: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     192: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+     195: iconst_1
+     196: isub
+     197: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+     200: aload_0
+     201: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+     204: aload_1
+     205: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+     208: aload_3
+     209: invokevirtual #745                // Method org/luaj/kahluafork/compiler/FuncState.storevar:(Lorg/luaj/kahluafork/compiler/ExpDesc;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     212: return
+
+  int cond();
+    Code:
+       0: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       3: dup
+       4: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+       7: astore_1
+       8: aload_0
+       9: aload_1
+      10: invokevirtual #516                // Method expr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      13: aload_1
+      14: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      17: iconst_1
+      18: if_icmpne     26
+      21: aload_1
+      22: iconst_3
+      23: putfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      26: aload_0
+      27: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      30: aload_1
+      31: invokevirtual #748                // Method org/luaj/kahluafork/compiler/FuncState.goiftrue:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      34: aload_1
+      35: getfield      #751                // Field org/luaj/kahluafork/compiler/ExpDesc.f:I
+      38: ireturn
+
+  void breakstat();
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_1
+       5: aload_1
+       6: getfield      #500                // Field org/luaj/kahluafork/compiler/FuncState.bl:Lorg/luaj/kahluafork/compiler/BlockCnt;
+       9: astore_2
+      10: iconst_0
+      11: istore_3
+      12: aload_2
+      13: ifnull        38
+      16: aload_2
+      17: getfield      #753                // Field org/luaj/kahluafork/compiler/BlockCnt.isbreakable:Z
+      20: ifne          38
+      23: iload_3
+      24: aload_2
+      25: getfield      #756                // Field org/luaj/kahluafork/compiler/BlockCnt.upval:Z
+      28: ior
+      29: istore_3
+      30: aload_2
+      31: getfield      #759                // Field org/luaj/kahluafork/compiler/BlockCnt.previous:Lorg/luaj/kahluafork/compiler/BlockCnt;
+      34: astore_2
+      35: goto          12
+      38: aload_2
+      39: ifnonnull     49
+      42: aload_0
+      43: ldc_w         #762                // String no loop to break
+      46: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+      49: iload_3
+      50: ifeq          66
+      53: aload_1
+      54: bipush        35
+      56: aload_2
+      57: getfield      #764                // Field org/luaj/kahluafork/compiler/BlockCnt.nactvar:I
+      60: iconst_0
+      61: iconst_0
+      62: invokevirtual #459                // Method org/luaj/kahluafork/compiler/FuncState.codeABC:(IIII)I
+      65: pop
+      66: aload_2
+      67: aload_1
+      68: aload_2
+      69: getfield      #712                // Field org/luaj/kahluafork/compiler/BlockCnt.breaklist:I
+      72: aload_1
+      73: invokevirtual #765                // Method org/luaj/kahluafork/compiler/FuncState.jump:()I
+      76: invokevirtual #768                // Method org/luaj/kahluafork/compiler/FuncState.concat:(II)I
+      79: putfield      #712                // Field org/luaj/kahluafork/compiler/BlockCnt.breaklist:I
+      82: return
+
+  void whilestat(int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: new           #705                // class org/luaj/kahluafork/compiler/BlockCnt
+       8: dup
+       9: invokespecial #707                // Method org/luaj/kahluafork/compiler/BlockCnt."<init>":()V
+      12: astore        5
+      14: aload_0
+      15: invokevirtual #62                 // Method next:()V
+      18: aload_2
+      19: invokevirtual #771                // Method org/luaj/kahluafork/compiler/FuncState.getlabel:()I
+      22: istore_3
+      23: aload_0
+      24: invokevirtual #774                // Method cond:()I
+      27: istore        4
+      29: aload_2
+      30: aload         5
+      32: iconst_1
+      33: invokevirtual #708                // Method org/luaj/kahluafork/compiler/FuncState.enterblock:(Lorg/luaj/kahluafork/compiler/BlockCnt;Z)V
+      36: aload_0
+      37: sipush        259
+      40: invokevirtual #522                // Method checknext:(I)V
+      43: aload_0
+      44: invokevirtual #777                // Method block:()V
+      47: aload_2
+      48: aload_2
+      49: invokevirtual #765                // Method org/luaj/kahluafork/compiler/FuncState.jump:()I
+      52: iload_3
+      53: invokevirtual #780                // Method org/luaj/kahluafork/compiler/FuncState.patchlist:(II)V
+      56: aload_0
+      57: sipush        262
+      60: sipush        277
+      63: iload_1
+      64: invokevirtual #563                // Method check_match:(III)V
+      67: aload_2
+      68: invokevirtual #715                // Method org/luaj/kahluafork/compiler/FuncState.leaveblock:()V
+      71: aload_2
+      72: iload         4
+      74: invokevirtual #783                // Method org/luaj/kahluafork/compiler/FuncState.patchtohere:(I)V
+      77: return
+
+  void repeatstat(int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_3
+       5: aload_3
+       6: invokevirtual #771                // Method org/luaj/kahluafork/compiler/FuncState.getlabel:()I
+       9: istore        4
+      11: new           #705                // class org/luaj/kahluafork/compiler/BlockCnt
+      14: dup
+      15: invokespecial #707                // Method org/luaj/kahluafork/compiler/BlockCnt."<init>":()V
+      18: astore        5
+      20: new           #705                // class org/luaj/kahluafork/compiler/BlockCnt
+      23: dup
+      24: invokespecial #707                // Method org/luaj/kahluafork/compiler/BlockCnt."<init>":()V
+      27: astore        6
+      29: aload_3
+      30: aload         5
+      32: iconst_1
+      33: invokevirtual #708                // Method org/luaj/kahluafork/compiler/FuncState.enterblock:(Lorg/luaj/kahluafork/compiler/BlockCnt;Z)V
+      36: aload_3
+      37: aload         6
+      39: iconst_0
+      40: invokevirtual #708                // Method org/luaj/kahluafork/compiler/FuncState.enterblock:(Lorg/luaj/kahluafork/compiler/BlockCnt;Z)V
+      43: aload_0
+      44: invokevirtual #62                 // Method next:()V
+      47: aload_0
+      48: invokevirtual #66                 // Method chunk:()V
+      51: aload_0
+      52: sipush        276
+      55: sipush        272
+      58: iload_1
+      59: invokevirtual #563                // Method check_match:(III)V
+      62: aload_0
+      63: invokevirtual #774                // Method cond:()I
+      66: istore_2
+      67: aload         6
+      69: getfield      #756                // Field org/luaj/kahluafork/compiler/BlockCnt.upval:Z
+      72: ifne          89
+      75: aload_3
+      76: invokevirtual #715                // Method org/luaj/kahluafork/compiler/FuncState.leaveblock:()V
+      79: aload_3
+      80: iload_2
+      81: iload         4
+      83: invokevirtual #780                // Method org/luaj/kahluafork/compiler/FuncState.patchlist:(II)V
+      86: goto          112
+      89: aload_0
+      90: invokevirtual #786                // Method breakstat:()V
+      93: aload_3
+      94: iload_2
+      95: invokevirtual #783                // Method org/luaj/kahluafork/compiler/FuncState.patchtohere:(I)V
+      98: aload_3
+      99: invokevirtual #715                // Method org/luaj/kahluafork/compiler/FuncState.leaveblock:()V
+     102: aload_3
+     103: aload_3
+     104: invokevirtual #765                // Method org/luaj/kahluafork/compiler/FuncState.jump:()I
+     107: iload         4
+     109: invokevirtual #780                // Method org/luaj/kahluafork/compiler/FuncState.patchlist:(II)V
+     112: aload_3
+     113: invokevirtual #715                // Method org/luaj/kahluafork/compiler/FuncState.leaveblock:()V
+     116: return
+
+  int exp1();
+    Code:
+       0: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       3: dup
+       4: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+       7: astore_1
+       8: aload_0
+       9: aload_1
+      10: invokevirtual #516                // Method expr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      13: aload_1
+      14: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      17: istore_2
+      18: aload_0
+      19: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      22: aload_1
+      23: invokevirtual #424                // Method org/luaj/kahluafork/compiler/FuncState.exp2nextreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      26: iload_2
+      27: ireturn
+
+  void forbody(int, int, int, boolean);
+    Code:
+       0: new           #705                // class org/luaj/kahluafork/compiler/BlockCnt
+       3: dup
+       4: invokespecial #707                // Method org/luaj/kahluafork/compiler/BlockCnt."<init>":()V
+       7: astore        5
+       9: aload_0
+      10: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      13: astore        6
+      15: aload_0
+      16: iconst_3
+      17: invokevirtual #591                // Method adjustlocalvars:(I)V
+      20: aload_0
+      21: sipush        259
+      24: invokevirtual #522                // Method checknext:(I)V
+      27: iload         4
+      29: ifeq          44
+      32: aload         6
+      34: bipush        32
+      36: iload_1
+      37: iconst_m1
+      38: invokevirtual #789                // Method org/luaj/kahluafork/compiler/FuncState.codeAsBx:(III)I
+      41: goto          49
+      44: aload         6
+      46: invokevirtual #765                // Method org/luaj/kahluafork/compiler/FuncState.jump:()I
+      49: istore        7
+      51: aload         6
+      53: aload         5
+      55: iconst_0
+      56: invokevirtual #708                // Method org/luaj/kahluafork/compiler/FuncState.enterblock:(Lorg/luaj/kahluafork/compiler/BlockCnt;Z)V
+      59: aload_0
+      60: iload_3
+      61: invokevirtual #591                // Method adjustlocalvars:(I)V
+      64: aload         6
+      66: iload_3
+      67: invokevirtual #421                // Method org/luaj/kahluafork/compiler/FuncState.reserveregs:(I)V
+      70: aload_0
+      71: invokevirtual #777                // Method block:()V
+      74: aload         6
+      76: invokevirtual #715                // Method org/luaj/kahluafork/compiler/FuncState.leaveblock:()V
+      79: aload         6
+      81: iload         7
+      83: invokevirtual #783                // Method org/luaj/kahluafork/compiler/FuncState.patchtohere:(I)V
+      86: iload         4
+      88: ifeq          103
+      91: aload         6
+      93: bipush        31
+      95: iload_1
+      96: iconst_m1
+      97: invokevirtual #789                // Method org/luaj/kahluafork/compiler/FuncState.codeAsBx:(III)I
+     100: goto          113
+     103: aload         6
+     105: bipush        33
+     107: iload_1
+     108: iconst_0
+     109: iload_3
+     110: invokevirtual #459                // Method org/luaj/kahluafork/compiler/FuncState.codeABC:(IIII)I
+     113: istore        8
+     115: aload         6
+     117: iload_2
+     118: invokevirtual #631                // Method org/luaj/kahluafork/compiler/FuncState.fixline:(I)V
+     121: aload         6
+     123: iload         4
+     125: ifeq          133
+     128: iload         8
+     130: goto          138
+     133: aload         6
+     135: invokevirtual #765                // Method org/luaj/kahluafork/compiler/FuncState.jump:()I
+     138: iload         7
+     140: iconst_1
+     141: iadd
+     142: invokevirtual #780                // Method org/luaj/kahluafork/compiler/FuncState.patchlist:(II)V
+     145: return
+
+  void fornum(java.lang.String, int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_3
+       5: aload_3
+       6: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+       9: istore        4
+      11: aload_0
+      12: ldc_w         #792                // String (for index)
+      15: iconst_0
+      16: invokevirtual #605                // Method new_localvarliteral:(Ljava/lang/String;I)V
+      19: aload_0
+      20: ldc_w         #794                // String (for limit)
+      23: iconst_1
+      24: invokevirtual #605                // Method new_localvarliteral:(Ljava/lang/String;I)V
+      27: aload_0
+      28: ldc_w         #796                // String (for step)
+      31: iconst_2
+      32: invokevirtual #605                // Method new_localvarliteral:(Ljava/lang/String;I)V
+      35: aload_0
+      36: aload_1
+      37: iconst_3
+      38: invokevirtual #366                // Method new_localvar:(Ljava/lang/String;I)V
+      41: aload_0
+      42: bipush        61
+      44: invokevirtual #522                // Method checknext:(I)V
+      47: aload_0
+      48: invokevirtual #798                // Method exp1:()I
+      51: pop
+      52: aload_0
+      53: bipush        44
+      55: invokevirtual #522                // Method checknext:(I)V
+      58: aload_0
+      59: invokevirtual #798                // Method exp1:()I
+      62: pop
+      63: aload_0
+      64: bipush        44
+      66: invokevirtual #334                // Method testnext:(I)Z
+      69: ifeq          80
+      72: aload_0
+      73: invokevirtual #798                // Method exp1:()I
+      76: pop
+      77: goto          100
+      80: aload_3
+      81: iconst_1
+      82: aload_3
+      83: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+      86: aload_3
+      87: dconst_1
+      88: invokevirtual #801                // Method org/luaj/kahluafork/compiler/FuncState.numberK:(D)I
+      91: invokevirtual #449                // Method org/luaj/kahluafork/compiler/FuncState.codeABx:(III)I
+      94: pop
+      95: aload_3
+      96: iconst_1
+      97: invokevirtual #421                // Method org/luaj/kahluafork/compiler/FuncState.reserveregs:(I)V
+     100: aload_0
+     101: iload         4
+     103: iload_2
+     104: iconst_1
+     105: iconst_1
+     106: invokevirtual #805                // Method forbody:(IIIZ)V
+     109: return
+
+  void forlist(java.lang.String);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       8: dup
+       9: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      12: astore_3
+      13: iconst_0
+      14: istore        4
+      16: aload_2
+      17: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+      20: istore        6
+      22: aload_0
+      23: ldc_w         #809                // String (for generator)
+      26: iload         4
+      28: iinc          4, 1
+      31: invokevirtual #605                // Method new_localvarliteral:(Ljava/lang/String;I)V
+      34: aload_0
+      35: ldc_w         #811                // String (for state)
+      38: iload         4
+      40: iinc          4, 1
+      43: invokevirtual #605                // Method new_localvarliteral:(Ljava/lang/String;I)V
+      46: aload_0
+      47: ldc_w         #813                // String (for control)
+      50: iload         4
+      52: iinc          4, 1
+      55: invokevirtual #605                // Method new_localvarliteral:(Ljava/lang/String;I)V
+      58: aload_0
+      59: aload_1
+      60: iload         4
+      62: iinc          4, 1
+      65: invokevirtual #366                // Method new_localvar:(Ljava/lang/String;I)V
+      68: aload_0
+      69: bipush        44
+      71: invokevirtual #334                // Method testnext:(I)Z
+      74: ifeq          93
+      77: aload_0
+      78: aload_0
+      79: invokevirtual #350                // Method str_checkname:()Ljava/lang/String;
+      82: iload         4
+      84: iinc          4, 1
+      87: invokevirtual #366                // Method new_localvar:(Ljava/lang/String;I)V
+      90: goto          68
+      93: aload_0
+      94: sipush        267
+      97: invokevirtual #522                // Method checknext:(I)V
+     100: aload_0
+     101: getfield      #115                // Field linenumber:I
+     104: istore        5
+     106: aload_0
+     107: iconst_3
+     108: aload_0
+     109: aload_3
+     110: invokevirtual #620                // Method explist1:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+     113: aload_3
+     114: invokevirtual #738                // Method adjust_assign:(IILorg/luaj/kahluafork/compiler/ExpDesc;)V
+     117: aload_2
+     118: iconst_3
+     119: invokevirtual #815                // Method org/luaj/kahluafork/compiler/FuncState.checkstack:(I)V
+     122: aload_0
+     123: iload         6
+     125: iload         5
+     127: iload         4
+     129: iconst_3
+     130: isub
+     131: iconst_0
+     132: invokevirtual #805                // Method forbody:(IIIZ)V
+     135: return
+
+  void forstat(int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: new           #705                // class org/luaj/kahluafork/compiler/BlockCnt
+       8: dup
+       9: invokespecial #707                // Method org/luaj/kahluafork/compiler/BlockCnt."<init>":()V
+      12: astore        4
+      14: aload_2
+      15: aload         4
+      17: iconst_1
+      18: invokevirtual #708                // Method org/luaj/kahluafork/compiler/FuncState.enterblock:(Lorg/luaj/kahluafork/compiler/BlockCnt;Z)V
+      21: aload_0
+      22: invokevirtual #62                 // Method next:()V
+      25: aload_0
+      26: invokevirtual #350                // Method str_checkname:()Ljava/lang/String;
+      29: astore_3
+      30: aload_0
+      31: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      34: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      37: lookupswitch  { // 3
+                    44: 81
+                    61: 72
+                   267: 81
+               default: 89
+          }
+      72: aload_0
+      73: aload_3
+      74: iload_1
+      75: invokevirtual #818                // Method fornum:(Ljava/lang/String;I)V
+      78: goto          110
+      81: aload_0
+      82: aload_3
+      83: invokevirtual #821                // Method forlist:(Ljava/lang/String;)V
+      86: goto          110
+      89: aload_0
+      90: ldc_w         #824                // String =
+      93: invokestatic  #587                // Method LUA_QL:(Ljava/lang/Object;)Ljava/lang/String;
+      96: ldc_w         #826                // String in
+      99: invokestatic  #587                // Method LUA_QL:(Ljava/lang/Object;)Ljava/lang/String;
+     102: invokedynamic #828,  0            // InvokeDynamic #10:makeConcatWithConstants:(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+     107: invokevirtual #214                // Method syntaxerror:(Ljava/lang/String;)V
+     110: aload_0
+     111: sipush        262
+     114: sipush        264
+     117: iload_1
+     118: invokevirtual #563                // Method check_match:(III)V
+     121: aload_2
+     122: invokevirtual #715                // Method org/luaj/kahluafork/compiler/FuncState.leaveblock:()V
+     125: return
+
+  int test_then_block();
+    Code:
+       0: aload_0
+       1: invokevirtual #62                 // Method next:()V
+       4: aload_0
+       5: invokevirtual #774                // Method cond:()I
+       8: istore_1
+       9: aload_0
+      10: sipush        274
+      13: invokevirtual #522                // Method checknext:(I)V
+      16: aload_0
+      17: invokevirtual #777                // Method block:()V
+      20: iload_1
+      21: ireturn
+
+  void ifstat(int);
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_2
+       5: iconst_m1
+       6: istore        4
+       8: aload_0
+       9: invokevirtual #831                // Method test_then_block:()I
+      12: istore_3
+      13: aload_0
+      14: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      17: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      20: sipush        261
+      23: if_icmpne     51
+      26: aload_2
+      27: iload         4
+      29: aload_2
+      30: invokevirtual #765                // Method org/luaj/kahluafork/compiler/FuncState.jump:()I
+      33: invokevirtual #768                // Method org/luaj/kahluafork/compiler/FuncState.concat:(II)I
+      36: istore        4
+      38: aload_2
+      39: iload_3
+      40: invokevirtual #783                // Method org/luaj/kahluafork/compiler/FuncState.patchtohere:(I)V
+      43: aload_0
+      44: invokevirtual #831                // Method test_then_block:()I
+      47: istore_3
+      48: goto          13
+      51: aload_0
+      52: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      55: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      58: sipush        260
+      61: if_icmpne     92
+      64: aload_2
+      65: iload         4
+      67: aload_2
+      68: invokevirtual #765                // Method org/luaj/kahluafork/compiler/FuncState.jump:()I
+      71: invokevirtual #768                // Method org/luaj/kahluafork/compiler/FuncState.concat:(II)I
+      74: istore        4
+      76: aload_2
+      77: iload_3
+      78: invokevirtual #783                // Method org/luaj/kahluafork/compiler/FuncState.patchtohere:(I)V
+      81: aload_0
+      82: invokevirtual #62                 // Method next:()V
+      85: aload_0
+      86: invokevirtual #777                // Method block:()V
+      89: goto          101
+      92: aload_2
+      93: iload         4
+      95: iload_3
+      96: invokevirtual #768                // Method org/luaj/kahluafork/compiler/FuncState.concat:(II)I
+      99: istore        4
+     101: aload_2
+     102: iload         4
+     104: invokevirtual #783                // Method org/luaj/kahluafork/compiler/FuncState.patchtohere:(I)V
+     107: aload_0
+     108: sipush        262
+     111: sipush        266
+     114: iload_1
+     115: invokevirtual #563                // Method check_match:(III)V
+     118: return
+
+  void localfunc();
+    Code:
+       0: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       3: dup
+       4: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+       7: astore_1
+       8: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+      11: dup
+      12: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      15: astore_2
+      16: aload_0
+      17: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      20: astore_3
+      21: aload_0
+      22: aload_0
+      23: invokevirtual #350                // Method str_checkname:()Ljava/lang/String;
+      26: iconst_0
+      27: invokevirtual #366                // Method new_localvar:(Ljava/lang/String;I)V
+      30: aload_1
+      31: bipush        6
+      33: aload_3
+      34: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+      37: invokevirtual #344                // Method org/luaj/kahluafork/compiler/ExpDesc.init:(II)V
+      40: aload_3
+      41: iconst_1
+      42: invokevirtual #421                // Method org/luaj/kahluafork/compiler/FuncState.reserveregs:(I)V
+      45: aload_0
+      46: iconst_1
+      47: invokevirtual #591                // Method adjustlocalvars:(I)V
+      50: aload_0
+      51: aload_2
+      52: iconst_0
+      53: aload_0
+      54: getfield      #115                // Field linenumber:I
+      57: invokevirtual #662                // Method body:(Lorg/luaj/kahluafork/compiler/ExpDesc;ZI)V
+      60: aload_3
+      61: aload_1
+      62: aload_2
+      63: invokevirtual #745                // Method org/luaj/kahluafork/compiler/FuncState.storevar:(Lorg/luaj/kahluafork/compiler/ExpDesc;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      66: return
+
+  void localstat(int);
+    Code:
+       0: iconst_0
+       1: istore_2
+       2: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       5: dup
+       6: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+       9: astore        4
+      11: aload_0
+      12: aload_0
+      13: invokevirtual #350                // Method str_checkname:()Ljava/lang/String;
+      16: iload_2
+      17: iinc          2, 1
+      20: iload_1
+      21: invokevirtual #834                // Method new_localvar:(Ljava/lang/String;II)V
+      24: aload_0
+      25: bipush        44
+      27: invokevirtual #334                // Method testnext:(I)Z
+      30: ifne          11
+      33: aload_0
+      34: bipush        61
+      36: invokevirtual #334                // Method testnext:(I)Z
+      39: ifeq          52
+      42: aload_0
+      43: aload         4
+      45: invokevirtual #620                // Method explist1:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+      48: istore_3
+      49: goto          60
+      52: aload         4
+      54: iconst_0
+      55: putfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      58: iconst_0
+      59: istore_3
+      60: aload_0
+      61: iload_2
+      62: iload_3
+      63: aload         4
+      65: invokevirtual #738                // Method adjust_assign:(IILorg/luaj/kahluafork/compiler/ExpDesc;)V
+      68: aload_0
+      69: iload_2
+      70: invokevirtual #591                // Method adjustlocalvars:(I)V
+      73: return
+
+  boolean funcname(org.luaj.kahluafork.compiler.ExpDesc);
+    Code:
+       0: iconst_0
+       1: istore_2
+       2: aload_0
+       3: aload_1
+       4: invokevirtual #637                // Method singlevar:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+       7: aload_0
+       8: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      11: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      14: bipush        46
+      16: if_icmpne     27
+      19: aload_0
+      20: aload_1
+      21: invokevirtual #645                // Method field:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      24: goto          7
+      27: aload_0
+      28: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      31: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      34: bipush        58
+      36: if_icmpne     46
+      39: iconst_1
+      40: istore_2
+      41: aload_0
+      42: aload_1
+      43: invokevirtual #645                // Method field:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      46: iload_2
+      47: ireturn
+
+  void funcstat(int);
+    Code:
+       0: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       3: dup
+       4: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+       7: astore_3
+       8: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+      11: dup
+      12: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      15: astore        4
+      17: aload_0
+      18: invokevirtual #62                 // Method next:()V
+      21: aload_0
+      22: aload_3
+      23: invokevirtual #837                // Method funcname:(Lorg/luaj/kahluafork/compiler/ExpDesc;)Z
+      26: istore_2
+      27: aload_0
+      28: aload         4
+      30: iload_2
+      31: iload_1
+      32: invokevirtual #662                // Method body:(Lorg/luaj/kahluafork/compiler/ExpDesc;ZI)V
+      35: aload_0
+      36: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      39: aload_3
+      40: aload         4
+      42: invokevirtual #745                // Method org/luaj/kahluafork/compiler/FuncState.storevar:(Lorg/luaj/kahluafork/compiler/ExpDesc;Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      45: aload_0
+      46: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      49: iload_1
+      50: invokevirtual #631                // Method org/luaj/kahluafork/compiler/FuncState.fixline:(I)V
+      53: return
+
+  void exprstat();
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_1
+       5: new           #719                // class org/luaj/kahluafork/compiler/LHS_assign
+       8: dup
+       9: invokespecial #729                // Method org/luaj/kahluafork/compiler/LHS_assign."<init>":()V
+      12: astore_2
+      13: aload_0
+      14: aload_2
+      15: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      18: invokevirtual #666                // Method primaryexp:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      21: aload_2
+      22: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      25: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      28: bipush        13
+      30: if_icmpne     48
+      33: aload_1
+      34: aload_2
+      35: getfield      #718                // Field org/luaj/kahluafork/compiler/LHS_assign.v:Lorg/luaj/kahluafork/compiler/ExpDesc;
+      38: invokevirtual #841                // Method org/luaj/kahluafork/compiler/FuncState.getcodePtr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)Lorg/luaj/kahluafork/compiler/InstructionPtr;
+      41: iconst_1
+      42: invokestatic  #582                // Method org/luaj/kahluafork/compiler/FuncState.SETARG_C:(Lorg/luaj/kahluafork/compiler/InstructionPtr;I)V
+      45: goto          59
+      48: aload_2
+      49: aconst_null
+      50: putfield      #724                // Field org/luaj/kahluafork/compiler/LHS_assign.prev:Lorg/luaj/kahluafork/compiler/LHS_assign;
+      53: aload_0
+      54: aload_2
+      55: iconst_1
+      56: invokevirtual #734                // Method assignment:(Lorg/luaj/kahluafork/compiler/LHS_assign;I)V
+      59: return
+
+  void retstat();
+    Code:
+       0: aload_0
+       1: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+       4: astore_1
+       5: new           #345                // class org/luaj/kahluafork/compiler/ExpDesc
+       8: dup
+       9: invokespecial #504                // Method org/luaj/kahluafork/compiler/ExpDesc."<init>":()V
+      12: astore_2
+      13: aload_0
+      14: invokevirtual #62                 // Method next:()V
+      17: aload_0
+      18: aload_0
+      19: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      22: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      25: invokevirtual #845                // Method block_follow:(I)Z
+      28: ifne          43
+      31: aload_0
+      32: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      35: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      38: bipush        59
+      40: if_icmpne     51
+      43: iconst_0
+      44: dup
+      45: istore        4
+      47: istore_3
+      48: goto          177
+      51: aload_0
+      52: aload_2
+      53: invokevirtual #620                // Method explist1:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+      56: istore        4
+      58: aload_0
+      59: aload_2
+      60: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      63: invokevirtual #414                // Method hasmultret:(I)Z
+      66: ifeq          133
+      69: aload_1
+      70: aload_2
+      71: invokevirtual #623                // Method org/luaj/kahluafork/compiler/FuncState.setmultret:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+      74: aload_2
+      75: getfield      #411                // Field org/luaj/kahluafork/compiler/ExpDesc.k:I
+      78: bipush        13
+      80: if_icmpne     122
+      83: iload         4
+      85: iconst_1
+      86: if_icmpne     122
+      89: aload_1
+      90: aload_2
+      91: invokevirtual #841                // Method org/luaj/kahluafork/compiler/FuncState.getcodePtr:(Lorg/luaj/kahluafork/compiler/ExpDesc;)Lorg/luaj/kahluafork/compiler/InstructionPtr;
+      94: bipush        29
+      96: invokestatic  #848                // Method org/luaj/kahluafork/compiler/FuncState.SET_OPCODE:(Lorg/luaj/kahluafork/compiler/InstructionPtr;I)V
+      99: aload_1
+     100: aload_2
+     101: invokevirtual #851                // Method org/luaj/kahluafork/compiler/FuncState.getcode:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+     104: invokestatic  #854                // Method org/luaj/kahluafork/compiler/FuncState.GETARG_A:(I)I
+     107: aload_1
+     108: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+     111: if_icmpne     118
+     114: iconst_1
+     115: goto          119
+     118: iconst_0
+     119: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     122: aload_1
+     123: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+     126: istore_3
+     127: iconst_m1
+     128: istore        4
+     130: goto          177
+     133: iload         4
+     135: iconst_1
+     136: if_icmpne     148
+     139: aload_1
+     140: aload_2
+     141: invokevirtual #505                // Method org/luaj/kahluafork/compiler/FuncState.exp2anyreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)I
+     144: istore_3
+     145: goto          177
+     148: aload_1
+     149: aload_2
+     150: invokevirtual #424                // Method org/luaj/kahluafork/compiler/FuncState.exp2nextreg:(Lorg/luaj/kahluafork/compiler/ExpDesc;)V
+     153: aload_1
+     154: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+     157: istore_3
+     158: iload         4
+     160: aload_1
+     161: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+     164: iload_3
+     165: isub
+     166: if_icmpne     173
+     169: iconst_1
+     170: goto          174
+     173: iconst_0
+     174: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+     177: aload_1
+     178: iload_3
+     179: iload         4
+     181: invokevirtual #468                // Method org/luaj/kahluafork/compiler/FuncState.ret:(II)V
+     184: return
+
+  boolean statement();
+    Code:
+       0: aload_0
+       1: getfield      #115                // Field linenumber:I
+       4: istore_1
+       5: aload_0
+       6: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+       9: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      12: tableswitch   { // 258 to 277
+                   258: 198
+                   259: 122
+                   260: 208
+                   261: 208
+                   262: 208
+                   263: 208
+                   264: 143
+                   265: 157
+                   266: 108
+                   267: 208
+                   268: 164
+                   269: 208
+                   270: 208
+                   271: 208
+                   272: 150
+                   273: 192
+                   274: 208
+                   275: 208
+                   276: 208
+                   277: 115
+               default: 208
+          }
+     108: aload_0
+     109: iload_1
+     110: invokevirtual #857                // Method ifstat:(I)V
+     113: iconst_0
+     114: ireturn
+     115: aload_0
+     116: iload_1
+     117: invokevirtual #860                // Method whilestat:(I)V
+     120: iconst_0
+     121: ireturn
+     122: aload_0
+     123: invokevirtual #62                 // Method next:()V
+     126: aload_0
+     127: invokevirtual #777                // Method block:()V
+     130: aload_0
+     131: sipush        262
+     134: sipush        259
+     137: iload_1
+     138: invokevirtual #563                // Method check_match:(III)V
+     141: iconst_0
+     142: ireturn
+     143: aload_0
+     144: iload_1
+     145: invokevirtual #863                // Method forstat:(I)V
+     148: iconst_0
+     149: ireturn
+     150: aload_0
+     151: iload_1
+     152: invokevirtual #866                // Method repeatstat:(I)V
+     155: iconst_0
+     156: ireturn
+     157: aload_0
+     158: iload_1
+     159: invokevirtual #869                // Method funcstat:(I)V
+     162: iconst_0
+     163: ireturn
+     164: aload_0
+     165: invokevirtual #62                 // Method next:()V
+     168: aload_0
+     169: sipush        265
+     172: invokevirtual #334                // Method testnext:(I)Z
+     175: ifeq          185
+     178: aload_0
+     179: invokevirtual #872                // Method localfunc:()V
+     182: goto          190
+     185: aload_0
+     186: iload_1
+     187: invokevirtual #875                // Method localstat:(I)V
+     190: iconst_0
+     191: ireturn
+     192: aload_0
+     193: invokevirtual #878                // Method retstat:()V
+     196: iconst_1
+     197: ireturn
+     198: aload_0
+     199: invokevirtual #62                 // Method next:()V
+     202: aload_0
+     203: invokevirtual #786                // Method breakstat:()V
+     206: iconst_1
+     207: ireturn
+     208: aload_0
+     209: invokevirtual #881                // Method exprstat:()V
+     212: iconst_0
+     213: ireturn
+
+  void chunk();
+    Code:
+       0: iconst_0
+       1: istore_1
+       2: aload_0
+       3: invokevirtual #669                // Method enterlevel:()V
+       6: iload_1
+       7: ifne          98
+      10: aload_0
+      11: aload_0
+      12: getfield      #97                 // Field t:Lorg/luaj/kahluafork/compiler/Token;
+      15: getfield      #112                // Field org/luaj/kahluafork/compiler/Token.token:I
+      18: invokevirtual #845                // Method block_follow:(I)Z
+      21: ifne          98
+      24: aload_0
+      25: invokevirtual #884                // Method statement:()Z
+      28: istore_1
+      29: aload_0
+      30: bipush        59
+      32: invokevirtual #334                // Method testnext:(I)Z
+      35: pop
+      36: aload_0
+      37: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      40: getfield      #48                 // Field org/luaj/kahluafork/compiler/FuncState.f:Lse/krka/kahlua/vm/Prototype;
+      43: getfield      #887                // Field se/krka/kahlua/vm/Prototype.maxStacksize:I
+      46: aload_0
+      47: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      50: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+      53: if_icmplt     77
+      56: aload_0
+      57: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      60: getfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+      63: aload_0
+      64: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      67: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      70: if_icmplt     77
+      73: iconst_1
+      74: goto          78
+      77: iconst_0
+      78: invokestatic  #80                 // Method org/luaj/kahluafork/compiler/FuncState._assert:(Z)V
+      81: aload_0
+      82: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      85: aload_0
+      86: getfield      #87                 // Field fs:Lorg/luaj/kahluafork/compiler/FuncState;
+      89: getfield      #369                // Field org/luaj/kahluafork/compiler/FuncState.nactvar:I
+      92: putfield      #428                // Field org/luaj/kahluafork/compiler/FuncState.freereg:I
+      95: goto          6
+      98: aload_0
+      99: invokevirtual #702                // Method leavelevel:()V
+     102: return
+
+  static {};
+    Code:
+       0: bipush        6
+       2: anewarray     #10                 // class java/lang/String
+       5: dup
+       6: iconst_0
+       7: ldc_w         #813                // String (for control)
+      10: aastore
+      11: dup
+      12: iconst_1
+      13: ldc_w         #809                // String (for generator)
+      16: aastore
+      17: dup
+      18: iconst_2
+      19: ldc_w         #792                // String (for index)
+      22: aastore
+      23: dup
+      24: iconst_3
+      25: ldc_w         #794                // String (for limit)
+      28: aastore
+      29: dup
+      30: iconst_4
+      31: ldc_w         #811                // String (for state)
+      34: aastore
+      35: dup
+      36: iconst_5
+      37: ldc_w         #796                // String (for step)
+      40: aastore
+      41: putstatic     #890                // Field RESERVED_LOCAL_VAR_KEYWORDS:[Ljava/lang/String;
+      44: new           #23                 // class java/util/Hashtable
+      47: dup
+      48: invokespecial #893                // Method java/util/Hashtable."<init>":()V
+      51: putstatic     #18                 // Field RESERVED_LOCAL_VAR_KEYWORDS_TABLE:Ljava/util/Hashtable;
+      54: iconst_0
+      55: istore_0
+      56: iload_0
+      57: getstatic     #890                // Field RESERVED_LOCAL_VAR_KEYWORDS:[Ljava/lang/String;
+      60: arraylength
+      61: if_icmpge     85
+      64: getstatic     #18                 // Field RESERVED_LOCAL_VAR_KEYWORDS_TABLE:Ljava/util/Hashtable;
+      67: getstatic     #890                // Field RESERVED_LOCAL_VAR_KEYWORDS:[Ljava/lang/String;
+      70: iload_0
+      71: aaload
+      72: getstatic     #894                // Field java/lang/Boolean.TRUE:Ljava/lang/Boolean;
+      75: invokevirtual #900                // Method java/util/Hashtable.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+      78: pop
+      79: iinc          0, 1
+      82: goto          56
+      85: bipush        31
+      87: anewarray     #10                 // class java/lang/String
+      90: dup
+      91: iconst_0
+      92: ldc_w         #904                // String and
+      95: aastore
+      96: dup
+      97: iconst_1
+      98: ldc_w         #906                // String break
+     101: aastore
+     102: dup
+     103: iconst_2
+     104: ldc_w         #908                // String do
+     107: aastore
+     108: dup
+     109: iconst_3
+     110: ldc_w         #910                // String else
+     113: aastore
+     114: dup
+     115: iconst_4
+     116: ldc_w         #912                // String elseif
+     119: aastore
+     120: dup
+     121: iconst_5
+     122: ldc_w         #914                // String end
+     125: aastore
+     126: dup
+     127: bipush        6
+     129: ldc_w         #916                // String false
+     132: aastore
+     133: dup
+     134: bipush        7
+     136: ldc_w         #918                // String for
+     139: aastore
+     140: dup
+     141: bipush        8
+     143: ldc_w         #920                // String function
+     146: aastore
+     147: dup
+     148: bipush        9
+     150: ldc_w         #922                // String if
+     153: aastore
+     154: dup
+     155: bipush        10
+     157: ldc_w         #826                // String in
+     160: aastore
+     161: dup
+     162: bipush        11
+     164: ldc_w         #924                // String local
+     167: aastore
+     168: dup
+     169: bipush        12
+     171: ldc_w         #926                // String nil
+     174: aastore
+     175: dup
+     176: bipush        13
+     178: ldc_w         #927                // String not
+     181: aastore
+     182: dup
+     183: bipush        14
+     185: ldc_w         #929                // String or
+     188: aastore
+     189: dup
+     190: bipush        15
+     192: ldc_w         #931                // String repeat
+     195: aastore
+     196: dup
+     197: bipush        16
+     199: ldc_w         #933                // String return
+     202: aastore
+     203: dup
+     204: bipush        17
+     206: ldc_w         #935                // String then
+     209: aastore
+     210: dup
+     211: bipush        18
+     213: ldc_w         #937                // String true
+     216: aastore
+     217: dup
+     218: bipush        19
+     220: ldc_w         #939                // String until
+     223: aastore
+     224: dup
+     225: bipush        20
+     227: ldc_w         #941                // String while
+     230: aastore
+     231: dup
+     232: bipush        21
+     234: ldc_w         #943                // String ..
+     237: aastore
+     238: dup
+     239: bipush        22
+     241: ldc_w         #585                // String ...
+     244: aastore
+     245: dup
+     246: bipush        23
+     248: ldc_w         #945                // String ==
+     251: aastore
+     252: dup
+     253: bipush        24
+     255: ldc_w         #947                // String >=
+     258: aastore
+     259: dup
+     260: bipush        25
+     262: ldc_w         #949                // String <=
+     265: aastore
+     266: dup
+     267: bipush        26
+     269: ldc_w         #951                // String ~=
+     272: aastore
+     273: dup
+     274: bipush        27
+     276: ldc_w         #953                // String <number>
+     279: aastore
+     280: dup
+     281: bipush        28
+     283: ldc_w         #955                // String <name>
+     286: aastore
+     287: dup
+     288: bipush        29
+     290: ldc_w         #957                // String <string>
+     293: aastore
+     294: dup
+     295: bipush        30
+     297: ldc_w         #959                // String <eof>
+     300: aastore
+     301: putstatic     #164                // Field luaX_tokens:[Ljava/lang/String;
+     304: new           #23                 // class java/util/Hashtable
+     307: dup
+     308: invokespecial #893                // Method java/util/Hashtable."<init>":()V
+     311: putstatic     #313                // Field RESERVED:Ljava/util/Hashtable;
+     314: iconst_0
+     315: istore_0
+     316: iload_0
+     317: bipush        21
+     319: if_icmpge     350
+     322: getstatic     #164                // Field luaX_tokens:[Ljava/lang/String;
+     325: iload_0
+     326: aaload
+     327: astore_1
+     328: getstatic     #313                // Field RESERVED:Ljava/util/Hashtable;
+     331: aload_1
+     332: sipush        257
+     335: iload_0
+     336: iadd
+     337: invokestatic  #961                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+     340: invokevirtual #900                // Method java/util/Hashtable.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+     343: pop
+     344: iinc          0, 1
+     347: goto          316
+     350: bipush        15
+     352: newarray       int
+     354: dup
+     355: iconst_0
+     356: bipush        6
+     358: iastore
+     359: dup
+     360: iconst_1
+     361: bipush        6
+     363: iastore
+     364: dup
+     365: iconst_2
+     366: bipush        7
+     368: iastore
+     369: dup
+     370: iconst_3
+     371: bipush        7
+     373: iastore
+     374: dup
+     375: iconst_4
+     376: bipush        7
+     378: iastore
+     379: dup
+     380: iconst_5
+     381: bipush        10
+     383: iastore
+     384: dup
+     385: bipush        6
+     387: iconst_5
+     388: iastore
+     389: dup
+     390: bipush        7
+     392: iconst_3
+     393: iastore
+     394: dup
+     395: bipush        8
+     397: iconst_3
+     398: iastore
+     399: dup
+     400: bipush        9
+     402: iconst_3
+     403: iastore
+     404: dup
+     405: bipush        10
+     407: iconst_3
+     408: iastore
+     409: dup
+     410: bipush        11
+     412: iconst_3
+     413: iastore
+     414: dup
+     415: bipush        12
+     417: iconst_3
+     418: iastore
+     419: dup
+     420: bipush        13
+     422: iconst_2
+     423: iastore
+     424: dup
+     425: bipush        14
+     427: iconst_1
+     428: iastore
+     429: putstatic     #689                // Field priorityLeft:[I
+     432: bipush        15
+     434: newarray       int
+     436: dup
+     437: iconst_0
+     438: bipush        6
+     440: iastore
+     441: dup
+     442: iconst_1
+     443: bipush        6
+     445: iastore
+     446: dup
+     447: iconst_2
+     448: bipush        7
+     450: iastore
+     451: dup
+     452: iconst_3
+     453: bipush        7
+     455: iastore
+     456: dup
+     457: iconst_4
+     458: bipush        7
+     460: iastore
+     461: dup
+     462: iconst_5
+     463: bipush        9
+     465: iastore
+     466: dup
+     467: bipush        6
+     469: iconst_4
+     470: iastore
+     471: dup
+     472: bipush        7
+     474: iconst_3
+     475: iastore
+     476: dup
+     477: bipush        8
+     479: iconst_3
+     480: iastore
+     481: dup
+     482: bipush        9
+     484: iconst_3
+     485: iastore
+     486: dup
+     487: bipush        10
+     489: iconst_3
+     490: iastore
+     491: dup
+     492: bipush        11
+     494: iconst_3
+     495: iastore
+     496: dup
+     497: bipush        12
+     499: iconst_3
+     500: iastore
+     501: dup
+     502: bipush        13
+     504: iconst_2
+     505: iastore
+     506: dup
+     507: bipush        14
+     509: iconst_1
+     510: iastore
+     511: putstatic     #695                // Field priorityRight:[I
+     514: return
+}

@@ -1,0 +1,24 @@
+Actual LuaCompiler.loadstring UTF-8 literal probe against installed Project Zomboid jar:
+
+SRC=return 'ABC', #'ABC', string.byte('ABC',1)
+0=true
+1=STRING U+0041 U+0042 U+0043
+2=3.0
+3=65.0
+
+SRC=return '中', #'中', string.byte('中',1)
+0=true
+1=STRING U+002D
+2=1.0
+3=45.0
+
+SRC=return '😀', #'😀', string.byte('😀',1), string.byte('😀',2)
+0=true
+1=STRING U+003D U+0000
+2=2.0
+3=61.0
+4=0.0
+
+Cause from javap LexState: source is read through Reader.read() into int current (UTF-16 code units), then read_string saves each current via save(int). save stores only byte low 8 bits in byte[] buff. Final newstring(byte[],...) decodes the bytes as UTF-8. Therefore non-ASCII Java/Lua source literals are irreversibly corrupted: U+4E2D low byte 0x2D => '-', U+D83D low byte 0x3D => '=', U+DE00 low byte 0 => NUL. ASCII source works.
+
+Files: KahluaLiteralProbe.java, KahluaLiteralProbe.output.txt, LexState.javap.txt.

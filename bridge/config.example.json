@@ -1,0 +1,29 @@
+{
+  "api_key": "",
+  "base_url": "https://api.deepseek.com",
+  "model": "deepseek-chat",
+  "temperature": 0.9,
+  "max_tokens": 200,
+  "min_interval_sec": 8,
+  "system_prompt": "",
+  "zomboid_dir": "",
+  "game_dir": "",
+  "asr": {
+    "provider": "local",
+    "model_size": "base",
+    "language": "zh",
+    "seconds": 6
+  },
+  "tts": {
+    "enabled": true,
+    "output": "game",
+    "provider": "edge",
+    "sapi_voice": "Microsoft Huihui Desktop",
+    "edge_voice": "zh-CN-YunjianNeural",
+    "rate": 0,
+    "volume": 100,
+    "only_when_foreground": true,
+    "max_chars": 80,
+    "slot_count": 300
+  }
+}

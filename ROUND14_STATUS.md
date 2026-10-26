@@ -1,0 +1,9 @@
+# Round 14
+
+- Added test_speech_uses_npc_and_failure_does_not_replay to tests/test_teammate_mailbox.py. Confirms existing Halo API does not intercept NPC speech; failed Say surfaces status warning while completed command stays consumed. Seven direct-script mailbox groups pass. Unittest discover30 pass plus adapter/UI import-time checks.
+- Test combat now explicitly gated by DC_AI_TestPersistenceConfig.combat (false); no hostile automatically spawned for UI tests. Current config still mode=create, Zombies3, save/quit at1200ticks: must configure UI-only reload old no-zombie save before next UI run.
+- Created teammate-config.example.json: empty key, https://api.deepseek.com, deepseek-chat, timeout30.
+- Built teammate-only preview ZIP ai-mod/dist/DC_AI_Teammate-preview.zip using tools/build_teammate_package.py. Strict allowlist3 Lua+standalone mod.info+2 Python+example config+README; SHA256 manifest, CRC/contents checks pass. Excludes legacy cheats/radio agents/installers, credentials, test automation/saves, third-party dependencies.
+- Child c2f84cad completed docs review and revised TEAMMATE_INSTALL_DRAFT.md. Parent read all90lines and rebuilt archive afterward. Documentation accurately states manual private profile install, actual dependency/native-loader setup, watch mode, state persistence, and unverified visual/model scope. No installation into original profile.
+- User selected DeepSeek API via ask_user_question; has NOT provided API key/config file path. Asked to configure private JSON and send only absolute path, no chat secrets. Next request must obtain that path, never search unrelated harness credentials.
+- No new native game launched this round. UI real clicks/glyph/speech still unverified. Goal remains active; no blocked declaration. All child work finished, no background jobs started.

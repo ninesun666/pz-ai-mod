@@ -1,0 +1,3 @@
+name=无线电里的阿D·AI
+id=DC_AIVoice
+description=把游戏状态交给外部 bridge 调大模型，让阿D 根据你的处境实时说话。需要配合 bridge.py 使用；没开 bridge 时用本地兜底台词。

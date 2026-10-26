@@ -1,0 +1,13 @@
+# 第34轮：当前发行包与原生安装逐字节一致性
+
+检查发现：此前原生中文点击测试使用的三份Lua均与当前生产源码完全一致，但测试profile的common/mod.info仍是英文旧元数据。已将该文件同步为独立发行包中文元数据。
+
+随后直接从dist/DC_AI_Teammate-preview.zip读取四个mods文件，逐字节比对test-profile安装，全部匹配：
+- adapter SHA256 0fffcaa780a2f94471469aa13aea212dc160ad3c66f716a9ee69b32a24bd89db
+- mailbox SHA256 d81bad4531f98d92b3c349f96c16add27ca9be01c32b6a2a2bf3ba16a7fea919
+- UI SHA256 219ce1e856c8ef4a35baf878d52a6de2d4dd0c1ab8eed29851b81ce0624a2248
+- mod.info SHA256 2c14a3b3e8502f4c1e7a1946362c271fc9722e9b2999378a347fce230c1a8f1e
+
+启动当前同步安装的原生游戏，live-chinese-current34.log记录加载36秒完成。但SetForegroundWindow返回false，守卫拒绝点击。因此本轮只证明文件一致及原生加载，不新增进入世界/模型/对话验收。没有绕过前台守卫。
+
+PID12944校验隔离命令行后停止；后台job pwsh-a42bf758c3f04d54已收集。JVM -1为主动终止。仍需中文模型真实回复及说话显示、字形/干净依赖安装验收，以及完整发布材料。

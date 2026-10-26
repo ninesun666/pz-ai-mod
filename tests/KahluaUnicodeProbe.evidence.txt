@@ -1,0 +1,17 @@
+Actual installed Project Zomboid Kahlua probe output (jar: D:\SteamLibrary\steamapps\common\ProjectZomboid\projectzomboid.jar):
+
+byte(Chinese Zhong)=20013.0
+char(20013)=U+4E2D
+char(228,184,173)=U+00E4 U+00B8 U+00AD
+byte(emoji,1)=55357.0
+byte(emoji,2)=56832.0
+
+Invocation:
+C:\Users\gjx\Desktop\workspace\workspace\envronment\jdk1.8.0_181\bin\javac.exe -encoding UTF-8 -d ai-mod\tests ai-mod\tests\KahluaUnicodeProbe.java
+D:\SteamLibrary\steamapps\common\ProjectZomboid\jre64\bin\java.exe -cp "ai-mod\tests;D:\SteamLibrary\steamapps\common\ProjectZomboid\projectzomboid.jar" KahluaUnicodeProbe
+
+Interpretation: Kahlua strings are Java String semantics. string.byte indexes UTF-16 charAt units and returns unsigned UTF-16 code units (Chinese U+4E2D -> 20013; emoji is surrogate pair 55357,56832). string.char accepts code units via i2c; passing UTF-8 bytes produces mojibake. # uses Java String.length, i.e. UTF-16 code-unit count, not UTF-8 byte count or Unicode scalar count.
+
+Mailbox consequence: current validText assumes UTF-8 bytes (`s:byte`) and therefore rejects native Chinese Java strings because 20013 >= 128. It also treats `#s` as a 512 UTF-16-unit cap. For concrete fix: validate Java/Kahlua text by iterating UTF-16 units with `s:byte(i)`, accept ASCII/non-surrogate units; for high surrogate require next low surrogate and compute scalar; reject lone surrogates and forbidden scalar values. Preserve original `text` unchanged in wire construction and UI display. If wire cap is intended bytes, compute UTF-8 byte length separately (1/2/3/4 per scalar), while keep a separate UTF-16-unit cap if desired. Do not call string.char on UTF-8 byte sequences.
+
+Evidence: ai-mod/tests/StringLib.javap.txt (String.length/charAt/i2c), ai-mod/tests/KahluaThread.javap.txt, ai-mod/tests/KahluaUnicodeProbe.java, compiled class KahluaUnicodeProbe.class.

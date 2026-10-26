@@ -1,0 +1,16 @@
+SRC=return 'ABC', #'ABC', string.byte('ABC',1)
+0=true
+1=STRING U+0041 U+0042 U+0043
+2=3.0
+3=65.0
+SRC=return '��', #'��', string.byte('��',1)
+0=true
+1=STRING U+002D
+2=1.0
+3=45.0
+SRC=return '?', #'?', string.byte('?',1), string.byte('?',2)
+0=true
+1=STRING U+003D U+0000
+2=2.0
+3=61.0
+4=0.0

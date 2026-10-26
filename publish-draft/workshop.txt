@@ -1,0 +1,15 @@
+version=1
+title=AI 队友（单人预览版）
+description=在《僵尸毁灭工程》中招募实体 NPC 队友，通过模型对话控制跟随或等待，队友使用正常 NPC AI 参与战斗。
+description=
+description=依赖：ZombieBuddy 和 Knox Event Expanded NPC，需分别安装。当前实测游戏版本为 Windows Build 42.21.0，仅支持单人模式。
+description=模型功能需要单独运行外部 Python 桥接程序并自行配置 OpenAI 兼容接口。仅订阅本模组不会自动启动模型；接口可能产生费用。
+description=支持对话、跟随、等待及同一 NPC 存档恢复。不提供无敌、治疗、强制伤害或属性修改，不承诺搜刮、建造、驾驶等能力。
+description=当前已验证中文菜单的跟随、等待、对话打开、确定提交与取消；中文字形、中文输入法和 NPC 中文说话显示仍待可视验收。
+description=请先使用新建测试存档；招募会写入世界与 NPC 数据，卸载不会自动撤销存档变化。
+description=感谢 Knox Event Expanded NPC 项目及 ZombieBuddy 项目提供本模组所需的独立依赖；本模组不重新分发其文件。请从各自官方页面获取依赖。
+description=Knox Event Expanded NPC：https://steamcommunity.com/sharedfiles/filedetails/?id=3397396843
+description=ZombieBuddy：https://steamcommunity.com/sharedfiles/filedetails/?id=3619862853
+description=发布前待补：作者/贡献者确认、许可说明、封面、桥接发行下载地址和最终中文验收记录。
+tags=
+visibility=private

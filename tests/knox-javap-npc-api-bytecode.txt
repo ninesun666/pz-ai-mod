@@ -1,0 +1,1002 @@
+Compiled from "KnoxEventNpcAPI.java"
+public class knox.event.api.KnoxEventNpcAPI {
+  public java.util.HashMap<java.lang.String, knox.event.npc.utils.NpcPreset> presets;
+
+  public java.util.HashMap<java.lang.String, se.krka.kahlua.vm.KahluaTable> behaviorTrees;
+
+  public static knox.event.api.KnoxEventNpcAPI getInstance();
+    Code:
+       0: getstatic     #26                 // Field instance:Lknox/event/api/KnoxEventNpcAPI;
+       3: areturn
+
+  public java.util.ArrayList<knox.event.npc.MetaNpcCharacter> getNpcs();
+    Code:
+       0: invokestatic  #30                 // Method knox/event/npc/singletons/MetaCharacterManager.getNpcs:()Ljava/util/ArrayList;
+       3: areturn
+
+  public void disableAllDebug();
+    Code:
+       0: invokestatic  #30                 // Method knox/event/npc/singletons/MetaCharacterManager.getNpcs:()Ljava/util/ArrayList;
+       3: invokevirtual #36                 // Method java/util/ArrayList.iterator:()Ljava/util/Iterator;
+       6: astore_1
+       7: aload_1
+       8: invokeinterface #42,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      13: ifeq          67
+      16: aload_1
+      17: invokeinterface #48,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      22: checkcast     #52                 // class knox/event/npc/MetaNpcCharacter
+      25: astore_2
+      26: aload_2
+      27: iconst_0
+      28: invokevirtual #54                 // Method knox/event/npc/MetaNpcCharacter.setDebugTreeEnable:(Z)V
+      31: aload_2
+      32: invokevirtual #58                 // Method knox/event/npc/MetaNpcCharacter.getWorldObject:()Lzombie/characters/IsoPlayer;
+      35: astore        4
+      37: aload         4
+      39: instanceof    #62                 // class knox/event/npc/IsoNpcPlayer
+      42: ifeq          64
+      45: aload         4
+      47: checkcast     #62                 // class knox/event/npc/IsoNpcPlayer
+      50: astore_3
+      51: aload_3
+      52: iconst_0
+      53: invokevirtual #64                 // Method knox/event/npc/IsoNpcPlayer.setDebugNpcEnable:(Z)V
+      56: aload_3
+      57: invokevirtual #67                 // Method knox/event/npc/IsoNpcPlayer.getMetaCharacter:()Lknox/event/npc/MetaNpcCharacter;
+      60: iconst_0
+      61: invokevirtual #71                 // Method knox/event/npc/MetaNpcCharacter.setStoryDebugEnable:(Z)V
+      64: goto          7
+      67: return
+
+  public knox.event.meta.groups.BaseGroup getGroupFromPlayer(zombie.characters.IsoPlayer);
+    Code:
+       0: aload_1
+       1: invokestatic  #74                 // Method knox/event/npc/singletons/MetaCharacterManager.getGroupFromPlayer:(Lzombie/characters/IsoPlayer;)Lknox/event/meta/groups/BaseGroup;
+       4: astore_2
+       5: aload_2
+       6: ifnonnull     23
+       9: new           #78                 // class knox/event/meta/groups/PlayerGroup
+      12: dup
+      13: aload_1
+      14: invokespecial #80                 // Method knox/event/meta/groups/PlayerGroup."<init>":(Lzombie/characters/IsoPlayer;)V
+      17: astore_2
+      18: aload_1
+      19: aload_2
+      20: invokestatic  #83                 // Method knox/event/npc/singletons/MetaCharacterManager.addNpcPlayerGroup:(Lzombie/characters/IsoPlayer;Lknox/event/meta/groups/BaseGroup;)V
+      23: aload_2
+      24: areturn
+
+  public knox.event.meta.groups.BaseGroup getGroupFromSafehouse(knox.event.npc.utils.NpcSafehouse);
+    Code:
+       0: aload_1
+       1: invokestatic  #87                 // Method knox/event/npc/singletons/MetaCharacterManager.getGroupFromSafehouse:(Lknox/event/npc/utils/NpcSafehouse;)Lknox/event/meta/groups/BaseGroup;
+       4: areturn
+
+  public knox.event.npc.MetaPlayerCharacter getMetaPlayer(zombie.characters.IsoPlayer);
+    Code:
+       0: aload_1
+       1: invokestatic  #91                 // Method knox/event/npc/PlayerExtensions.getMetaCharacter:(Lzombie/characters/IsoPlayer;)Lknox/event/npc/MetaCharacter;
+       4: astore_2
+       5: aload_2
+       6: instanceof    #96                 // class knox/event/npc/MetaPlayerCharacter
+       9: ifeq          21
+      12: aload_2
+      13: checkcast     #96                 // class knox/event/npc/MetaPlayerCharacter
+      16: astore_3
+      17: aload_3
+      18: goto          22
+      21: aconst_null
+      22: areturn
+
+  public knox.event.npc.MetaCharacter getMetaCharacter(zombie.characters.IsoPlayer);
+    Code:
+       0: aload_1
+       1: invokestatic  #91                 // Method knox/event/npc/PlayerExtensions.getMetaCharacter:(Lzombie/characters/IsoPlayer;)Lknox/event/npc/MetaCharacter;
+       4: areturn
+
+  public void setMetaCharacter(zombie.characters.IsoPlayer, knox.event.npc.MetaCharacter);
+    Code:
+       0: aload_1
+       1: aload_2
+       2: invokestatic  #98                 // Method knox/event/npc/PlayerExtensions.setMetaCharacter:(Lzombie/characters/IsoPlayer;Lknox/event/npc/MetaCharacter;)V
+       5: return
+
+  public knox.event.meta.groups.BaseGroup getGroup(zombie.characters.IsoPlayer);
+    Code:
+       0: aload_1
+       1: invokestatic  #102                // Method knox/event/npc/PlayerExtensions.getGroup:(Lzombie/characters/IsoPlayer;)Lknox/event/meta/groups/BaseGroup;
+       4: areturn
+
+  public void setGroup(zombie.characters.IsoPlayer, knox.event.meta.groups.BaseGroup);
+    Code:
+       0: aload_1
+       1: aload_2
+       2: invokestatic  #105                // Method knox/event/npc/PlayerExtensions.setGroup:(Lzombie/characters/IsoPlayer;Lknox/event/meta/groups/BaseGroup;)V
+       5: return
+
+  public knox.event.meta.squads.BaseSquad getSquad(zombie.characters.IsoPlayer);
+    Code:
+       0: aload_1
+       1: invokestatic  #108                // Method knox/event/npc/PlayerExtensions.getSquad:(Lzombie/characters/IsoPlayer;)Lknox/event/meta/squads/BaseSquad;
+       4: areturn
+
+  public void setSquad(zombie.characters.IsoPlayer, knox.event.meta.squads.BaseSquad);
+    Code:
+       0: aload_1
+       1: aload_2
+       2: invokestatic  #112                // Method knox/event/npc/PlayerExtensions.setSquad:(Lzombie/characters/IsoPlayer;Lknox/event/meta/squads/BaseSquad;)V
+       5: return
+
+  public boolean canReveal(knox.event.npc.MetaNpcCharacter, knox.event.npc.MetaCharacter, java.lang.String);
+    Code:
+       0: aload_1
+       1: aload_2
+       2: aload_3
+       3: invokestatic  #116                // Method knox/event/npc/MetaPlayerCharacter.canReveal:(Lknox/event/npc/MetaNpcCharacter;Lknox/event/npc/MetaCharacter;Ljava/lang/String;)Z
+       6: ireturn
+
+  public knox.event.npc.interaction.NpcContextualAction getContextualAction();
+    Code:
+       0: aload_0
+       1: getfield      #22                 // Field contextualAction:Lknox/event/npc/interaction/NpcContextualAction;
+       4: areturn
+
+  public void performReveal(knox.event.npc.MetaNpcCharacter, knox.event.npc.MetaCharacter, java.lang.String);
+    Code:
+       0: aload_1
+       1: aload_2
+       2: aload_3
+       3: invokestatic  #120                // Method knox/event/npc/MetaPlayerCharacter.performReveal:(Lknox/event/npc/MetaNpcCharacter;Lknox/event/npc/MetaCharacter;Ljava/lang/String;)V
+       6: return
+
+  public knox.event.npc.MetaNpcCharacter getNpcById(int);
+    Code:
+       0: iload_1
+       1: invokestatic  #124                // Method knox/event/npc/singletons/MetaCharacterManager.getMetaNpcFromId:(I)Lknox/event/npc/MetaNpcCharacter;
+       4: areturn
+
+  public knox.event.npc.MetaCharacter getMetaCharacterById(int);
+    Code:
+       0: iload_1
+       1: invokestatic  #128                // Method knox/event/npc/singletons/MetaCharacterManager.getMetaCharacterFromId:(I)Lknox/event/npc/MetaCharacter;
+       4: areturn
+
+  public void recordContactForPlayer(zombie.characters.IsoPlayer, knox.event.npc.MetaNpcCharacter);
+    Code:
+       0: aload_1
+       1: ifnull        8
+       4: aload_2
+       5: ifnonnull     9
+       8: return
+       9: aload_1
+      10: invokestatic  #91                 // Method knox/event/npc/PlayerExtensions.getMetaCharacter:(Lzombie/characters/IsoPlayer;)Lknox/event/npc/MetaCharacter;
+      13: astore_3
+      14: aload_3
+      15: instanceof    #96                 // class knox/event/npc/MetaPlayerCharacter
+      18: ifeq          33
+      21: aload_3
+      22: checkcast     #96                 // class knox/event/npc/MetaPlayerCharacter
+      25: astore        4
+      27: aload         4
+      29: aload_2
+      30: invokevirtual #132                // Method knox/event/npc/MetaPlayerCharacter.recordContact:(Lknox/event/npc/MetaNpcCharacter;)V
+      33: return
+
+  public void addPreset(knox.event.npc.utils.NpcPreset);
+    Code:
+       0: aload_0
+       1: getfield      #10                 // Field presets:Ljava/util/HashMap;
+       4: aload_1
+       5: invokevirtual #136                // Method knox/event/npc/utils/NpcPreset.getName:()Ljava/lang/String;
+       8: aload_1
+       9: invokevirtual #142                // Method java/util/HashMap.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+      12: pop
+      13: return
+
+  public knox.event.npc.utils.NpcPreset getPreset(java.lang.String);
+    Code:
+       0: aload_0
+       1: getfield      #10                 // Field presets:Ljava/util/HashMap;
+       4: aload_1
+       5: invokevirtual #146                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+       8: checkcast     #137                // class knox/event/npc/utils/NpcPreset
+      11: areturn
+
+  public knox.event.npc.MetaNpcCharacter spawnNpc(java.lang.String, int, int);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iload_2
+       3: iload_3
+       4: iconst_0
+       5: invokevirtual #150                // Method spawnNpc:(Ljava/lang/String;III)Lknox/event/npc/MetaNpcCharacter;
+       8: areturn
+
+  public knox.event.npc.MetaNpcCharacter spawnNpc(java.lang.String, int, int, int);
+    Code:
+       0: aload_0
+       1: getfield      #10                 // Field presets:Ljava/util/HashMap;
+       4: aload_1
+       5: invokevirtual #146                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+       8: checkcast     #137                // class knox/event/npc/utils/NpcPreset
+      11: astore        5
+      13: aload         5
+      15: iload_2
+      16: iload_3
+      17: iload         4
+      19: invokestatic  #154                // Method knox/event/npc/singletons/MetaCharacterManager.spawnNpcFromPreset:(Lknox/event/npc/utils/NpcPreset;III)Lknox/event/npc/MetaNpcCharacter;
+      22: areturn
+
+  public knox.event.npc.MetaNpcCharacter spawnNpcWithOutfit(java.lang.String, java.lang.String, int, int);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_2
+       3: iload_3
+       4: iload         4
+       6: iconst_0
+       7: invokevirtual #158                // Method spawnNpcWithOutfit:(Ljava/lang/String;Ljava/lang/String;III)Lknox/event/npc/MetaNpcCharacter;
+      10: areturn
+
+  public knox.event.npc.MetaNpcCharacter spawnNpcWithOutfit(java.lang.String, java.lang.String, int, int, int);
+    Code:
+       0: aload_0
+       1: getfield      #10                 // Field presets:Ljava/util/HashMap;
+       4: aload_1
+       5: invokevirtual #146                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+       8: checkcast     #137                // class knox/event/npc/utils/NpcPreset
+      11: astore        6
+      13: aload         6
+      15: aload_2
+      16: iload_3
+      17: iload         4
+      19: iload         5
+      21: invokestatic  #162                // Method knox/event/npc/singletons/MetaCharacterManager.spawnNpcFromOutfit:(Lknox/event/npc/utils/NpcPreset;Ljava/lang/String;III)Lknox/event/npc/MetaNpcCharacter;
+      24: areturn
+
+  public knox.event.meta.groups.NpcGroup spawnNpcGroup(java.lang.String, int, int, int);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: iload_2
+       3: iload_3
+       4: iconst_0
+       5: iconst_2
+       6: iload         4
+       8: invokevirtual #166                // Method spawnNpcGroupWithOffset:(Ljava/lang/String;IIIII)Lknox/event/meta/groups/NpcGroup;
+      11: areturn
+
+  public knox.event.meta.groups.NpcGroup spawnNpcGroupWithOffset(java.lang.String, int, int, int, int, int);
+    Code:
+       0: new           #170                // class knox/event/meta/groups/NpcGroup
+       3: dup
+       4: invokespecial #172                // Method knox/event/meta/groups/NpcGroup."<init>":()V
+       7: astore        7
+       9: aload_0
+      10: getfield      #10                 // Field presets:Ljava/util/HashMap;
+      13: aload_1
+      14: invokevirtual #146                // Method java/util/HashMap.get:(Ljava/lang/Object;)Ljava/lang/Object;
+      17: checkcast     #137                // class knox/event/npc/utils/NpcPreset
+      20: astore        8
+      22: iconst_0
+      23: istore        9
+      25: iload         9
+      27: iload         6
+      29: if_icmpge     86
+      32: iload_2
+      33: iload         5
+      35: isub
+      36: iconst_2
+      37: iload         5
+      39: imul
+      40: invokestatic  #173                // Method zombie/core/random/Rand.Next:(I)I
+      43: iadd
+      44: istore        10
+      46: iload_3
+      47: iload         5
+      49: isub
+      50: iconst_2
+      51: iload         5
+      53: imul
+      54: invokestatic  #173                // Method zombie/core/random/Rand.Next:(I)I
+      57: iadd
+      58: istore        11
+      60: aload         8
+      62: iload         10
+      64: iload         11
+      66: iload         4
+      68: invokestatic  #154                // Method knox/event/npc/singletons/MetaCharacterManager.spawnNpcFromPreset:(Lknox/event/npc/utils/NpcPreset;III)Lknox/event/npc/MetaNpcCharacter;
+      71: astore        12
+      73: aload         12
+      75: aload         7
+      77: invokestatic  #179                // Method knox/event/npc/singletons/MetaCharacterManager.npcAddToGroup:(Lknox/event/npc/MetaNpcCharacter;Lknox/event/meta/groups/BaseGroup;)V
+      80: iinc          9, 1
+      83: goto          25
+      86: aload         7
+      88: invokevirtual #183                // Method knox/event/meta/groups/NpcGroup.getAllNpcMembers:()Ljava/util/ArrayList;
+      91: invokevirtual #186                // Method java/util/ArrayList.size:()I
+      94: ifle          117
+      97: aload         7
+      99: aload         7
+     101: invokevirtual #183                // Method knox/event/meta/groups/NpcGroup.getAllNpcMembers:()Ljava/util/ArrayList;
+     104: iconst_0
+     105: invokevirtual #190                // Method java/util/ArrayList.get:(I)Ljava/lang/Object;
+     108: checkcast     #193                // class knox/event/npc/MetaCharacter
+     111: invokevirtual #195                // Method knox/event/meta/groups/NpcGroup.setLeader:(Lknox/event/npc/MetaCharacter;)V
+     114: goto          122
+     117: ldc           #199                // String Potential issue: No leader could be found for group?
+     119: invokestatic  #201                // Method zombie/debug/DebugLog.log:(Ljava/lang/String;)V
+     122: aload         7
+     124: invokestatic  #207                // Method knox/event/npc/singletons/MetaCharacterManager.addNpcGroup:(Lknox/event/meta/groups/NpcGroup;)V
+     127: aload         7
+     129: areturn
+
+  public void forceMigrationEvent();
+    Code:
+       0: return
+
+  public java.util.ArrayList<knox.event.npc.IsoNpcPlayer> getWorldNpcs();
+    Code:
+       0: new           #37                 // class java/util/ArrayList
+       3: dup
+       4: invokespecial #211                // Method java/util/ArrayList."<init>":()V
+       7: astore_1
+       8: invokestatic  #212                // Method knox/event/meta/KnoxEventMetaMainLoop.getWorldCharacters:()Ljava/util/ArrayList;
+      11: invokevirtual #36                 // Method java/util/ArrayList.iterator:()Ljava/util/Iterator;
+      14: astore_2
+      15: aload_2
+      16: invokeinterface #42,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      21: ifeq          65
+      24: aload_2
+      25: invokeinterface #48,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      30: checkcast     #52                 // class knox/event/npc/MetaNpcCharacter
+      33: astore_3
+      34: aload_3
+      35: invokevirtual #58                 // Method knox/event/npc/MetaNpcCharacter.getWorldObject:()Lzombie/characters/IsoPlayer;
+      38: astore        5
+      40: aload         5
+      42: instanceof    #62                 // class knox/event/npc/IsoNpcPlayer
+      45: ifeq          62
+      48: aload         5
+      50: checkcast     #62                 // class knox/event/npc/IsoNpcPlayer
+      53: astore        4
+      55: aload_1
+      56: aload         4
+      58: invokevirtual #217                // Method java/util/ArrayList.add:(Ljava/lang/Object;)Z
+      61: pop
+      62: goto          15
+      65: aload_1
+      66: areturn
+
+  public java.util.ArrayList<knox.event.npc.utils.NpcSafehouse> getSafehouses();
+    Code:
+       0: invokestatic  #221                // Method knox/event/npc/singletons/MetaCharacterManager.getNpcSafeHouses:()Ljava/util/ArrayList;
+       3: areturn
+
+  public java.util.ArrayList<knox.event.npc.utils.NpcSafehouse> getSafehousesWithinDist(float, float, float);
+    Code:
+       0: new           #37                 // class java/util/ArrayList
+       3: dup
+       4: invokespecial #211                // Method java/util/ArrayList."<init>":()V
+       7: astore        4
+       9: invokestatic  #221                // Method knox/event/npc/singletons/MetaCharacterManager.getNpcSafeHouses:()Ljava/util/ArrayList;
+      12: invokevirtual #36                 // Method java/util/ArrayList.iterator:()Ljava/util/Iterator;
+      15: astore        5
+      17: aload         5
+      19: invokeinterface #42,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      24: ifeq          116
+      27: aload         5
+      29: invokeinterface #48,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      34: checkcast     #224                // class knox/event/npc/utils/NpcSafehouse
+      37: astore        6
+      39: aload         6
+      41: invokevirtual #226                // Method knox/event/npc/utils/NpcSafehouse.getX:()I
+      44: aload         6
+      46: invokevirtual #229                // Method knox/event/npc/utils/NpcSafehouse.getWidth:()I
+      49: iconst_2
+      50: idiv
+      51: iadd
+      52: i2f
+      53: fstore        7
+      55: aload         6
+      57: invokevirtual #232                // Method knox/event/npc/utils/NpcSafehouse.getY:()I
+      60: aload         6
+      62: invokevirtual #235                // Method knox/event/npc/utils/NpcSafehouse.getHeight:()I
+      65: iconst_2
+      66: idiv
+      67: iadd
+      68: i2f
+      69: fstore        8
+      71: fload         7
+      73: fload_1
+      74: fsub
+      75: fstore        9
+      77: fload         8
+      79: fload_2
+      80: fsub
+      81: fstore        10
+      83: fload         9
+      85: fload         9
+      87: fmul
+      88: fload         10
+      90: fload         10
+      92: fmul
+      93: fadd
+      94: fstore        11
+      96: fload         11
+      98: fload_3
+      99: fload_3
+     100: fmul
+     101: fcmpg
+     102: ifgt          113
+     105: aload         4
+     107: aload         6
+     109: invokevirtual #217                // Method java/util/ArrayList.add:(Ljava/lang/Object;)Z
+     112: pop
+     113: goto          17
+     116: aload         4
+     118: areturn
+
+  public java.util.ArrayList<knox.event.npc.utils.NpcSafehouse> getSafehousesWithFilter(se.krka.kahlua.vm.LuaClosure);
+    Code:
+       0: getstatic     #238                // Field safehouseFilterPool:Lzombie/popman/ObjectPool;
+       3: invokevirtual #242                // Method zombie/popman/ObjectPool.alloc:()Ljava/lang/Object;
+       6: checkcast     #247                // class knox/event/api/KnoxEventNpcAPI$NpcSafehouseFilterPredicate
+       9: astore_2
+      10: aload_2
+      11: aload_1
+      12: invokevirtual #249                // Method knox/event/api/KnoxEventNpcAPI$NpcSafehouseFilterPredicate.init:(Lse/krka/kahlua/vm/LuaClosure;)Lknox/event/api/KnoxEventNpcAPI$NpcSafehouseFilterPredicate;
+      15: pop
+      16: aload_0
+      17: invokevirtual #253                // Method getSafehouses:()Ljava/util/ArrayList;
+      20: invokevirtual #256                // Method java/util/ArrayList.stream:()Ljava/util/stream/Stream;
+      23: aload_2
+      24: invokeinterface #260,  2          // InterfaceMethod java/util/stream/Stream.filter:(Ljava/util/function/Predicate;)Ljava/util/stream/Stream;
+      29: invokedynamic #266,  0            // InvokeDynamic #0:get:()Ljava/util/function/Supplier;
+      34: invokestatic  #269                // Method java/util/stream/Collectors.toCollection:(Ljava/util/function/Supplier;)Ljava/util/stream/Collector;
+      37: invokeinterface #275,  2          // InterfaceMethod java/util/stream/Stream.collect:(Ljava/util/stream/Collector;)Ljava/lang/Object;
+      42: checkcast     #37                 // class java/util/ArrayList
+      45: astore_3
+      46: getstatic     #238                // Field safehouseFilterPool:Lzombie/popman/ObjectPool;
+      49: aload_2
+      50: invokevirtual #279                // Method zombie/popman/ObjectPool.release:(Ljava/lang/Object;)V
+      53: aload_3
+      54: areturn
+
+  public boolean canClaimSafehouse(zombie.iso.BuildingDef);
+    Code:
+       0: aload_1
+       1: invokestatic  #283                // Method knox/event/npc/singletons/MetaCharacterManager.canClaimNpcSafehouse:(Lzombie/iso/BuildingDef;)Z
+       4: ireturn
+
+  public boolean claimPlayerSafehouse(zombie.iso.BuildingDef);
+    Code:
+       0: getstatic     #287                // Field zombie/characters/IsoPlayer.players:[Lzombie/characters/IsoPlayer;
+       3: iconst_0
+       4: aaload
+       5: astore_2
+       6: aload_2
+       7: invokestatic  #102                // Method knox/event/npc/PlayerExtensions.getGroup:(Lzombie/characters/IsoPlayer;)Lknox/event/meta/groups/BaseGroup;
+      10: astore_3
+      11: aload_3
+      12: ifnull        38
+      15: new           #224                // class knox/event/npc/utils/NpcSafehouse
+      18: dup
+      19: aload_1
+      20: iconst_0
+      21: invokespecial #293                // Method knox/event/npc/utils/NpcSafehouse."<init>":(Lzombie/iso/BuildingDef;Z)V
+      24: astore        4
+      26: aload_3
+      27: aload         4
+      29: invokevirtual #296                // Method knox/event/meta/groups/BaseGroup.claimSafehouse:(Lknox/event/npc/utils/NpcSafehouse;)V
+      32: aload         4
+      34: invokestatic  #302                // Method knox/event/npc/singletons/MetaCharacterManager.addPlayerSafeHouse:(Lknox/event/npc/utils/NpcSafehouse;)Z
+      37: pop
+      38: iconst_1
+      39: ireturn
+
+  public boolean claimPlayerSafehouseManualSelect(int, int, int, int);
+    Code:
+       0: getstatic     #287                // Field zombie/characters/IsoPlayer.players:[Lzombie/characters/IsoPlayer;
+       3: iconst_0
+       4: aaload
+       5: astore        5
+       7: aload         5
+       9: invokestatic  #102                // Method knox/event/npc/PlayerExtensions.getGroup:(Lzombie/characters/IsoPlayer;)Lknox/event/meta/groups/BaseGroup;
+      12: astore        7
+      14: aload         7
+      16: instanceof    #297                // class knox/event/meta/groups/BaseGroup
+      19: ifeq          115
+      22: aload         7
+      24: astore        6
+      26: iload_1
+      27: iload_3
+      28: if_icmple     39
+      31: iload_3
+      32: istore        7
+      34: iload_1
+      35: istore_3
+      36: iload         7
+      38: istore_1
+      39: iload_2
+      40: iload         4
+      42: if_icmple     55
+      45: iload         4
+      47: istore        7
+      49: iload_2
+      50: istore        4
+      52: iload         7
+      54: istore_2
+      55: aload         6
+      57: getfield      #306                // Field knox/event/meta/groups/BaseGroup.safehouse:Lknox/event/npc/utils/NpcSafehouse;
+      60: ifnull        76
+      63: aload         6
+      65: iload_1
+      66: iload_2
+      67: iload_3
+      68: iload         4
+      70: invokevirtual #310                // Method knox/event/meta/groups/BaseGroup.adjustSafehouse:(IIII)Z
+      73: pop
+      74: iconst_1
+      75: ireturn
+      76: iload_3
+      77: iload_1
+      78: isub
+      79: istore        7
+      81: iload         4
+      83: iload_2
+      84: isub
+      85: istore        8
+      87: new           #224                // class knox/event/npc/utils/NpcSafehouse
+      90: dup
+      91: iload_1
+      92: iload_2
+      93: iload         7
+      95: iload         8
+      97: invokespecial #314                // Method knox/event/npc/utils/NpcSafehouse."<init>":(IIII)V
+     100: astore        9
+     102: aload         6
+     104: aload         9
+     106: invokevirtual #296                // Method knox/event/meta/groups/BaseGroup.claimSafehouse:(Lknox/event/npc/utils/NpcSafehouse;)V
+     109: aload         9
+     111: invokestatic  #302                // Method knox/event/npc/singletons/MetaCharacterManager.addPlayerSafeHouse:(Lknox/event/npc/utils/NpcSafehouse;)Z
+     114: pop
+     115: iconst_1
+     116: ireturn
+
+  public boolean switchPlayerSafehouse(zombie.iso.BuildingDef);
+    Code:
+       0: getstatic     #287                // Field zombie/characters/IsoPlayer.players:[Lzombie/characters/IsoPlayer;
+       3: iconst_0
+       4: aaload
+       5: astore_2
+       6: aload_2
+       7: invokestatic  #102                // Method knox/event/npc/PlayerExtensions.getGroup:(Lzombie/characters/IsoPlayer;)Lknox/event/meta/groups/BaseGroup;
+      10: astore_3
+      11: aload_3
+      12: ifnull        26
+      15: aload_3
+      16: getfield      #306                // Field knox/event/meta/groups/BaseGroup.safehouse:Lknox/event/npc/utils/NpcSafehouse;
+      19: ifnull        26
+      22: iconst_1
+      23: goto          27
+      26: iconst_0
+      27: istore        4
+      29: aload_0
+      30: invokevirtual #317                // Method releasePlayerSafehouse:()Z
+      33: pop
+      34: aload_0
+      35: aload_1
+      36: invokevirtual #320                // Method claimPlayerSafehouse:(Lzombie/iso/BuildingDef;)Z
+      39: istore        5
+      41: iload         5
+      43: ifeq          69
+      46: iload         4
+      48: ifeq          69
+      51: aload_3
+      52: instanceof    #78                 // class knox/event/meta/groups/PlayerGroup
+      55: ifeq          69
+      58: aload_3
+      59: checkcast     #78                 // class knox/event/meta/groups/PlayerGroup
+      62: astore        6
+      64: aload         6
+      66: invokevirtual #323                // Method knox/event/meta/groups/PlayerGroup.returnSafehouseMembersAsSquad:()V
+      69: iload         5
+      71: ireturn
+
+  public knox.event.npc.utils.NpcSafehouse getPlayerSafehouse();
+    Code:
+       0: getstatic     #287                // Field zombie/characters/IsoPlayer.players:[Lzombie/characters/IsoPlayer;
+       3: iconst_0
+       4: aaload
+       5: astore_1
+       6: aload_1
+       7: invokestatic  #102                // Method knox/event/npc/PlayerExtensions.getGroup:(Lzombie/characters/IsoPlayer;)Lknox/event/meta/groups/BaseGroup;
+      10: astore_2
+      11: aload_2
+      12: ifnull        20
+      15: aload_2
+      16: getfield      #306                // Field knox/event/meta/groups/BaseGroup.safehouse:Lknox/event/npc/utils/NpcSafehouse;
+      19: areturn
+      20: aconst_null
+      21: areturn
+
+  public boolean releasePlayerSafehouse();
+    Code:
+       0: getstatic     #287                // Field zombie/characters/IsoPlayer.players:[Lzombie/characters/IsoPlayer;
+       3: iconst_0
+       4: aaload
+       5: astore_1
+       6: aload_1
+       7: invokestatic  #102                // Method knox/event/npc/PlayerExtensions.getGroup:(Lzombie/characters/IsoPlayer;)Lknox/event/meta/groups/BaseGroup;
+      10: astore_2
+      11: aload_2
+      12: ifnull        29
+      15: aload_2
+      16: getfield      #306                // Field knox/event/meta/groups/BaseGroup.safehouse:Lknox/event/npc/utils/NpcSafehouse;
+      19: invokestatic  #326                // Method knox/event/npc/singletons/MetaCharacterManager.removePlayerSafeHouse:(Lknox/event/npc/utils/NpcSafehouse;)Z
+      22: pop
+      23: aload_2
+      24: invokevirtual #329                // Method knox/event/meta/groups/BaseGroup.releaseSafehouse:()V
+      27: iconst_1
+      28: ireturn
+      29: iconst_0
+      30: ireturn
+
+  public knox.event.meta.groups.NpcStaticFaction getStaticFaction(java.lang.String);
+    Code:
+       0: aload_1
+       1: invokestatic  #332                // Method knox/event/npc/singletons/MetaCharacterManager.getStaticFaction:(Ljava/lang/String;)Lknox/event/meta/groups/NpcStaticFaction;
+       4: areturn
+
+  public knox.event.meta.groups.NpcStaticFaction getOrCreateStaticFaction(java.lang.String, se.krka.kahlua.vm.KahluaTable);
+    Code:
+       0: aload_1
+       1: invokestatic  #332                // Method knox/event/npc/singletons/MetaCharacterManager.getStaticFaction:(Ljava/lang/String;)Lknox/event/meta/groups/NpcStaticFaction;
+       4: astore_3
+       5: aload_3
+       6: ifnonnull     22
+       9: new           #336                // class knox/event/meta/groups/NpcStaticFaction
+      12: dup
+      13: aload_1
+      14: aload_2
+      15: invokespecial #338                // Method knox/event/meta/groups/NpcStaticFaction."<init>":(Ljava/lang/String;Lse/krka/kahlua/vm/KahluaTable;)V
+      18: astore_3
+      19: goto          27
+      22: aload_3
+      23: aload_2
+      24: invokevirtual #341                // Method knox/event/meta/groups/NpcStaticFaction.attachTable:(Lse/krka/kahlua/vm/KahluaTable;)V
+      27: aload_3
+      28: areturn
+
+  public void sendNpcRadioMessage(int, int, int, java.lang.String);
+    Code:
+       0: invokestatic  #345                // Method zombie/radio/ZomboidRadio.getInstance:()Lzombie/radio/ZomboidRadio;
+       3: iload_1
+       4: iload_2
+       5: iload_3
+       6: aload         4
+       8: aconst_null
+       9: checkcast     #351                // class java/lang/String
+      12: ldc_w         #353                // String
+      15: ldc_w         #355                // float 0.7f
+      18: ldc_w         #355                // float 0.7f
+      21: ldc_w         #355                // float 0.7f
+      24: iconst_m1
+      25: iconst_0
+      26: invokevirtual #356                // Method zombie/radio/ZomboidRadio.SendTransmission:(IIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;FFFIZ)V
+      29: return
+
+  public void sendNpcRadioMessageWithRange(int, int, int, int, java.lang.String);
+    Code:
+       0: invokestatic  #345                // Method zombie/radio/ZomboidRadio.getInstance:()Lzombie/radio/ZomboidRadio;
+       3: ldc2_w        #360                // long -1l
+       6: iload_1
+       7: iload_2
+       8: iload_3
+       9: aload         5
+      11: aconst_null
+      12: checkcast     #351                // class java/lang/String
+      15: ldc_w         #353                // String
+      18: ldc_w         #355                // float 0.7f
+      21: ldc_w         #355                // float 0.7f
+      24: ldc_w         #355                // float 0.7f
+      27: iload         4
+      29: iconst_0
+      30: invokevirtual #362                // Method zombie/radio/ZomboidRadio.SendTransmission:(JIIILjava/lang/String;Ljava/lang/String;Ljava/lang/String;FFFIZ)V
+      33: return
+
+  public void addNewGameNpc(zombie.characters.SurvivorDesc, knox.event.npc.memory.NpcMemories$RelationType, int);
+    Code:
+       0: getstatic     #365                // Field knox/event/npc/singletons/MetaCharacterManager.newGameNpcs:Ljava/util/HashMap;
+       3: aload_1
+       4: aload_2
+       5: invokevirtual #142                // Method java/util/HashMap.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+       8: pop
+       9: getstatic     #368                // Field knox/event/npc/singletons/MetaCharacterManager.newGameNpcsAges:Ljava/util/HashMap;
+      12: aload_1
+      13: iload_3
+      14: invokestatic  #371                // Method java/lang/Integer.valueOf:(I)Ljava/lang/Integer;
+      17: invokevirtual #142                // Method java/util/HashMap.put:(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+      20: pop
+      21: return
+
+  public void addNewGameNpc(zombie.characters.SurvivorDesc, java.lang.String, int);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: aload_0
+       3: aload_2
+       4: aload_1
+       5: invokevirtual #377                // Method zombie/characters/SurvivorDesc.isFemale:()Z
+       8: invokevirtual #382                // Method parseRelationshipString:(Ljava/lang/String;Z)Lknox/event/npc/memory/NpcMemories$RelationType;
+      11: iload_3
+      12: invokevirtual #386                // Method addNewGameNpc:(Lzombie/characters/SurvivorDesc;Lknox/event/npc/memory/NpcMemories$RelationType;I)V
+      15: return
+
+  public void doKnockOnBuilding(zombie.characters.IsoPlayer, zombie.iso.BuildingDef);
+    Code:
+       0: aload_2
+       1: invokestatic  #439                // Method knox/event/npc/singletons/MetaCharacterManager.getGroupFromSafehouse:(Lzombie/iso/BuildingDef;)Lknox/event/meta/groups/BaseGroup;
+       4: astore_3
+       5: aload_3
+       6: ifnull        80
+       9: aload_3
+      10: invokevirtual #442                // Method knox/event/meta/groups/BaseGroup.getAllNpcMemberObjects:()Ljava/util/ArrayList;
+      13: astore        4
+      15: aload         4
+      17: invokevirtual #36                 // Method java/util/ArrayList.iterator:()Ljava/util/Iterator;
+      20: astore        5
+      22: aload         5
+      24: invokeinterface #42,  1           // InterfaceMethod java/util/Iterator.hasNext:()Z
+      29: ifeq          80
+      32: aload         5
+      34: invokeinterface #48,  1           // InterfaceMethod java/util/Iterator.next:()Ljava/lang/Object;
+      39: checkcast     #62                 // class knox/event/npc/IsoNpcPlayer
+      42: astore        6
+      44: aload         6
+      46: invokevirtual #445                // Method knox/event/npc/IsoNpcPlayer.isInMeta:()Z
+      49: ifeq          55
+      52: goto          22
+      55: new           #7                  // class java/util/HashMap
+      58: dup
+      59: invokespecial #9                  // Method java/util/HashMap."<init>":()V
+      62: astore        7
+      64: aload         6
+      66: aload_1
+      67: aload_1
+      68: getstatic     #448                // Field knox/event/npc/IsoNpcPlayer$EventType.KNOCK:Lknox/event/npc/IsoNpcPlayer$EventType;
+      71: aload         7
+      73: invokevirtual #454                // Method knox/event/npc/IsoNpcPlayer.reactToEvent:(Lzombie/characters/IsoGameCharacter;Lzombie/characters/IsoPlayer;Lknox/event/npc/IsoNpcPlayer$EventType;Ljava/util/HashMap;)Z
+      76: pop
+      77: goto          22
+      80: return
+
+  public void processAwarenessTraits(zombie.characters.IsoPlayer);
+    Code:
+       0: aload_0
+       1: aload_1
+       2: invokevirtual #458                // Method getMetaPlayer:(Lzombie/characters/IsoPlayer;)Lknox/event/npc/MetaPlayerCharacter;
+       5: astore_2
+       6: aload_2
+       7: ifnonnull     11
+      10: return
+      11: ldc_w         #462                // String kee:nosy_neighbor
+      14: invokestatic  #464                // Method zombie/scripting/objects/ResourceLocation.of:(Ljava/lang/String;)Lzombie/scripting/objects/ResourceLocation;
+      17: invokestatic  #470                // Method zombie/scripting/objects/CharacterTrait.get:(Lzombie/scripting/objects/ResourceLocation;)Lzombie/scripting/objects/CharacterTrait;
+      20: astore_3
+      21: ldc_w         #475                // String kee:town_local
+      24: invokestatic  #464                // Method zombie/scripting/objects/ResourceLocation.of:(Ljava/lang/String;)Lzombie/scripting/objects/ResourceLocation;
+      27: invokestatic  #470                // Method zombie/scripting/objects/CharacterTrait.get:(Lzombie/scripting/objects/ResourceLocation;)Lzombie/scripting/objects/CharacterTrait;
+      30: astore        4
+      32: aload_3
+      33: ifnull        48
+      36: aload_1
+      37: aload_3
+      38: invokevirtual #477                // Method zombie/characters/IsoPlayer.hasTrait:(Lzombie/scripting/objects/CharacterTrait;)Z
+      41: ifeq          48
+      44: iconst_1
+      45: goto          49
+      48: iconst_0
+      49: istore        5
+      51: aload         4
+      53: ifnull        69
+      56: aload_1
+      57: aload         4
+      59: invokevirtual #477                // Method zombie/characters/IsoPlayer.hasTrait:(Lzombie/scripting/objects/CharacterTrait;)Z
+      62: ifeq          69
+      65: iconst_1
+      66: goto          70
+      69: iconst_0
+      70: istore        6
+      72: iload         5
+      74: ifne          83
+      77: iload         6
+      79: ifne          83
+      82: return
+      83: getstatic     #481                // Field zombie/GameTime.instance:Lzombie/GameTime;
+      86: invokevirtual #486                // Method zombie/GameTime.getMinutesStamp:()J
+      89: lstore        7
+      91: aload_1
+      92: invokevirtual #490                // Method zombie/characters/IsoPlayer.getX:()F
+      95: f2i
+      96: istore        9
+      98: aload_1
+      99: invokevirtual #493                // Method zombie/characters/IsoPlayer.getY:()F
+     102: f2i
+     103: istore        10
+     105: iload         6
+     107: ifeq          124
+     110: aload_0
+     111: aload_2
+     112: iload         9
+     114: iload         10
+     116: lload         7
+     118: invokevirtual #495                // Method revealTownNpcs:(Lknox/event/npc/MetaPlayerCharacter;IIJ)V
+     121: goto          137
+     124: aload_0
+     125: aload_2
+     126: iload         9
+     128: iload         10
+     130: bipush        100
+     132: lload         7
+     134: invokevirtual #499                // Method revealNearbyNpcs:(Lknox/event/npc/MetaPlayerCharacter;IIIJ)V
+     137: return
+
+  public knox.event.npc.utils.organize.ItemFilter createItemFilter();
+    Code:
+       0: new           #580                // class knox/event/npc/utils/organize/ItemFilter
+       3: dup
+       4: iconst_1
+       5: invokespecial #582                // Method knox/event/npc/utils/organize/ItemFilter."<init>":(Z)V
+       8: areturn
+
+  public knox.event.npc.utils.organize.ItemFilter createRestrictiveItemFilter();
+    Code:
+       0: new           #580                // class knox/event/npc/utils/organize/ItemFilter
+       3: dup
+       4: iconst_0
+       5: invokespecial #582                // Method knox/event/npc/utils/organize/ItemFilter."<init>":(Z)V
+       8: areturn
+
+  public knox.event.npc.utils.organize.StorageRuleManager getStorageRuleManager(knox.event.meta.groups.BaseGroup);
+    Code:
+       0: aload_1
+       1: ifnonnull     6
+       4: aconst_null
+       5: areturn
+       6: aload_1
+       7: invokevirtual #584                // Method knox/event/meta/groups/BaseGroup.getStorageRuleManager:()Lknox/event/npc/utils/organize/StorageRuleManager;
+      10: areturn
+
+  public knox.event.npc.utils.organize.StorageRule createStorageRule(knox.event.meta.groups.BaseGroup, java.lang.String, knox.event.npc.utils.organize.ItemFilter);
+    Code:
+       0: aload_1
+       1: ifnonnull     6
+       4: aconst_null
+       5: areturn
+       6: aload_1
+       7: invokevirtual #584                // Method knox/event/meta/groups/BaseGroup.getStorageRuleManager:()Lknox/event/npc/utils/organize/StorageRuleManager;
+      10: aload_2
+      11: aload_3
+      12: ifnull        19
+      15: aload_3
+      16: goto          27
+      19: new           #580                // class knox/event/npc/utils/organize/ItemFilter
+      22: dup
+      23: iconst_1
+      24: invokespecial #582                // Method knox/event/npc/utils/organize/ItemFilter."<init>":(Z)V
+      27: invokevirtual #588                // Method knox/event/npc/utils/organize/StorageRuleManager.addRule:(Ljava/lang/String;Lknox/event/npc/utils/organize/ItemFilter;)Lknox/event/npc/utils/organize/StorageRule;
+      30: areturn
+
+  public void removeStorageRule(knox.event.meta.groups.BaseGroup, knox.event.npc.utils.organize.StorageRule);
+    Code:
+       0: aload_1
+       1: ifnull        16
+       4: aload_2
+       5: ifnull        16
+       8: aload_1
+       9: invokevirtual #584                // Method knox/event/meta/groups/BaseGroup.getStorageRuleManager:()Lknox/event/npc/utils/organize/StorageRuleManager;
+      12: aload_2
+      13: invokevirtual #594                // Method knox/event/npc/utils/organize/StorageRuleManager.removeRule:(Lknox/event/npc/utils/organize/StorageRule;)V
+      16: return
+
+  public void applyStorageRule(knox.event.meta.groups.BaseGroup, zombie.iso.IsoObject, knox.event.npc.utils.organize.StorageRule);
+    Code:
+       0: aload_1
+       1: ifnull        12
+       4: aload_2
+       5: ifnull        12
+       8: aload_3
+       9: ifnonnull     13
+      12: return
+      13: new           #580                // class knox/event/npc/utils/organize/ItemFilter
+      16: dup
+      17: aload_3
+      18: invokevirtual #598                // Method knox/event/npc/utils/organize/StorageRule.getFilter:()Lknox/event/npc/utils/organize/ItemFilter;
+      21: invokevirtual #604                // Method knox/event/npc/utils/organize/ItemFilter.getDefaultAllow:()Z
+      24: invokespecial #582                // Method knox/event/npc/utils/organize/ItemFilter."<init>":(Z)V
+      27: astore        4
+      29: aload         4
+      31: aload_3
+      32: invokevirtual #598                // Method knox/event/npc/utils/organize/StorageRule.getFilter:()Lknox/event/npc/utils/organize/ItemFilter;
+      35: invokevirtual #607                // Method knox/event/npc/utils/organize/ItemFilter.replaceWith:(Lknox/event/npc/utils/organize/ItemFilter;)V
+      38: aload_1
+      39: aload_2
+      40: aload         4
+      42: invokevirtual #611                // Method knox/event/meta/groups/BaseGroup.setContainerFilter:(Lzombie/iso/IsoObject;Lknox/event/npc/utils/organize/ItemFilter;)V
+      45: return
+
+  public knox.event.npc.utils.organize.ItemFilter cloneItemFilter(knox.event.npc.utils.organize.ItemFilter);
+    Code:
+       0: aload_1
+       1: ifnonnull     6
+       4: aconst_null
+       5: areturn
+       6: new           #580                // class knox/event/npc/utils/organize/ItemFilter
+       9: dup
+      10: aload_1
+      11: invokevirtual #604                // Method knox/event/npc/utils/organize/ItemFilter.getDefaultAllow:()Z
+      14: invokespecial #582                // Method knox/event/npc/utils/organize/ItemFilter."<init>":(Z)V
+      17: astore_2
+      18: aload_2
+      19: aload_1
+      20: invokevirtual #607                // Method knox/event/npc/utils/organize/ItemFilter.replaceWith:(Lknox/event/npc/utils/organize/ItemFilter;)V
+      23: aload_2
+      24: areturn
+
+  public knox.event.npc.utils.organize.ItemFilter getContainerFilter(knox.event.meta.groups.BaseGroup, zombie.iso.IsoObject);
+    Code:
+       0: aload_1
+       1: ifnull        8
+       4: aload_2
+       5: ifnonnull     10
+       8: aconst_null
+       9: areturn
+      10: aload_1
+      11: aload_2
+      12: invokevirtual #615                // Method knox/event/meta/groups/BaseGroup.getContainerFilter:(Lzombie/iso/IsoObject;)Lknox/event/npc/utils/organize/ItemFilter;
+      15: areturn
+
+  public void copyItemFilter(knox.event.npc.utils.organize.ItemFilter, knox.event.npc.utils.organize.ItemFilter);
+    Code:
+       0: aload_1
+       1: ifnull        13
+       4: aload_2
+       5: ifnull        13
+       8: aload_2
+       9: aload_1
+      10: invokevirtual #607                // Method knox/event/npc/utils/organize/ItemFilter.replaceWith:(Lknox/event/npc/utils/organize/ItemFilter;)V
+      13: return
+
+  public void setContainerFilter(knox.event.meta.groups.BaseGroup, zombie.iso.IsoObject, knox.event.npc.utils.organize.ItemFilter);
+    Code:
+       0: aload_1
+       1: ifnull        10
+       4: aload_1
+       5: aload_2
+       6: aload_3
+       7: invokevirtual #611                // Method knox/event/meta/groups/BaseGroup.setContainerFilter:(Lzombie/iso/IsoObject;Lknox/event/npc/utils/organize/ItemFilter;)V
+      10: return
+
+  public void removeContainerFilter(knox.event.meta.groups.BaseGroup, zombie.iso.IsoObject);
+    Code:
+       0: aload_1
+       1: ifnull        9
+       4: aload_1
+       5: aload_2
+       6: invokevirtual #619                // Method knox/event/meta/groups/BaseGroup.removeContainerFilter:(Lzombie/iso/IsoObject;)V
+       9: return
+
+  public java.util.ArrayList<knox.event.meta.groups.BaseGroup$ContainerFilterEntry> getContainerFilterEntries(knox.event.meta.groups.BaseGroup);
+    Code:
+       0: aload_1
+       1: ifnonnull     12
+       4: new           #37                 // class java/util/ArrayList
+       7: dup
+       8: invokespecial #211                // Method java/util/ArrayList."<init>":()V
+      11: areturn
+      12: aload_1
+      13: invokevirtual #623                // Method knox/event/meta/groups/BaseGroup.getContainerFilterEntries:()Ljava/util/ArrayList;
+      16: areturn
+}

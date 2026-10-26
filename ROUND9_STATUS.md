@@ -1,0 +1,10 @@
+# Round 9 handoff
+
+- Goal active: full actual AI teammate, not complete.
+- Added standalone `bridge/teammate_bridge.py` using strict `teammate_protocol.py`. Parent reran 13 bridge tests and 17 protocol tests: pass. Adapter regression direct script also passes. No real remote requests.
+- Credential presence checked WITHOUT printing values: existing bridge config key empty; DEEPSEEK_API_KEY and OPENAI_API_KEY absent. Real-model test needs explicit configured credential, not harness secret discovery.
+- Child 23bd15a7-3bd5-46ac-8abe-358c2a80bd3a creating mailbox + tests; source read at 94 lines during development. It verifies persisted adapter ID, membership, world readiness, nonce/seq/id matching, whitelist dispatch, consume-before-action. Not deployed or live tested. Child verified via javap installed GlobalObject.getFileReader returns java.io.BufferedReader; read() therefore plausible but actual Kahlua exposure still requires live test. Timeout60s. Unicode Java/Kahlua string vs Lupa byte-string semantics flagged unverified.
+- Native7 failed controlled movement harness at line93 `setLx` unavailable; repeated failures caused >150k log lines, NO pursuit evidence. Stopped exact verified isolated PID30680 and collected job pwsh-beff1bbfd02348b6 (deliberate JVM -1). No running game test jobs.
+- Replaced failed displacement code in test runner with ordinary ISWalkToTimedAction pathfinding to free square +8,+4. Latches before attempting, so no repeated displacement/error loop. This revised harness NOT run yet. No production player teleport capability added.
+- Best live evidence remains native6: exact NPC121 recruitment, real WAIT->Stay and FOLLOW->Follow, active updates and membership. No proven pursuit/combat/save-reload.
+- Next: finish/review mailbox child and tests; deploy mailbox only to actual enabled `test-profile/mods/DC_AI_Teammate/42/media/lua/client`; add isolated request/test fixtures and run native8 to verify real Kahlua mailbox + ordinary walking pursuit. Use fixed labelled mock replies only as transport integration evidence, not real model success. Later user controls/package, combat, reload, actual credential/model test remain.

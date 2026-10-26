@@ -1,0 +1,3 @@
+Premain-Class: com.dcai.agent.Agent
+Agent-Class: com.dcai.agent.Agent
+Can-Retransform-Classes: true

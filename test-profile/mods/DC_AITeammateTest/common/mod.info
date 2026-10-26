@@ -1,0 +1,4 @@
+name=DC AI Teammate Live Test
+id=DC_AITeammateTest
+description=Disposable isolated live test runner for DC AI Teammate and Knox NPC.
+versionMin=42.21
