@@ -1,4 +1,4 @@
 name=大肥鱼 AI 队友（独立开发中）
 id=DC_AIStandalone
-description=独立实现的 B42 大肥鱼 AI 队友；当前阶段仅包含身份注册与本地意图状态，角色实体和外观尚未完成。
+description=独立实现的 B42 大肥鱼 AI 队友；当前包含身份注册与主线程桥接探针，角色实体和外观尚未完成。
 versionMin=42.21

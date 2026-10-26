@@ -8,7 +8,7 @@ import zombie.core.skinnedmodel.visual.ItemVisuals;
 import zombie.iso.IsoCell;
 
 /** Compilation probe only. Not yet inserted into a world or presented as a character.
- * No Knox or ZombieBuddy classes are used. Lazy visual handles virtual calls from super.
+ * Uses only base-game types. Lazy visual handles virtual calls from super.
  */
 public final class CompanionActor extends IsoLivingCharacter implements IHumanVisual {
     private HumanVisual humanVisual;
