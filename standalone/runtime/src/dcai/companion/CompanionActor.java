@@ -17,9 +17,9 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
     public CompanionActor(IsoCell cell) {
         // Nonzero super coordinates auto-register a partially initialized actor.
         // This constructor deliberately stays detached; a world factory is still required.
-        super(cell, 0, 0, 0);
-        initWornItems("Human");
-        initAttachedItems("Human");
+        super(null, 0, 0, 0);
+        // Worn/attached groups are initialized by the world factory after game data is ready.
+
     }
 
     @Override public HumanVisual getHumanVisual() {
@@ -30,9 +30,11 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
     @Override public ItemVisuals getItemVisuals() {
         if (itemVisuals == null) itemVisuals = new ItemVisuals();
         itemVisuals.clear();
-        super.getItemVisuals(itemVisuals);
+        getItemVisuals(itemVisuals);
         return itemVisuals;
     }
-    @Override public void getItemVisuals(ItemVisuals out) { super.getItemVisuals(out); }
+    @Override public void getItemVisuals(ItemVisuals out) {
+        if (getWornItems() != null) super.getItemVisuals(out);
+    }
     @Override public boolean isSkeleton() { return false; }
 }
