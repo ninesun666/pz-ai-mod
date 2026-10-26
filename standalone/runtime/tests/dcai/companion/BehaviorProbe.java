@@ -18,10 +18,9 @@ public final class BehaviorProbe {
         equal(NONE, b.tick(800, 3, true, true));
         equal(PATH_TO_OWNER, b.tick(1501, 5, true, true));
         b.command(HOLD);
-        equal(CANCEL_PATH, b.tick(1502, 7, true, true));
-        equal(NONE, b.tick(1600, 20, true, true));
         b.command(RETREAT);
-        equal(PATH_TO_OWNER, b.tick(1601, 3, true, true));
+        equal(CANCEL_PATH, b.tick(1502, 7, true, true));
+        equal(PATH_TO_OWNER, b.tick(1503, 3, true, true));
         equal(CANCEL_PATH, b.tick(1602, 3, false, true));
         equal(NONE, b.tick(1603, 30, true, false));
         boolean rejected = false;

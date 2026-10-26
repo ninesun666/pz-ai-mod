@@ -12,7 +12,9 @@
 - Stationary model pipeline: an explicit model request and readiness-gated rendering/postupdate path have been added. Postupdate calls ActionContext.update() and public updateForServerGui(), without inherited physiology update. This path is compiled but world execution/pixel visibility is untested; locomotion remains unimplemented.
 - World actor probe: explicit `--world --gate world-actor` attaches a stationary placeholder near a loaded player and checks active model membership. It is disabled in production by default and has not passed a real-world run. A human terms action is still needed for world entry.
 - Full repository regression: 68 tests run; 5 failures and 13 errors remain in retired adapter/mailbox/UI/package tests. The focused independent gate passes 8 Python tests and 5 JVM probes; the legacy failures are not hidden or treated as independent-runtime acceptance.
-- Native profile parser: passed by `ModProfileProbe` against the actual game JAR.
+- Registry isolation: the Lua registry now binds state to the current player object before every identity operation. Player switches reset transient state, restore that player's saved UUID/intent, and never write to the previous player's ModData. Unsupported schemas remain fail-closed; successful later repair clears the stale error. Focused registry coverage is now 6 tests.
+- Deterministic behavior: consecutive command changes preserve a pending path cancellation, so HOLD immediately followed by RETREAT cannot lose the cancellation. The JVM behavior probe covers this sequence plus throttling, hysteresis, unavailable readiness and invalid perception.
+
 - Offline transformer/FSM/source tests: passed.
 
 The current evidence is initialization and mod/Lua loading only, not a playable teammate acceptance.

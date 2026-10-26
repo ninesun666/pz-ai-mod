@@ -25,8 +25,21 @@ local function newId()
     return "dc-whale-" .. uuidPart() .. "-" .. uuidPart()
 end
 
+local boundPlayer = nil
+local started = false
+local function bindPlayer(p)
+    if boundPlayer == p then return end
+    boundPlayer = p
+    started = false
+    M.state.phase = "disabled"
+    M.state.intent = "hold"
+    M.state.companionId = nil
+    M.state.assetId = "deepseek_whale_girl"
+    M.state.error = nil
+end
+
 local function data()
-    local p = player()
+    local p = boundPlayer or player()
     return p and p.getModData and p:getModData() or nil
 end
 
@@ -54,10 +67,14 @@ local function restoreIdentity()
         M.state.intent = "hold"
     end
     M.state.phase = "identity-restored"
+    M.state.error = nil
     return true
 end
 
 function M.ensureIdentity()
+    local p = player()
+    bindPlayer(p)
+    if not p then return false end
     local d = data()
     if not d then return false end
     if M.state.companionId then return saveIdentity() end
@@ -85,12 +102,13 @@ function M.status()
     return M.state
 end
 
-local started = false
 local function onWorldTick()
+    local p = player()
+    if not p then return end
+    bindPlayer(p)
     if started then return end
-    if not player() then return end
+    if not M.ensureIdentity() then return end
     started = true
-    M.ensureIdentity()
     print("[DC_AI_Standalone] registry ready id=" .. tostring(M.state.companionId) ..
         " asset=" .. tostring(M.state.assetId) .. " intent=" .. tostring(M.state.intent))
 end

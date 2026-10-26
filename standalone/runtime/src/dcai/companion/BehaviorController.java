@@ -14,7 +14,7 @@ public final class BehaviorController {
     public void command(Intent next) {
         if (next == null) throw new IllegalArgumentException("intent missing");
         if (intent != next) {
-            cancelPending = pathing;
+            cancelPending = cancelPending || pathing;
             pathing = false;
             requested = false;
         }
