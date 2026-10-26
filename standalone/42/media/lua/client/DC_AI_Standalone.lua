@@ -93,6 +93,11 @@ function M.ensureIdentity()
     return saveIdentity()
 end
 
+function M.canCommand()
+    -- No live identity-bound locomotion executor is connected yet.
+    return false
+end
+
 function M.command(intent)
     M.state.error = "actor unavailable"
     return false

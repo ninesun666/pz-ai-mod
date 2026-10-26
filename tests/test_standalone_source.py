@@ -11,6 +11,16 @@ class StandaloneSourceTests(unittest.TestCase):
         for forbidden in ("KnoxEventLoader", "spawnNpc(", "me.zed_0xff.zombie_buddy", "tellNpcFollow(", "tellNpcStay("):
             self.assertNotIn(forbidden, text)
 
+    def test_no_text_controls_use_native_key_event_only(self):
+        ui = (ROOT / "standalone/42/media/lua/client/DC_AI_StandaloneUI.lua").read_text(encoding="utf-8")
+        self.assertIn("Events.OnFillWorldObjectContextMenu.Add", ui)
+        self.assertIn("大肥鱼：跟随", ui)
+        self.assertIn("大肥鱼：停留", ui)
+        self.assertIn("大肥鱼：重新集合", ui)
+        self.assertNotIn("ISTextBox", ui)
+        self.assertNotIn("ISPanel", ui)
+        self.assertNotIn("OnKeyPressed", ui)
+
     def test_runtime_does_not_capture_mouse_or_open_textbox(self):
         files = list((ROOT / "standalone").rglob("*.lua"))
         text = "\n".join(path.read_text(encoding="utf-8") for path in files)
