@@ -28,5 +28,7 @@ public final class CompanionBridge {
             }
         });
         System.out.println("[DCStandalone] bridge installed on " + installThread.getName());
+        System.out.println("[DCStandalone] active mods=" + zombie.modding.ActiveMods.getById("default").getMods());
+        System.out.println("[DCStandalone] discovered=" + (zombie.gameStates.ChooseGameInfo.getModDetails("DC_AIStandalone") != null));
     }
 }
