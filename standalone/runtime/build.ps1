@@ -27,6 +27,8 @@ if ($testFiles) {
 $gameJar = Join-Path $GameDir "projectzomboid.jar"
 & $java -cp "$out;$cp" dcai.companion.TransformProbe $gameJar
 if ($LASTEXITCODE -ne 0) { throw "Transform probe failed: $LASTEXITCODE" }
+& $java -cp "$out;$cp" dcai.companion.BehaviorProbe
+if ($LASTEXITCODE -ne 0) { throw "Behavior probe failed: $LASTEXITCODE" }
 $manifest = Join-Path $root "standalone\runtime\build\MANIFEST.MF"
 @"
 Manifest-Version: 1.0
