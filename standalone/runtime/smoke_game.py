@@ -33,6 +33,8 @@ def main():
     (profile / 'mods/default.txt').write_text(
         'VERSION = 1,\n\nmods\n{\n    mod = DC_AIStandalone,\n}\n\nmaps\n{\n}\n',
         encoding='utf-8')
+    # Core.initOptionsINI copies shipped mods on a first launch without options.ini.
+    (profile / 'options.ini').write_text('version=8\nwidth=1280\nheight=720\nfullScreen=false\n', encoding='utf-8')
     (profile / 'mods/reset-mods-42_00.txt').write_text('', encoding='utf-8')
     out = run / 'stdout.log'
 
