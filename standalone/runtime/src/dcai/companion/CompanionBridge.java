@@ -33,10 +33,14 @@ public final class CompanionBridge {
                     if (Thread.currentThread() != GameWindow.gameThread)
                         throw new IllegalStateException("constructor probe off game thread");
                     CompanionActor actor = new CompanionActor(null);
+                    actor.initializePlaceholderVisuals();
                     if (actor.isAttached() || actor.getCurrentSquare() != null)
                         throw new IllegalStateException("constructor registered actor into world");
                     if (actor.getHumanVisual() == null || actor.getItemVisuals() == null)
                         throw new IllegalStateException("constructor missing own visual interface");
+                    if (!actor.isPlaceholderVisualReady())
+                        throw new IllegalStateException("placeholder visual preconditions missing");
+                    System.out.println("[DCStandaloneTest] placeholder visual setup PASS (not rendered)");
                     System.out.println("[DCStandaloneTest] detached constructor PASS on " + Thread.currentThread().getName());
                     return frame.push(true);
                 }

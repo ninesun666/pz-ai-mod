@@ -14,10 +14,37 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
     private HumanVisual humanVisual;
     private ItemVisuals itemVisuals;
     private CompanionLifecycle lifecycle;
+    private boolean visualsReady;
+
+    /** Placeholder human model only; not the final whale-girl asset. */
+    public void initializePlaceholderVisuals() {
+        requireGameThread();
+        if (visualsReady) return;
+        if (isAttached()) throw new IllegalStateException("initialize visuals before attachment");
+        initWornItems("Human");
+        initAttachedItems("Human");
+        zombie.characters.SurvivorDesc desc = new zombie.characters.SurvivorDesc(false);
+        desc.setFemale(true);
+        desc.setForename("大肥鱼");
+        desc.setSurname("[placeholder]");
+        desc.setInstance(this);
+        setDescriptor(desc);
+        setFemale(true);
+        getHumanVisual().copyFrom(desc.getHumanVisual());
+        initSpritePartsEmpty();
+        setVariable("bMoving", false);
+        setVariable("bPathfind", false);
+        visualsReady = true;
+    }
 
     public CompanionActor(IsoCell ignoredCell) {
         super(null, 0, 0, 0);
         // Worn/attached groups are initialized by the world factory after game data is ready.
+    }
+
+    public boolean isPlaceholderVisualReady() {
+        return visualsReady && getDescriptor() != null && isFemale()
+                && getWornItems() != null && getAttachedItems() != null && legsSprite != null;
     }
 
     /** Main/world-thread only. No inherited physiology or animation update is called. */

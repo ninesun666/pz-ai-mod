@@ -17,7 +17,11 @@ def main():
     parser.add_argument('--timeout', type=int, default=120)
     parser.add_argument('--world', action='store_true', help='create a fresh disposable world automatically')
     parser.add_argument('--profile', type=Path, help='reuse only a harness-marked disposable profile')
+    parser.add_argument('--gate', choices=('tick', 'visual-setup'), default='tick',
+                        help='visual-setup proves initialized detached placeholder only, not rendering')
     args = parser.parse_args()
+    if args.gate == 'visual-setup' and not args.world:
+        parser.error('visual-setup requires --world test bootstrap')
     jar = ROOT / 'standalone/runtime/build/DC_AIStandaloneRuntime.jar'
     if not jar.is_file():
         raise SystemExit('Build runtime first')
@@ -68,7 +72,11 @@ def main():
         try:
             while time.monotonic() - started < args.timeout:
                 text = out.read_text(encoding='utf-8', errors='replace') + err.read_text(encoding='utf-8', errors='replace')
-                if '[DCStandalone] first game-thread tick' in text:
+                if args.gate == 'visual-setup' and '[DCStandaloneTest] placeholder visual setup PASS' in text:
+                    result['passed'] = True
+                    result['reason'] = 'initialized detached placeholder visual setup reached game thread; not rendering acceptance'
+                    break
+                if args.gate == 'tick' and '[DCStandalone] first game-thread tick' in text:
                     result['passed'] = True
                     result['reason'] = 'standalone Lua OnTick reached Java game-thread callback'
                     break
