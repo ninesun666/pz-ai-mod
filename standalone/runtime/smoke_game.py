@@ -19,24 +19,26 @@ def _auto_click_daemon(pid, stop):
     import ctypes
     import threading
     user32 = ctypes.windll.user32
-    found = []
-    def _pid_of(hwnd):
-        value = ctypes.c_ulong()
-        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(value))
-        return value.value
     ENUM = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
-    def on_window(hwnd, _l):
-        if _pid_of(hwnd) == pid:
-            buf = ctypes.create_unicode_buffer(64)
-            user32.GetClassNameW(hwnd, buf, 64)
-            if buf.value == 'GLFW30':
-                found.append(hwnd)
-                return False
-        return True
-    user32.EnumWindows(ENUM(on_window), 0)
-    if not found:
+    hwnd = None
+    while not stop.is_set() and hwnd is None:
+        found = []
+        def on_window(h, _l):
+            value = ctypes.c_ulong()
+            user32.GetWindowThreadProcessId(h, ctypes.byref(value))
+            if value.value == pid:
+                buf = ctypes.create_unicode_buffer(64)
+                user32.GetClassNameW(h, buf, 64)
+                if buf.value == 'GLFW30':
+                    found.append(h)
+                    return False
+            return True
+        user32.EnumWindows(ENUM(on_window), 0)
+        hwnd = found[0] if found else None
+        if hwnd is None:
+            threading.Event().wait(1.0)
+    if hwnd is None:
         return
-    hwnd = found[0]
     lparam = (383 << 16) | 642  # center of the 1284x767 client area
     while not stop.is_set():
         user32.PostMessageW(hwnd, 0x0200, 0, lparam)   # WM_MOUSEMOVE
@@ -90,7 +92,7 @@ def main():
     # user's real profiles are never touched.
     if not (profile / 'options.ini').exists():
         (profile / 'options.ini').write_text(
-            'version=8\nwidth=1280\nheight=720\nfullScreen=false\ntermsOfServiceVersion=1\n',
+            'version=8\nwidth=1280\nheight=720\nfullScreen=false\ntermsOfServiceVersion=1\nlanguage=CN\n',
             encoding='utf-8')
     (profile / 'mods/default.txt').write_text(
         'VERSION = 1,\n\nmods\n{\n    mod = DC_AIStandalone,\n}\n\nmaps\n{\n}\n',

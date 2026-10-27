@@ -26,6 +26,7 @@ public final class CompanionController {
     private Float lastActorY;
     private int stuckTicks;
     private boolean stuck;
+    private boolean modelConfirmed;
 
     /** Called from Lua after ensureIdentity() succeeds. Accepts only one identity. */
     public synchronized boolean declareIdentity(String uuid, String assetId) {
@@ -41,6 +42,10 @@ public final class CompanionController {
         if (!declared) return;
         if (actor == null && !spawnFailed) trySpawn();
         if (actor == null) return;
+        if (!modelConfirmed && actor.requestPlaceholderModel()) {
+            modelConfirmed = true;
+            System.out.println("[DCStandalone] companion model active (visible)");
+        }
         IsoPlayer owner = IsoPlayer.getInstance();
         if (owner == null || owner.getCurrentSquare() == null) return;
         long now = System.currentTimeMillis();
@@ -150,9 +155,13 @@ public final class CompanionController {
             if (!candidate.attachAt(cell, spot.getX() + 0.5f, spot.getY() + 0.5f, spot.getZ()))
                 throw new IllegalStateException("attach rejected");
             actor = candidate;
+            // Production must request the model explicitly: without it render() stays
+            // gated and the companion is an invisible ghost in the world.
+            boolean modelActive = actor.requestPlaceholderModel();
             spawnFailed = false;
             System.out.println("[DCStandalone] companion spawned id=" + companionId
-                + " at " + actor.getX() + "," + actor.getY());
+                + " at " + actor.getX() + "," + actor.getY()
+                + " modelActive=" + modelActive);
         } catch (RuntimeException failure) {
             spawnFailed = true; // Never silently retry-loop a broken spawn.
             lastError = "spawn failed: " + failure.getMessage();
