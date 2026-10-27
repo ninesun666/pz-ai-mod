@@ -22,8 +22,8 @@ def main():
     parser.add_argument('--interactive', action='store_true',
                         help='visible window for the human to accept terms; no headless flag')
     args = parser.parse_args()
-    if args.gate != 'tick' and not args.world:
-        parser.error('actor gates require --world test bootstrap')
+    if args.gate in ('visual-setup', 'world-actor') and not args.world:
+        parser.error('engine probe gates require --world test bootstrap')
     jar = ROOT / 'standalone/runtime/build/DC_AIStandaloneRuntime.jar'
     if not jar.is_file():
         raise SystemExit('Build runtime first')
