@@ -45,6 +45,8 @@
 | 自定义角色类隐身 | `IsoLivingCharacter` 子类不在 B42 渲染管线里，无解，必须换基类 | cat-characters.md："Knox NPC 走 IsoZombie 子机制"，ZB 需 patch ModelCameraRenderData |
 | 引擎 update 系列强转崩溃 | Knox 路线（继承 IsoPlayer）下强转天然安全；若换基类必须重写 preupdate/update/postupdate | 2026-10-27 点击秒退实测 |
 | 手动生成的实体不可见 | 引擎全自动管线（Knox 路线）下不存在此问题；手动路径需 alpha+dress+resetModelNextFrame | 实测对照 |
+| 手动生成的 IsoPlayer 不走引擎 update 循环（画面在但寻路永不执行） | 构造后必须显式调用 `addToWorld()`（Knox `phaseIn` L344→L450 同款） | 2026-10-27 follow 门禁实测：无 addToWorld 时 `path requested` 后 `pathing=false` 永不移动 |
+| 测试中移动玩家做刺激是合法的（引擎 API teleport owner），但绝不能 teleport 伙伴来伪造跟随 | follow 探针 PASS 必须要求伙伴自身位移过半 | FollowProbe 设计规则 |
 | 角色没有网格（mesh=null） | `dressInRandomOutfit()` + `resetModelNextFrame()`，穿衣触发模型构建 | javap IsoGameCharacter |
 | 菜单中文乱码 | 默认加载 `B42Trans_CN` 汉化 mod + `language=CN` | test-profile 既有配置 |
 | 新 profile 卡条款页 | options.ini 预置 `termsOfServiceVersion=1`（用户已授权，仅限一次性测试 profile） | 2026-10-27 用户明确授权 |

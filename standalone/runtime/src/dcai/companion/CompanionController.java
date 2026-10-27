@@ -174,6 +174,10 @@ public final class CompanionController {
             // Knox-proven construction: the IsoPlayer in-world constructor runs the
             // engine's full character pipeline (model, dressing, animation, render).
             CompanionActor candidate = new CompanionActor(cell, desc, (int) spot.getX(), (int) spot.getY(), (int) spot.getZ());
+            // Knox-proven spawn sequence (逆向笔记-knox核心.md L344→L450): the
+            // in-world constructor alone leaves the actor OUT of the update loop —
+            // pathing never executes. addToWorld() registers it for updates.
+            candidate.addToWorld();
             actor = candidate;
             spawnFailed = false;
             System.out.println("[DCStandalone] companion spawned id=" + companionId
