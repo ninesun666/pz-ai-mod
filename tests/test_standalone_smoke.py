@@ -34,7 +34,7 @@ class SmokeProfileTests(unittest.TestCase):
             code = SMOKE.main()
         return code, launch
 
-    def test_new_profile_loads_mod_without_accepting_terms(self):
+    def test_new_profile_loads_mod_with_authorized_tos_seed(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.setup_root(root)
@@ -42,7 +42,8 @@ class SmokeProfileTests(unittest.TestCase):
             self.assertEqual(code, 1)  # Process exit cannot masquerade as game-thread success.
             profile = root / 'standalone/runtime/build/runs/test-run/profile'
             self.assertEqual((profile / '.dc-standalone-disposable').read_text(), 'DCStandalone disposable profile v1\n')
-            self.assertNotIn('termsOfServiceVersion', (profile / 'options.ini').read_text())
+            options = (profile / 'options.ini').read_text()
+            self.assertIn('termsOfServiceVersion=1', options)  # User-authorized automation seed.
             self.assertIn('mod = DC_AIStandalone', (profile / 'mods/default.txt').read_text())
             self.assertTrue((profile / 'mods/reset-mods-42_00.txt').exists())
             self.assertTrue((profile / 'mods/DC_AIStandalone/42/media/lua/client/DCStandaloneTestBootstrap.lua').exists())

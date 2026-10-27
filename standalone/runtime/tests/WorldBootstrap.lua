@@ -9,7 +9,25 @@ local scenario = {
     setSandbox = function()
         SandboxVars.Zombies = 6
     end,
-    onStart = function() print("[DCStandaloneTest] world started") end,
+    onStart = function()
+        print("[DCStandaloneTest] world started")
+        -- After loading, the game can sit paused (speed 0) so Lua OnTick never
+        -- advances; restore normal speed so automated probes keep ticking.
+        local ok, err = pcall(setGameSpeed, 1)
+        if not ok then print("[DCStandaloneTest] setGameSpeed failed: " .. tostring(err)) end
+        local diagDone = {}
+        local function probe(name)
+            if diagDone[name] then return end
+            diagDone[name] = true
+            local okp, paused = pcall(isGamePaused)
+            print("[DCStandaloneTest] probe " .. name .. " paused=" .. tostring(okp and paused)
+                .. " speed=" .. tostring(getGameSpeed and getGameSpeed()))
+        end
+        for _, name in ipairs({"OnTick", "OnTickEvenPaused", "OnPostRender", "OnPlayerUpdate", "OnPreRender"}) do
+            local ev = Events[name]
+            if ev then ev.Add(function() probe(name) end) end
+        end
+    end,
 }
 local function tryLaunch()
     if launched or isClient() or isServer() then return end

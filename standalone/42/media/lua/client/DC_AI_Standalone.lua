@@ -148,6 +148,8 @@ local function onWorldTick()
 end
 
 if Events and Events.OnTick then Events.OnTick.Add(onWorldTick) end
+-- Keep identity declaration alive while the game is paused during automated runs.
+if Events and Events.OnTickEvenPaused then Events.OnTickEvenPaused.Add(onWorldTick) end
 if Events and Events.OnSave then
     Events.OnSave.Add(function()
         if DCStandaloneSuspend then pcall(DCStandaloneSuspend) end

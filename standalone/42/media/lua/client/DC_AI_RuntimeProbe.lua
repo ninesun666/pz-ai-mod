@@ -1,7 +1,7 @@
 -- Independent runtime capability probe; never creates UI or captures input.
 local checked = false
 local constructorChecked = false
-Events.OnTick.Add(function()
+local function onTick()
     if DCStandaloneTick == nil then
         if not checked then
             checked = true
@@ -19,4 +19,8 @@ Events.OnTick.Add(function()
             print("[DCStandalone] detached constructor probe returned non-true")
         end
     end
-end)
+end
+if Events and Events.OnTick then Events.OnTick.Add(onTick) end
+-- The game can sit paused (focus loss, speed 0) during automated runs; this
+-- engine event keeps probes ticking so acceptance does not stall.
+if Events and Events.OnTickEvenPaused then Events.OnTickEvenPaused.Add(onTick) end

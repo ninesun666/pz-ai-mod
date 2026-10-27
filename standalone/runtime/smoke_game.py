@@ -49,8 +49,13 @@ def main():
         bootstrap.unlink()  # Exact known test-only file in a marked disposable profile.
 
     # Exact known generated files in the marked disposable profile only.
+    # termsOfServiceVersion=1 is pre-seeded by explicit user authorization
+    # (2026-10-27) for harness-created disposable automation profiles; the
+    # user's real profiles are never touched.
     if not (profile / 'options.ini').exists():
-        (profile / 'options.ini').write_text('version=8\nwidth=1280\nheight=720\nfullScreen=false\n', encoding='utf-8')
+        (profile / 'options.ini').write_text(
+            'version=8\nwidth=1280\nheight=720\nfullScreen=false\ntermsOfServiceVersion=1\n',
+            encoding='utf-8')
     (profile / 'mods/default.txt').write_text(
         'VERSION = 1,\n\nmods\n{\n    mod = DC_AIStandalone,\n}\n\nmaps\n{\n}\n',
         encoding='utf-8')
