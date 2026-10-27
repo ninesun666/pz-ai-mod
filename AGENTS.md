@@ -24,6 +24,43 @@
 - 不要混用旧版 ZombieBuddy API 与当前上游 API；当前审查基线是 `upstream/ZombieBuddy` 固定提交 `7794d9f974b509f9f800b266f76c15cd9eb6bfa6`，Java 25 和对应依赖必须单独核对。
 - ZombieBuddy 的自更新、原生代理和硬编码 `ZombieBuddy.jar` 路径不可直接当作本项目运行时；若采用其代码，必须有项目自己的命名、更新信任和配置策略。
 
+## 借鉴优先（2026-10-27 血泪教训固化，最高优先级工作流）
+
+**任何引擎相关问题，写代码前必须先查参考，禁止拍脑袋试错。** 实例：实体隐身问题盲试了 alpha、模型请求、穿衣重建等 4 轮，才在自家笔记里找到答案——而答案一直躺在 `research/pz-reverse/cat-characters.md` 的一行字里。
+
+### 查参考的固定顺序（从快到慢）
+
+1. `research/pz-reverse/cat-*.md` —— 逆向笔记分类库（AI/角色/Lua/原生/输入…）
+2. `research/decompiled/` —— Knox 反编译笔记（行为树、角色管理、生成 API）
+3. `research/*.txt` —— javap 签名库（先 grep 确认方法存在，别猜签名）
+4. `upstream/ZombieBuddy/doc/` + 源码 —— 队友 mod 参考实现（固定提交 7794d9f9）
+5. `research/*.md` 阶段笔记 —— 之前的架构结论
+6. 以上都没有 → 才允许 javap/反编译，且结论必须回写 research/ 对应文件
+
+### 已验证的标准答案表（直接抄，别再试）
+
+| 问题 | 标准答案 | 依据 |
+|---|---|---|
+| 自有 NPC 基类选什么 | `extends IsoPlayer`，世界内构造 `super(cell, desc, x, y, z)` | Knox `IsoNpcPlayer` 同款，渲染/穿衣/动画全管线开箱即用 |
+| 自定义角色类隐身 | `IsoLivingCharacter` 子类不在 B42 渲染管线里，无解，必须换基类 | cat-characters.md："Knox NPC 走 IsoZombie 子机制"，ZB 需 patch ModelCameraRenderData |
+| 引擎 update 系列强转崩溃 | Knox 路线（继承 IsoPlayer）下强转天然安全；若换基类必须重写 preupdate/update/postupdate | 2026-10-27 点击秒退实测 |
+| 手动生成的实体不可见 | 引擎全自动管线（Knox 路线）下不存在此问题；手动路径需 alpha+dress+resetModelNextFrame | 实测对照 |
+| 角色没有网格（mesh=null） | `dressInRandomOutfit()` + `resetModelNextFrame()`，穿衣触发模型构建 | javap IsoGameCharacter |
+| 菜单中文乱码 | 默认加载 `B42Trans_CN` 汉化 mod + `language=CN` | test-profile 既有配置 |
+| 新 profile 卡条款页 | options.ini 预置 `termsOfServiceVersion=1`（用户已授权，仅限一次性测试 profile） | 2026-10-27 用户明确授权 |
+| 游戏卡"点击开始" | 真实鼠标点击（SetForegroundWindow+mouse_event）；PostMessage 假点击不可靠 | monitor_run.py 同期实测 |
+
+### 架构锁定（字节码门禁强制）
+
+- `CompanionActor` 必须 `extends IsoPlayer`，构造器必须是 `(IsoCell, SurvivorDesc, III)` 直通——`ActorConstructionProbe` 违反即构建失败，任何人不得以任何理由改回自定义基类。
+- IsoPlayer 带来的新问题（存档隔离、玩家系统隔离、UI 误认），先读 Knox 的 `MetaCharacterManager`（research/decompiled/ 有反编译笔记），它已解决：实体池、存档摘除、分组、记忆。
+
+### 测试必须自带监测（不许让用户当眼睛）
+
+- 游戏内：`CompanionController` 周期性 `diag` 日志（位置/模型实例/动画/距离）。
+- 游戏外：`monitor_run.py` 盯日志状态转换 + 周期截图存证。
+- 任何"你看看有没有"式的问题，先补监测手段再问。
+
 ## 看代码的方法
 
 1. 先读目标文件及其调用者，再搜索同名全局、事件注册和依赖 API。
