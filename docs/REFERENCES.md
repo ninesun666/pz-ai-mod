@@ -17,6 +17,37 @@
 | 本仓库 | `ai-mod` @ `rework/standalone-companion` |
 | 反编译方法 | 用 IDE/CFR/Vineflower 反编译 `projectzomboid.jar` 到本地只读目录（不提交仓库） |
 
+## 0.5 既有逆向资料总库（先查这里，再反编译）
+
+之前各阶段沉淀的逆向资料都在仓库内，**大部分问题不需要重新反编译**：
+
+### research\pz-reverse\ — PZ 逆向笔记库（带索引）
+- `index\` + `build_doc.py` + `cat-*.md` 分类文档：`cat-ai.md`（AI 状态机）、`cat-characters.md`（角色类）、`cat-lua.md`、`cat-native-dlls.md`（原生 DLL）、`cat-input-ime.md`（输入法）、`cat-mod-design.md`、`cat-network.md`、`cat-audio-ui.md`、`cat-game-design.md`、`cat-mods-fonts.md`、`cat-dc-toolkit.md`。
+
+### research\decompiled\ — Knox 逆向类笔记（Knox Event Expanded NPC 反编译）
+- `KnoxEventNpcAPI.txt`、`NpcBehaviorTree.txt`、`NpcBehaviorTreeManager.txt`、`BehaviorNode.txt`、`BehaviorTreeBase.txt`、`SelectorNode.txt`、`FollowSubTree.txt`、`AttackAction.txt`、`MetaCharacterManager.txt`、`MetaNpcCharacter-sig.txt` — Knox 的行为树/角色管理实现笔记，M3 移动与行为接线时的对照实现（只读参考，生产代码不依赖 Knox）。
+
+### research\*.txt — 游戏类 javap 签名库（已核实存在的 API 清单）
+- `javap-zombie_characters_IsoGameCharacter.txt` / `IsoLivingCharacter.txt` / `IsoPlayer.txt` / `IsoSurvivor.txt` / `IsoZombie.txt`
+- `javap-zombie_characters_action_ActionContext.txt`、`javap-zombie_characters_component_StateMachineComponent.txt`
+- `javap-zombie_core_skinnedmodel_advancedanimation_AdvancedAnimator.txt`、`javap-zombie_core_skinnedmodel_ModelManager.txt`、`javap-zombie_core_skinnedmodel_visual_HumanVisual/IHumanVisual/ItemVisuals.txt`
+- `javap-zombie_iso_IsoCell.txt` / `IsoMovingObject.txt` / `IsoObject.txt`、`javap-zombie_MovingObjectUpdateScheduler.txt`
+- `javap-zombie_ai_states_GenericDefaultState.txt`、`generated-companion-javap.txt`
+- 写代码前先 grep 这里确认方法签名，避免再跑 javap。
+
+### research\*.md — 阶段逆向笔记
+- `逆向笔记-knox核心.md`、`knox-design.md` — Knox 核心机制逆向结论。
+- `game-zombiebuddy-design.md` — ZombieBuddy 设计逆向。
+- `字体与汉化模组解剖.md`、`架构与重做路线.md` — 字体/汉化与整体架构演进。
+
+### 仓库根目录 — 输入法与原生层逆向
+- `ime-api.txt` / `ime-native-api.txt` / `ime-signatures.txt` / `ime-textbox.txt` / `ime-display-bc.txt` — 原型阶段对游戏输入框/IME 的逆向记录（交互层需要输入相关参考时查这里）。
+- `bridge\`、`agent\`、`dctoolkit\` — 旧原型工程（含 zbNative 原生代理逆向产物），仅作历史参考，生产禁用。
+- `knox-i18n\` — Knox 汉化资料。
+
+### upstream\ZombieBuddy\doc\ — ZombieBuddy 官方文档（固定提交 7794d9f9）
+- `LuaAPI.md`、`ModdingGuide.md`、`CommandLine.md`、`DevDebugFunctions.md`、`ModSigning.md`、`Installation.md`、`Migrating2xTo3x.md` — 改造其代码时对照的原始语义文档。
+
 ## 1. 实体与渲染（M1–M2：挂载、可见性）
 
 **逆向/源（projectzomboid.jar 内类，反编译阅读）**
