@@ -80,6 +80,11 @@ def main():
     import shutil
     shutil.copytree(ROOT / 'standalone/common', mods / 'common', dirs_exist_ok=True)
     shutil.copytree(ROOT / 'standalone/42', mods / '42', dirs_exist_ok=True)
+    # Chinese translation/font mod by explicit user request: CJK glyphs for our
+    # context-menu labels. Loads after our mod (排序置底).
+    cn_mod_src = ROOT / 'test-profile/mods/B42Trans_CN_As1'
+    if cn_mod_src.is_dir():
+        shutil.copytree(cn_mod_src, profile / 'mods/B42Trans_CN_As1', dirs_exist_ok=True)
     bootstrap = mods / '42/media/lua/client/DCStandaloneTestBootstrap.lua'
     if args.world:
         shutil.copyfile(ROOT / 'standalone/runtime/tests/WorldBootstrap.lua', bootstrap)
@@ -95,7 +100,7 @@ def main():
             'version=8\nwidth=1280\nheight=720\nfullScreen=false\ntermsOfServiceVersion=1\nlanguage=CN\n',
             encoding='utf-8')
     (profile / 'mods/default.txt').write_text(
-        'VERSION = 1,\n\nmods\n{\n    mod = DC_AIStandalone,\n}\n\nmaps\n{\n}\n',
+        'VERSION = 1,\n\nmods\n{\n    mod = DC_AIStandalone,\n    mod = B42Trans_CN,\n}\n\nmaps\n{\n}\n',
         encoding='utf-8')
     (profile / 'mods/reset-mods-42_00.txt').write_text('', encoding='utf-8')
     out = run / 'stdout.log'

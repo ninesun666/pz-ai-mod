@@ -27,6 +27,7 @@ public final class CompanionController {
     private int stuckTicks;
     private boolean stuck;
     private boolean modelConfirmed;
+    private long lastDiagMs;
 
     /** Called from Lua after ensureIdentity() succeeds. Accepts only one identity. */
     public synchronized boolean declareIdentity(String uuid, String assetId) {
@@ -49,6 +50,16 @@ public final class CompanionController {
         IsoPlayer owner = IsoPlayer.getInstance();
         if (owner == null || owner.getCurrentSquare() == null) return;
         long now = System.currentTimeMillis();
+        if (now - lastDiagMs > 5000) {
+            lastDiagMs = now;
+            double dist = Math.sqrt(Math.pow(owner.getX() - actor.getX(), 2) + Math.pow(owner.getY() - actor.getY(), 2));
+            System.out.println("[DCStandalone] diag pos=" + String.format("%.1f,%.1f", actor.getX(), actor.getY())
+                + " attached=" + actor.isAttached()
+                + " modelActive=" + actor.requestPlaceholderModel()
+                + " pathing=" + actor.isPathfinding()
+                + " intent=" + intent()
+                + " dist=" + String.format("%.1f", dist));
+        }
         if (lastBehaviorTickMs >= 0 && now - lastBehaviorTickMs < BEHAVIOR_PERIOD_MS) return;
         if (lastBehaviorTickMs >= 0 && now < lastBehaviorTickMs) return; // clock went backwards; skip
         lastBehaviorTickMs = now;

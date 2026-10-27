@@ -93,6 +93,9 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
         setLastX(x); setLastY(y); setLastZ(z);
         setCurrent(square);
         setMovingSquareNow();
+        // Manual attachment bypasses vanilla spawn fades: without this the actor
+        // renders at alpha 0 — a ghost that occupies the world but is invisible.
+        setAlphaAndTarget(1f);
         targetCell.addMovingObject(this);
         lifecycle.attach();
         return true;
