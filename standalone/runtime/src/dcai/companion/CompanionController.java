@@ -132,6 +132,9 @@ public final class CompanionController {
 
     public synchronized boolean isSpawnFailed() { return spawnFailed; }
 
+    /** Test-only access for the follow stimulus probe; package-private on purpose. */
+    synchronized CompanionActor liveActor() { return actor; }
+
     /** Detaches before a world save so the actor never enters the save file; identity is kept. */
     public synchronized void suspend() {
         if (actor != null) {

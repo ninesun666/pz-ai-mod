@@ -53,8 +53,9 @@ def main():
     parser.add_argument('--timeout', type=int, default=120)
     parser.add_argument('--world', action='store_true', help='create a fresh disposable world automatically')
     parser.add_argument('--profile', type=Path, help='reuse only a harness-marked disposable profile')
-    parser.add_argument('--gate', choices=('tick', 'visual-setup', 'world-actor', 'spawn'), default='tick',
-                        help='world-actor/spawn are disposable stationary attachment/model probes')
+    parser.add_argument('--gate', choices=('tick', 'visual-setup', 'world-actor', 'spawn', 'follow'), default='tick',
+                        help='world-actor/spawn are disposable stationary attachment/model probes; '
+                             'follow is the live follow-locomotion acceptance (player teleport stimulus)')
     parser.add_argument('--interactive', action='store_true',
                         help='visible window for the human to accept terms; no headless flag')
     parser.add_argument('--dwell', type=int, default=0,
@@ -107,6 +108,8 @@ def main():
 
     err = run / 'stderr.log'
     probe_property = '-Ddcai.worldActorProbe=true' if args.gate == 'world-actor' else '-Ddcai.constructorProbe=true'
+    if args.gate == 'follow':
+        probe_property = '-Ddcai.followProbe=true'
     command = [str(args.game / 'jre64/bin/java.exe'), f'-javaagent:{jar}', probe_property]
     if not args.interactive:
         command.append('-Djava.awt.headless=true')
@@ -138,6 +141,18 @@ def main():
                         deadline = time.monotonic() + args.dwell
                         while time.monotonic() < deadline and proc.poll() is None:
                             time.sleep(0.5)
+                    break
+                if args.gate == 'follow' and '[DCStandalone] follow-probe PASS' in text:
+                    result['passed'] = True
+                    result['reason'] = 'companion closed teleport-opened distance by its own pathing twice; input/UI acceptance not covered'
+                    if args.dwell > 0:
+                        result['dwellSeconds'] = args.dwell
+                        deadline = time.monotonic() + args.dwell
+                        while time.monotonic() < deadline and proc.poll() is None:
+                            time.sleep(0.5)
+                    break
+                if args.gate == 'follow' and '[DCStandalone] follow-probe FAIL' in text:
+                    result['reason'] = 'follow probe reported failure in log'
                     break
                 if args.gate == 'world-actor' and '[DCStandaloneTest] model membership active' in text:
                     result['passed'] = True

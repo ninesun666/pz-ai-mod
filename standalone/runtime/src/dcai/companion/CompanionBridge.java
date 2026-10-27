@@ -30,6 +30,7 @@ public final class CompanionBridge {
                 ticks++;
                 if (ticks == 1) System.out.println("[DCStandalone] first game-thread tick");
                 controller.tick();
+                FollowProbe.tick(controller);
                 return frame.push((double) ticks);
             }
         });
