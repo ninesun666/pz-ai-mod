@@ -58,6 +58,7 @@ public final class CompanionController {
                 + " modelActive=" + actor.requestPlaceholderModel()
                 + " pathing=" + actor.isPathfinding()
                 + " intent=" + intent()
+                + " " + actor.modelInstanceDiag()
                 + " dist=" + String.format("%.1f", dist));
         }
         if (lastBehaviorTickMs >= 0 && now - lastBehaviorTickMs < BEHAVIOR_PERIOD_MS) return;

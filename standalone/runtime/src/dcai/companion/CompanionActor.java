@@ -147,6 +147,13 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
 
     /** Inherited preupdate has server/equipment paths that cast to IsoPlayer; suppress them. */
     @Override public void preupdate() { /* owned scheduler hook; no IsoPlayer cast paths */ }
+
+    /** Render-side diagnostic: is an engine model instance actually bound to us? */
+    public String modelInstanceDiag() {
+        zombie.core.skinnedmodel.model.ModelInstance mi = getModelInstance();
+        if (mi == null) return "instance=null";
+        return "instance=present anim=" + (getAnimationPlayer() != null);
+    }
     @Override public void update() { /* owned scheduler hook; no bodyDamage path */ }
     @Override public void postupdate() {
         if (!isAttached() || !modelRequested || !actionGroupReady || !hasActiveModel()) return;
