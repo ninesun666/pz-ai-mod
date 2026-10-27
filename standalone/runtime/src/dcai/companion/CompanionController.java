@@ -21,7 +21,7 @@ public final class CompanionController {
     private String lastError;
     private BehaviorController.Action lastAction = BehaviorController.Action.NONE;
     private long lastBehaviorTickMs = -1;
-    private boolean movementWarned;
+    private boolean pathWarned;
 
     /** Called from Lua after ensureIdentity() succeeds. Accepts only one identity. */
     public synchronized boolean declareIdentity(String uuid, String assetId) {
@@ -47,11 +47,17 @@ public final class CompanionController {
         double dy = owner.getY() - actor.getY();
         double distance = Math.sqrt(dx * dx + dy * dy);
         lastAction = behavior.tick(now, distance, true, true);
-        // Movement execution lands after the pathfind probe proves the API;
-        // until then the action is recorded, never faked.
-        if (lastAction != BehaviorController.Action.NONE && !movementWarned) {
-            movementWarned = true;
-            System.out.println("[DCStandalone] behavior action pending engine wiring: " + lastAction);
+        switch (lastAction) {
+            case PATH_TO_OWNER:
+                if (actor.walkTo(owner) && !pathWarned) {
+                    pathWarned = true;
+                    System.out.println("[DCStandalone] path requested (locomotion arrival unverified)");
+                }
+                break;
+            case CANCEL_PATH:
+                actor.stopWalking();
+                break;
+            default: break;
         }
     }
 

@@ -114,6 +114,28 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
         return lifecycle != null && lifecycle.phase() == CompanionLifecycle.Phase.ATTACHED;
     }
 
+    /** Requests vanilla A* pathing toward the owner. True = request accepted, not arrival proof. */
+    public boolean walkTo(zombie.characters.IsoGameCharacter target) {
+        requireGameThread();
+        if (!isAttached() || !actionGroupReady || target == null) return false;
+        pathToCharacter(target);
+        return true;
+    }
+
+    /** Cancels pending pathing; idempotent. */
+    public void stopWalking() {
+        requireGameThread();
+        if (!isAttached()) return;
+        StopAllActionQueueWalking();
+        setPathing(false);
+        setVariable("bMoving", false);
+        setVariable("bPathfind", false);
+    }
+
+    public boolean isPathfinding() {
+        return isPathing();
+    }
+
     private static void requireGameThread() {
         Thread current = Thread.currentThread();
         if (current != zombie.GameWindow.gameThread)
