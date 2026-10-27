@@ -11,6 +11,10 @@ public final class BehaviorController {
     private long lastTick = -1;
     private boolean cancelPending;
 
+    public Intent currentIntent() {
+        return intent;
+    }
+
     public void command(Intent next) {
         if (next == null) throw new IllegalArgumentException("intent missing");
         if (intent != next) {

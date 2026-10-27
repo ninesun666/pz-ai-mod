@@ -94,11 +94,32 @@ function M.ensureIdentity()
 end
 
 function M.canCommand()
+    if DCStandaloneStatus then
+        local ok, status = pcall(DCStandaloneStatus)
+        if ok and type(status) == "table" then return status.present == true end
+    end
     -- No live identity-bound locomotion executor is connected yet.
     return false
 end
 
 function M.command(intent)
+    if not (intent == "follow" or intent == "hold" or intent == "retreat") then
+        M.state.error = "invalid intent"
+        return false
+    end
+    if DCStandaloneCommand then
+        local ok, accepted = pcall(DCStandaloneCommand, intent)
+        if ok then
+            if accepted then
+                M.state.intent = intent
+                M.state.error = nil
+                saveIdentity()
+            else
+                M.state.error = "actor unavailable"
+            end
+            return accepted == true
+        end
+    end
     M.state.error = "actor unavailable"
     return false
 end
@@ -114,6 +135,14 @@ local function onWorldTick()
     if started then return end
     if not M.ensureIdentity() then return end
     started = true
+    if DCStandaloneDeclareIdentity then
+        local ok, declared = pcall(DCStandaloneDeclareIdentity, M.state.companionId, M.state.assetId)
+        if not ok or declared ~= true then
+            started = false
+            M.state.error = "controller declare failed"
+            return
+        end
+    end
     print("[DC_AI_Standalone] registry ready id=" .. tostring(M.state.companionId) ..
         " asset=" .. tostring(M.state.assetId) .. " intent=" .. tostring(M.state.intent))
 end

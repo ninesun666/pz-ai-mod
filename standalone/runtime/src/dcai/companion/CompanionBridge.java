@@ -1,5 +1,6 @@
 package dcai.companion;
 
+import se.krka.kahlua.j2se.KahluaTableImpl;
 import se.krka.kahlua.vm.JavaFunction;
 import se.krka.kahlua.vm.KahluaTable;
 import se.krka.kahlua.vm.LuaCallFrame;
@@ -12,6 +13,7 @@ public final class CompanionBridge {
     private static Thread installThread;
     private static long ticks;
     private static WorldActorProbe worldProbe;
+    private static final CompanionController controller = new CompanionController();
 
     public static void install() {
         if (LuaManager.env == null) throw new IllegalStateException("Lua env missing");
@@ -25,6 +27,7 @@ public final class CompanionBridge {
                     throw new IllegalStateException("companion tick called off game thread");
                 ticks++;
                 if (ticks == 1) System.out.println("[DCStandalone] first game-thread tick");
+                controller.tick();
                 if (Boolean.getBoolean("dcai.worldActorProbe")) {
                     if (worldProbe == null) worldProbe = new WorldActorProbe();
                     worldProbe.tick();
@@ -36,8 +39,41 @@ public final class CompanionBridge {
             @Override public int call(LuaCallFrame frame, int count) {
                 if (Thread.currentThread() != GameWindow.gameThread)
                     throw new IllegalStateException("companion close off game thread");
+                controller.close();
                 if (worldProbe != null) worldProbe.close();
                 return 0;
+            }
+        });
+        LuaManager.env.rawset("DCStandaloneDeclareIdentity", new JavaFunction() {
+            @Override public int call(LuaCallFrame frame, int count) {
+                if (Thread.currentThread() != GameWindow.gameThread)
+                    throw new IllegalStateException("identity declare off game thread");
+                if (count < 1 || !(frame.get(0) instanceof String))
+                    throw new IllegalStateException("identity uuid missing");
+                String uuid = (String) frame.get(0);
+                String assetId = count >= 2 && frame.get(1) instanceof String ? (String) frame.get(1) : "";
+                return frame.push(controller.declareIdentity(uuid, assetId), Boolean.TRUE);
+            }
+        });
+        LuaManager.env.rawset("DCStandaloneCommand", new JavaFunction() {
+            @Override public int call(LuaCallFrame frame, int count) {
+                if (Thread.currentThread() != GameWindow.gameThread)
+                    throw new IllegalStateException("companion command off game thread");
+                if (count < 1 || !(frame.get(0) instanceof String))
+                    throw new IllegalStateException("intent missing");
+                return frame.push(controller.command((String) frame.get(0)), Boolean.TRUE);
+            }
+        });
+        LuaManager.env.rawset("DCStandaloneStatus", new JavaFunction() {
+            @Override public int call(LuaCallFrame frame, int count) {
+                if (Thread.currentThread() != GameWindow.gameThread)
+                    throw new IllegalStateException("companion status off game thread");
+                KahluaTable status = new KahluaTableImpl(null);
+                status.rawset("present", controller.canCommand());
+                status.rawset("intent", controller.intent());
+                status.rawset("spawnFailed", controller.isSpawnFailed());
+                status.rawset("error", controller.lastError());
+                return frame.push(status);
             }
         });
         if (Boolean.getBoolean("dcai.constructorProbe")) {

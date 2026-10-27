@@ -107,6 +107,26 @@ class TestStandaloneRegistry(unittest.TestCase):
         self.assertIsNone(self.mod.state.error)
 
 
+    def test_command_dispatches_to_java_controller(self):
+        self.lua.globals().tick()
+        calls = []
+        self.lua.globals().DCStandaloneCommand = lambda intent: (calls.append(intent) or (intent == "follow"))
+        self.assertTrue(self.mod.command("follow"))
+        self.assertEqual(calls, ["follow"])
+        self.assertEqual(self.mod.state.intent, "follow")
+        self.assertIsNone(self.mod.state.error)
+        self.assertFalse(self.mod.command("hold"))
+        self.assertEqual(self.mod.state.error, "actor unavailable")
+        self.assertEqual(self.mod.state.intent, "follow")
+        self.assertFalse(self.mod.command("dance"))
+        self.assertEqual(self.mod.state.error, "invalid intent")
+
+    def test_declare_failure_blocks_ready_state(self):
+        self.lua.globals().DCStandaloneDeclareIdentity = lambda *_: False
+        self.lua.globals().tick()
+        self.assertFalse(self.mod.canCommand())
+        self.assertEqual(self.mod.state.error, "controller declare failed")
+
     def test_native_menu_is_disabled_without_live_executor(self):
         self.lua.execute('''
             require = function() end
