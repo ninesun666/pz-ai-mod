@@ -1,6 +1,7 @@
 package dcai.companion;
 
 import zombie.characters.IsoPlayer;
+import zombie.characters.SurvivorDesc;
 import zombie.iso.IsoCell;
 import zombie.iso.IsoGridSquare;
 import zombie.iso.IsoWorld;
@@ -12,6 +13,7 @@ import zombie.iso.IsoWorld;
  */
 public final class CompanionController {
     private static final long BEHAVIOR_PERIOD_MS = 100;
+    private static final long DIAG_PERIOD_MS = 5000;
 
     private CompanionActor actor;
     private BehaviorController behavior = new BehaviorController();
@@ -43,14 +45,14 @@ public final class CompanionController {
         if (!declared) return;
         if (actor == null && !spawnFailed) trySpawn();
         if (actor == null) return;
-        if (!modelConfirmed && actor.requestPlaceholderModel()) {
+        if (!modelConfirmed && actor.modelConfirmed()) {
             modelConfirmed = true;
-            System.out.println("[DCStandalone] companion model active (visible)");
+            System.out.println("[DCStandalone] companion model confirmed");
         }
         IsoPlayer owner = IsoPlayer.getInstance();
         if (owner == null || owner.getCurrentSquare() == null) return;
         long now = System.currentTimeMillis();
-        if (now - lastDiagMs > 5000) {
+        if (now - lastDiagMs > DIAG_PERIOD_MS) {
             lastDiagMs = now;
             double dist = Math.sqrt(Math.pow(owner.getX() - actor.getX(), 2) + Math.pow(owner.getY() - actor.getY(), 2));
             System.out.println("[DCStandalone] diag " + actor.modelInstanceDiag()
@@ -65,7 +67,7 @@ public final class CompanionController {
         lastAction = behavior.tick(now, distance, true, true);
         switch (lastAction) {
             case PATH_TO_OWNER:
-                updateStuckState(now);
+                updateStuckState();
                 if (stuck && actor.isPathfinding()) {
                     actor.stopWalking(); // A live but unproductive path: cancel before re-request.
                     stuck = false;
@@ -85,7 +87,7 @@ public final class CompanionController {
     }
 
     /** Three consecutive behavior ticks without position change count as stuck. */
-    private void updateStuckState(long now) {
+    private void updateStuckState() {
         float ax = actor.getX();
         float ay = actor.getY();
         if (lastActorX == null || Math.abs(ax - lastActorX) > 0.01f || Math.abs(ay - lastActorY) > 0.01f) {
@@ -113,9 +115,9 @@ public final class CompanionController {
         return true;
     }
 
-    /** True only when a live attached actor exists, so the menu reflects reality. */
+    /** True only when a live actor exists, so the menu reflects reality. */
     public synchronized boolean canCommand() {
-        return actor != null && actor.isAttached();
+        return actor != null;
     }
 
     public synchronized String intent() {
@@ -134,7 +136,8 @@ public final class CompanionController {
     public synchronized void suspend() {
         if (actor != null) {
             actor.stopWalking();
-            actor.detach();
+            actor.removeFromWorld();
+            actor.removeFromSquare();
             actor = null;
         }
         // declared stays true: the next tick respawns from the same identity, so a
@@ -142,7 +145,11 @@ public final class CompanionController {
     }
 
     public synchronized void close() {
-        if (actor != null) actor.detach();
+        if (actor != null) {
+            actor.stopWalking();
+            actor.removeFromWorld();
+            actor.removeFromSquare();
+        }
         actor = null;
         declared = false;
         companionId = null;
@@ -157,18 +164,17 @@ public final class CompanionController {
             if (owner == null || cell == null || owner.getCurrentSquare() == null) return;
             IsoGridSquare spot = findSpotNear(owner, cell);
             if (spot == null) return;
-            CompanionActor candidate = new CompanionActor(null);
-            candidate.initializePlaceholderVisuals();
-            if (!candidate.attachAt(cell, spot.getX() + 0.5f, spot.getY() + 0.5f, spot.getZ()))
-                throw new IllegalStateException("attach rejected");
+            SurvivorDesc desc = new SurvivorDesc(false);
+            desc.setFemale(true);
+            desc.setForename("大肥鱼");
+            desc.setSurname("");
+            // Knox-proven construction: the IsoPlayer in-world constructor runs the
+            // engine's full character pipeline (model, dressing, animation, render).
+            CompanionActor candidate = new CompanionActor(cell, desc, (int) spot.getX(), (int) spot.getY(), (int) spot.getZ());
             actor = candidate;
-            // Production must request the model explicitly: without it render() stays
-            // gated and the companion is an invisible ghost in the world.
-            boolean modelActive = actor.requestPlaceholderModel();
             spawnFailed = false;
             System.out.println("[DCStandalone] companion spawned id=" + companionId
-                + " at " + actor.getX() + "," + actor.getY()
-                + " modelActive=" + modelActive);
+                + " at " + actor.getX() + "," + actor.getY());
         } catch (RuntimeException failure) {
             spawnFailed = true; // Never silently retry-loop a broken spawn.
             lastError = "spawn failed: " + failure.getMessage();

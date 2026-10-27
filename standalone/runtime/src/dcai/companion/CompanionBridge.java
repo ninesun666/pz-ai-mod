@@ -7,12 +7,11 @@ import se.krka.kahlua.vm.LuaCallFrame;
 import zombie.GameWindow;
 import zombie.Lua.LuaManager;
 
-/** Restricted probe interface. No spawn or arbitrary evaluation is exposed. */
+/** Restricted game bridge. Six fixed functions, no dynamic evaluation surface. */
 public final class CompanionBridge {
     private static KahluaTable installedEnvironment;
     private static Thread installThread;
     private static long ticks;
-    private static WorldActorProbe worldProbe;
     private static final CompanionController controller = new CompanionController();
 
     public static void install() {
@@ -24,6 +23,16 @@ public final class CompanionBridge {
         // A new Lua environment means a new world/session: drop the previous world's
         // actor reference so nothing stale survives a reload in the same JVM.
         controller.close();
+        LuaManager.env.rawset("DCStandaloneTick", new JavaFunction() {
+            @Override public int call(LuaCallFrame frame, int count) {
+                if (Thread.currentThread() != GameWindow.gameThread)
+                    throw new IllegalStateException("companion tick called off game thread");
+                ticks++;
+                if (ticks == 1) System.out.println("[DCStandalone] first game-thread tick");
+                controller.tick();
+                return frame.push((double) ticks);
+            }
+        });
         LuaManager.env.rawset("DCStandaloneSuspend", new JavaFunction() {
             @Override public int call(LuaCallFrame frame, int count) {
                 if (Thread.currentThread() != GameWindow.gameThread)
@@ -32,26 +41,11 @@ public final class CompanionBridge {
                 return 0;
             }
         });
-        LuaManager.env.rawset("DCStandaloneTick", new JavaFunction() {
-            @Override public int call(LuaCallFrame frame, int count) {
-                if (Thread.currentThread() != GameWindow.gameThread)
-                    throw new IllegalStateException("companion tick called off game thread");
-                ticks++;
-                if (ticks == 1) System.out.println("[DCStandalone] first game-thread tick");
-                controller.tick();
-                if (Boolean.getBoolean("dcai.worldActorProbe")) {
-                    if (worldProbe == null) worldProbe = new WorldActorProbe();
-                    worldProbe.tick();
-                }
-                return frame.push((double) ticks);
-            }
-        });
         LuaManager.env.rawset("DCStandaloneClose", new JavaFunction() {
             @Override public int call(LuaCallFrame frame, int count) {
                 if (Thread.currentThread() != GameWindow.gameThread)
                     throw new IllegalStateException("companion close off game thread");
                 controller.close();
-                if (worldProbe != null) worldProbe.close();
                 return 0;
             }
         });
@@ -87,25 +81,6 @@ public final class CompanionBridge {
                 return frame.push(status);
             }
         });
-        if (Boolean.getBoolean("dcai.constructorProbe")) {
-            LuaManager.env.rawset("DCStandaloneProbeConstructor", new JavaFunction() {
-                @Override public int call(LuaCallFrame frame, int count) {
-                    if (Thread.currentThread() != GameWindow.gameThread)
-                        throw new IllegalStateException("constructor probe off game thread");
-                    CompanionActor actor = new CompanionActor(null);
-                    actor.initializePlaceholderVisuals();
-                    if (actor.isAttached() || actor.getCurrentSquare() != null)
-                        throw new IllegalStateException("constructor registered actor into world");
-                    if (actor.getHumanVisual() == null || actor.getItemVisuals() == null)
-                        throw new IllegalStateException("constructor missing own visual interface");
-                    if (!actor.isPlaceholderVisualReady())
-                        throw new IllegalStateException("placeholder visual preconditions missing");
-                    System.out.println("[DCStandaloneTest] placeholder visual setup PASS (not rendered)");
-                    System.out.println("[DCStandaloneTest] detached constructor PASS on " + Thread.currentThread().getName());
-                    return frame.push(true);
-                }
-            });
-        }
         System.out.println("[DCStandalone] bridge installed on " + installThread.getName());
         System.out.println("[DCStandalone] active mods=" + zombie.modding.ActiveMods.getById("default").getMods());
         System.out.println("[DCStandalone] discovered=" + (zombie.gameStates.ChooseGameInfo.getModDetails("DC_AIStandalone") != null));
