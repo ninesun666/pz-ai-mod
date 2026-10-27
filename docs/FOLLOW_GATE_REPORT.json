@@ -1,0 +1,40 @@
+{
+  "command": [
+    "D:\\SteamLibrary\\steamapps\\common\\ProjectZomboid\\jre64\\bin\\java.exe",
+    "-javaagent:C:\\Users\\gjx\\Documents\\deepseek-harness\\default-workspace\\ai-mod\\standalone\\runtime\\build\\DC_AIStandaloneRuntime.jar",
+    "-Ddcai.followProbe=true",
+    "--enable-native-access=ALL-UNNAMED",
+    "--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED",
+    "-Xmx2048m",
+    "-Dzomboid.steam=0",
+    "-Djava.library.path=win64/;.",
+    "-cp",
+    ".;projectzomboid.jar",
+    "zombie.gameStates.MainScreenState",
+    "-modfolders",
+    "mods",
+    "-cachedir=C:\\Users\\gjx\\Documents\\deepseek-harness\\default-workspace\\ai-mod\\standalone\\runtime\\build\\runs\\20261027-230750\\profile",
+    "-nosteam"
+  ],
+  "scope": "follow probe only; no gameplay acceptance",
+  "gate": "follow",
+  "passed": false,
+  "profile": "C:\\Users\\gjx\\Documents\\deepseek-harness\\default-workspace\\ai-mod\\standalone\\runtime\\build\\runs\\20261027-230750\\profile",
+  "pid": 5260,
+  "reason": "follow probe reported failure in log",
+  "terminatedByHarness": true,
+  "exitCode": 1,
+  "elapsedSeconds": 169.31,
+  "stderrErrors": [
+    "ERROR: General      f:0 at AngelCodeFont.parseFnt              > AngelCodeFont failed to load page 0 texture D:/SteamLibrary/steamapps/common/ProjectZomboid/media/mainfont_0.png",
+    "ERROR: General      f:0 at AngelCodeFont.parseFnt              > AngelCodeFont failed to load page 0 texture D:/SteamLibrary/steamapps/common/ProjectZomboid/media/mainfont2_0.png",
+    "ERROR: General      f:0 at AngelCodeFont.parseFnt              > AngelCodeFont failed to load page 0 texture D:/SteamLibrary/steamapps/common/ProjectZomboid/media/fonts/zomboidDialogue.bmfc_0.png",
+    "ERROR: General      f:0 at AngelCodeFont.parseFnt              > AngelCodeFont failed to load page 0 texture D:/SteamLibrary/steamapps/common/ProjectZomboid/media/mainfont_0.png",
+    "ERROR: General      f:0 at AngelCodeFont.parseFnt              > AngelCodeFont failed to load page 0 texture D:/SteamLibrary/steamapps/common/ProjectZomboid/media/mainfont2_0.png",
+    "ERROR: General      f:0 at FluidContainerScript.load           > Sanitizing container name 'Large Bucket', name may not contain whitespaces.",
+    "ERROR: General      f:0 at FluidContainerScript.load           > Sanitizing container name 'Fuel Pump', name may not contain whitespaces.",
+    "ERROR: General      f:0 at CraftRecipeComponentScript.getIconTexture> CraftRecipeComponentScript: Recipe Piano missing UiConfigScript - falling back to SpriteConfigScript first world object face for recipe icon.",
+    "ERROR: Lua          f:0 at Lua(Vanilla).handleMannequinZone    > ERROR: Mannequin zone missing properties in media/maps/Muldraugh, KY/objects.lua coords: 13583, 1299, 0",
+    "ERROR: General      f:0 at Basements.mergeRoomsOntoMetaCell    > duplicate RoomDef.metaID for room at 10707,9484,0"
+  ]
+}

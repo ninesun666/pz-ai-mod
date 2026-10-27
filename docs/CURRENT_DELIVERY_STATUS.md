@@ -13,8 +13,8 @@
 
 ## Not verified / not delivered
 
-- Companion pixels on screen are seen in one screenshot but movement, animation playback and camera framing are not individually verified.
-- No follow/hold/retreat behavior acceptance in the live world.
+- Follow locomotion: `follow` 门禁已建立（2026-10-27，run 20261027-230750）但 **未通过**：传送玩家拉开 14 格后，FSM 发出 path requested，但伙伴 `pathing=false` 位置永不变化；`addToWorld()` 修复不解决。已固化结论（AGENTS.md 标准答案表）：Knox 路线 NPC 移动 = 自有行为树 + 模拟玩家输入驱动，非本地 IsoPlayer 不被引擎 update 循环驱动；下一步需反编译 IsoNpcPlayer/MetaNpcCharacter 的移动路径并回写 research/decompiled/。
+- No follow/hold/retreat behavior acceptance in the live world (blocked on locomotion above).
 - No `CompanionActor` save/reload identity acceptance (same UUID after save, exit, reload; no duplicate).
 - No whale-girl visual assets or directional world animation have been approved or integrated.
 - No keyboard/context command has been enabled; the UI entrypoint remains inert while actor capability is absent.

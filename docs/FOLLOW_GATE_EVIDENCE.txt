@@ -1,0 +1,5 @@
+LOG  : General      f:1> [DCStandalone] follow-probe intent=follow accepted
+LOG  : General      f:1> [DCStandalone] follow-probe round=1 owner teleported 16,0 startDist=14.0
+LOG  : General      f:2> [DCStandalone] follow-probe round=1 dist=14.0 pathing=false
+LOG  : General      f:25> [DCStandalone] follow-probe round=1 dist=14.0 pathing=false
+LOG  : General      f:5343> [DCStandalone] follow-probe FAIL round 1 timeout, dist=14.0 pathing=false
