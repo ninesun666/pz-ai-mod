@@ -126,6 +126,11 @@ def main():
                 if args.gate == 'spawn' and '[DCStandalone] companion spawned' in text:
                     result['passed'] = True
                     result['reason'] = 'production companion spawned near player; pixels and movement unverified'
+                    if args.dwell > 0:
+                        result['dwellSeconds'] = args.dwell
+                        deadline = time.monotonic() + args.dwell
+                        while time.monotonic() < deadline and proc.poll() is None:
+                            time.sleep(0.5)
                     break
                 if args.gate == 'world-actor' and '[DCStandaloneTest] model membership active' in text:
                     result['passed'] = True

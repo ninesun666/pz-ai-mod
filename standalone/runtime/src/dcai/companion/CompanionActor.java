@@ -142,6 +142,8 @@ public final class CompanionActor extends IsoLivingCharacter implements IHumanVi
             throw new IllegalStateException("companion actor mutation off game thread: " + current.getName());
     }
 
+    /** Inherited preupdate has server/equipment paths that cast to IsoPlayer; suppress them. */
+    @Override public void preupdate() { /* owned scheduler hook; no IsoPlayer cast paths */ }
     @Override public void update() { /* owned scheduler hook; no bodyDamage path */ }
     @Override public void postupdate() {
         if (!isAttached() || !modelRequested || !actionGroupReady || !hasActiveModel()) return;
