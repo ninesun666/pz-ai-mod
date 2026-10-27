@@ -53,12 +53,7 @@ public final class CompanionController {
         if (now - lastDiagMs > 5000) {
             lastDiagMs = now;
             double dist = Math.sqrt(Math.pow(owner.getX() - actor.getX(), 2) + Math.pow(owner.getY() - actor.getY(), 2));
-            System.out.println("[DCStandalone] diag pos=" + String.format("%.1f,%.1f", actor.getX(), actor.getY())
-                + " attached=" + actor.isAttached()
-                + " modelActive=" + actor.requestPlaceholderModel()
-                + " pathing=" + actor.isPathfinding()
-                + " intent=" + intent()
-                + " " + actor.modelInstanceDiag()
+            System.out.println("[DCStandalone] diag " + actor.modelInstanceDiag()
                 + " dist=" + String.format("%.1f", dist));
         }
         if (lastBehaviorTickMs >= 0 && now - lastBehaviorTickMs < BEHAVIOR_PERIOD_MS) return;
