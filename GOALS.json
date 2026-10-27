@@ -1,0 +1,87 @@
+{
+  "$schema_note": "阶段性目标维护文件。状态只允许: pending | in_progress | passed | failed | blocked。每个目标必须有可复现验收步骤和证据路径；日志/遥测不算通过，实机可玩才算通过。",
+  "updated": "2026-10-28T00:17:00+08:00",
+  "branch": "rework/standalone-companion",
+  "north_star": "游戏里可玩的独立大肥鱼 AI 队友：身份正确、鼠标正常、免打字交互、行为可靠、存档恢复同一伙伴",
+  "phases": [
+    {
+      "id": "P0",
+      "name": "伙伴身份与注册表",
+      "status": "passed",
+      "acceptance": "稳定 UUID 持久化于 ModData，重载不换 ID，单元测试通过",
+      "evidence": [
+        "tests/ 内 identity 单元测试（78 项静态回归中通过部分）",
+        "docs/CURRENT_DELIVERY_STATUS.md"
+      ],
+      "notes": "ID 目前存于 ModData，还不是标准 UUID 生命周期实现"
+    },
+    {
+      "id": "P1",
+      "name": "实体创建/可见性（IsoPlayer 路线）",
+      "status": "passed",
+      "acceptance": "干净 profile 实机：伙伴在玩家旁可见，instance/mesh/tex/anim 全 present，截图存证",
+      "evidence": [
+        "standalone/runtime/build/runs/20261027-221308/report.json (passed=true)",
+        "standalone/runtime/build/runs/20261027-221308/now.png（玩家旁可见第二角色）"
+      ],
+      "notes": "外观仍为 placeholder 随机穿着，不得称为成品"
+    },
+    {
+      "id": "P2",
+      "name": "跟随移动实机验收",
+      "status": "failed",
+      "acceptance": "follow 门禁两次通过：玩家传送拉开16格后，伙伴自身 A* 位移过半并回到 3.5 格内；伴随截图",
+      "evidence": [
+        "docs/FOLLOW_GATE_EVIDENCE.txt",
+        "docs/FOLLOW_GATE_REPORT.json (passed=false, 20261027-230750)"
+      ],
+      "root_cause": "非本地 IsoPlayer 不在引擎 update 循环；Knox 答案=自有行为树+模拟玩家输入驱动移动",
+      "next_actions": [
+        "反编译 Knox IsoNpcPlayer/MetaNpcCharacter 移动输入模拟路径，回写 research/decompiled/",
+        "按输入驱动方案重做伙伴移动",
+        "重跑 smoke_game.py --gate follow"
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "停留/撤退/指令切换（免打字）",
+      "status": "pending",
+      "acceptance": "热键或原生上下文菜单切换 follow/hold/retreat；停留时不自动跟走；普通左右键不被吞；实机操作录证",
+      "depends_on": ["P2"],
+      "next_actions": [
+        "接入既有 DCStandaloneCommand 桥到真实输入入口",
+        "鼠标保留验收门禁（可复用 follow 门禁框架）"
+      ]
+    },
+    {
+      "id": "P4",
+      "name": "存档恢复同一伙伴",
+      "status": "pending",
+      "acceptance": "正常保存、退出、重进后同一 UUID 恢复，无重复伙伴；存档目录无伙伴尸体残留；实机门禁通过",
+      "depends_on": ["P2"],
+      "next_actions": [
+        "实机验证 suspend/respawn 方案",
+        "新增 save/reload 门禁（可复用 follow 门禁框架 + 存档目录断言）"
+      ]
+    },
+    {
+      "id": "P5",
+      "name": "卡住恢复与短障碍绕行",
+      "status": "pending",
+      "acceptance": "绕过短障碍能跟上；卡住检测触发恢复；重复反馈有冷却",
+      "depends_on": ["P2"]
+    },
+    {
+      "id": "P6",
+      "name": "外观与台词（可选项，最后做）",
+      "status": "pending",
+      "acceptance": "大肥鱼外观资产审定接入；事件台词短促合时宜；中文字库 BMFont 隔离验证",
+      "depends_on": ["P3", "P4"],
+      "notes": "字体工作见 docs/archive/rounds/ROUND54-55；未完成，不得阻塞核心闭环"
+    }
+  ],
+  "known_debt": [
+    "tests/ 中 18 个遗留套件失败（teammate_adapter/ui/package、workshop、chinese_roundtrip），针对已退役旧架构，需专门清理提交",
+    "docs/CURRENT_DELIVERY_STATUS.md 与本文件需在每次门禁后同步"
+  ]
+}

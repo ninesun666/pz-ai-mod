@@ -4,6 +4,7 @@
 !/*.md
 !/*.cmd
 !/*.ps1
+!/GOALS.json
 !/agent/
 !/bridge/
 !/DC_AIVoice/
