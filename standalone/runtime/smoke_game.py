@@ -55,6 +55,8 @@ def main():
                         help='world-actor/spawn are disposable stationary attachment/model probes')
     parser.add_argument('--interactive', action='store_true',
                         help='visible window for the human to accept terms; no headless flag')
+    parser.add_argument('--dwell', type=int, default=0,
+                        help='seconds to keep the game alive after the gate passes (for visual evidence)')
     args = parser.parse_args()
     if args.gate in ('visual-setup', 'world-actor') and not args.world:
         parser.error('engine probe gates require --world test bootstrap')
@@ -139,6 +141,12 @@ def main():
                     break
                 if proc.poll() is not None:
                     result['reason'] = f'game exited {proc.returncode}'
+                    break
+                if result['passed'] and args.dwell > 0:
+                    result['dwellSeconds'] = args.dwell
+                    deadline = time.monotonic() + args.dwell
+                    while time.monotonic() < deadline and proc.poll() is None:
+                        time.sleep(0.5)
                     break
                 time.sleep(0.5)
             else:
