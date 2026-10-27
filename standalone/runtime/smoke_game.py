@@ -17,8 +17,10 @@ def main():
     parser.add_argument('--timeout', type=int, default=120)
     parser.add_argument('--world', action='store_true', help='create a fresh disposable world automatically')
     parser.add_argument('--profile', type=Path, help='reuse only a harness-marked disposable profile')
-    parser.add_argument('--gate', choices=('tick', 'visual-setup', 'world-actor'), default='tick',
-                        help='world-actor is a disposable stationary attachment/model probe')
+    parser.add_argument('--gate', choices=('tick', 'visual-setup', 'world-actor', 'spawn'), default='tick',
+                        help='world-actor/spawn are disposable stationary attachment/model probes')
+    parser.add_argument('--interactive', action='store_true',
+                        help='visible window for the human to accept terms; no headless flag')
     args = parser.parse_args()
     if args.gate != 'tick' and not args.world:
         parser.error('actor gates require --world test bootstrap')
@@ -57,13 +59,15 @@ def main():
 
     err = run / 'stderr.log'
     probe_property = '-Ddcai.worldActorProbe=true' if args.gate == 'world-actor' else '-Ddcai.constructorProbe=true'
-    command = [str(args.game / 'jre64/bin/java.exe'), f'-javaagent:{jar}',
-               probe_property, '-Djava.awt.headless=true', '--enable-native-access=ALL-UNNAMED',
-               '--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED', '-Xmx2048m',
-               '-Dzomboid.steam=0', '-Djava.library.path=win64/;.',
-               '-cp', '.;projectzomboid.jar', 'zombie.gameStates.MainScreenState',
-               '-modfolders', 'mods',
-               f'-cachedir={profile}', '-nosteam']
+    command = [str(args.game / 'jre64/bin/java.exe'), f'-javaagent:{jar}', probe_property]
+    if not args.interactive:
+        command.append('-Djava.awt.headless=true')
+    command += ['--enable-native-access=ALL-UNNAMED',
+                '--add-exports=java.base/jdk.internal.misc=ALL-UNNAMED', '-Xmx2048m',
+                '-Dzomboid.steam=0', '-Djava.library.path=win64/;.',
+                '-cp', '.;projectzomboid.jar', 'zombie.gameStates.MainScreenState',
+                '-modfolders', 'mods',
+                f'-cachedir={profile}', '-nosteam']
     result = {'command': command, 'scope': f'{args.gate} probe only; no gameplay acceptance',
               'gate': args.gate, 'passed': False, 'profile': str(profile)}
     started = time.monotonic()
@@ -73,6 +77,10 @@ def main():
         try:
             while time.monotonic() - started < args.timeout:
                 text = out.read_text(encoding='utf-8', errors='replace') + err.read_text(encoding='utf-8', errors='replace')
+                if args.gate == 'spawn' and '[DCStandalone] companion spawned' in text:
+                    result['passed'] = True
+                    result['reason'] = 'production companion spawned near player; pixels and movement unverified'
+                    break
                 if args.gate == 'world-actor' and '[DCStandaloneTest] model membership active' in text:
                     result['passed'] = True
                     result['reason'] = 'stationary own actor attached with active model; pixels and gameplay unverified'
