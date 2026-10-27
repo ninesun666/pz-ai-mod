@@ -157,5 +157,23 @@ class TestStandaloneRegistry(unittest.TestCase):
         self.assertFalse(self.mod.canCommand())
 
 
+    def test_save_suspends_actor_but_keeps_identity(self):
+        self.lua.globals().tick()
+        suspended = []
+        self.lua.globals().DCStandaloneSuspend = lambda: suspended.append(True)
+        save_handlers = []
+        self.lua.globals().Events = self.lua.table_from({
+            "OnTick": self.lua.table_from({"Add": lambda fn: None}),
+            "OnSave": self.lua.table_from({"Add": lambda fn: save_handlers.append(fn)}),
+        })
+        self.lua.execute(SRC.read_text(encoding="utf-8"))
+        mod = self.lua.globals().DC_AI_Standalone
+        self.assertEqual(len(save_handlers), 1)
+        before = mod.state.companionId
+        save_handlers[0]()
+        self.assertEqual(suspended, [True])
+        self.assertEqual(mod.state.companionId, before)  # identity survives save
+
+
 if __name__ == "__main__":
     unittest.main()

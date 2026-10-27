@@ -21,6 +21,17 @@ public final class CompanionBridge {
         installedEnvironment = LuaManager.env;
         installThread = Thread.currentThread();
         ticks = 0;
+        // A new Lua environment means a new world/session: drop the previous world's
+        // actor reference so nothing stale survives a reload in the same JVM.
+        controller.close();
+        LuaManager.env.rawset("DCStandaloneSuspend", new JavaFunction() {
+            @Override public int call(LuaCallFrame frame, int count) {
+                if (Thread.currentThread() != GameWindow.gameThread)
+                    throw new IllegalStateException("companion suspend off game thread");
+                controller.suspend();
+                return 0;
+            }
+        });
         LuaManager.env.rawset("DCStandaloneTick", new JavaFunction() {
             @Override public int call(LuaCallFrame frame, int count) {
                 if (Thread.currentThread() != GameWindow.gameThread)

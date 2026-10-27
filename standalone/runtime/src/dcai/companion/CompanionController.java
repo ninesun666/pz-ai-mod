@@ -92,6 +92,17 @@ public final class CompanionController {
 
     public synchronized boolean isSpawnFailed() { return spawnFailed; }
 
+    /** Detaches before a world save so the actor never enters the save file; identity is kept. */
+    public synchronized void suspend() {
+        if (actor != null) {
+            actor.stopWalking();
+            actor.detach();
+            actor = null;
+        }
+        // declared stays true: the next tick respawns from the same identity, so a
+        // reload can never produce a duplicate companion.
+    }
+
     public synchronized void close() {
         if (actor != null) actor.detach();
         actor = null;

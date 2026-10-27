@@ -148,3 +148,8 @@ local function onWorldTick()
 end
 
 if Events and Events.OnTick then Events.OnTick.Add(onWorldTick) end
+if Events and Events.OnSave then
+    Events.OnSave.Add(function()
+        if DCStandaloneSuspend then pcall(DCStandaloneSuspend) end
+    end)
+end
