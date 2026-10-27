@@ -22,6 +22,10 @@ public final class CompanionController {
     private BehaviorController.Action lastAction = BehaviorController.Action.NONE;
     private long lastBehaviorTickMs = -1;
     private boolean pathWarned;
+    private Float lastActorX;
+    private Float lastActorY;
+    private int stuckTicks;
+    private boolean stuck;
 
     /** Called from Lua after ensureIdentity() succeeds. Accepts only one identity. */
     public synchronized boolean declareIdentity(String uuid, String assetId) {
@@ -49,6 +53,11 @@ public final class CompanionController {
         lastAction = behavior.tick(now, distance, true, true);
         switch (lastAction) {
             case PATH_TO_OWNER:
+                updateStuckState(now);
+                if (stuck && actor.isPathfinding()) {
+                    actor.stopWalking(); // A live but unproductive path: cancel before re-request.
+                    stuck = false;
+                }
                 if (actor.walkTo(owner) && !pathWarned) {
                     pathWarned = true;
                     System.out.println("[DCStandalone] path requested (locomotion arrival unverified)");
@@ -56,9 +65,26 @@ public final class CompanionController {
                 break;
             case CANCEL_PATH:
                 actor.stopWalking();
+                stuck = false;
+                stuckTicks = 0;
                 break;
             default: break;
         }
+    }
+
+    /** Three consecutive behavior ticks without position change count as stuck. */
+    private void updateStuckState(long now) {
+        float ax = actor.getX();
+        float ay = actor.getY();
+        if (lastActorX == null || Math.abs(ax - lastActorX) > 0.01f || Math.abs(ay - lastActorY) > 0.01f) {
+            stuckTicks = 0;
+            stuck = false;
+        } else {
+            stuckTicks++;
+            stuck = stuckTicks >= 3;
+        }
+        lastActorX = ax;
+        lastActorY = ay;
     }
 
     public synchronized boolean command(String intent) {
