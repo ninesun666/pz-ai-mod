@@ -89,6 +89,10 @@
       "name": "灵魂/人设卡定稿",
       "status": "in_progress",
       "acceptance": "docs/SOUL_CARD.md 定稿并经用户拍板；台词池与涌现时刻文案全部对卡审查通过",
+      "evidence": [
+        "docs/SOUL_CARD.md v1（2026-10-28，按 DEC-2/DEC-4 拍板成稿）",
+        "docs/DIALOGUE_POOL.md v0（16 条全对卡审查）"
+      ],
       "content_spec": {
         "性格锚点": "憨、稳、馋；深海时间尺度（沉得住气）；她怕的是'你不见了'，不是丧尸",
         "价值定位": "情感放大器不是能力外挂：不产出资源/伤害/数值增益，替代的是孤独",
@@ -154,12 +158,15 @@
       "id": "D2",
       "track": "dialogue",
       "name": "台词池 + 指令应答",
-      "status": "pending",
-      "acceptance": "功能台词每事件 2-4 条轮换入库；15 条成品台词对 SOUL_CARD 审查通过；冷却机制防刷屏；实机触发录证",
+      "status": "in_progress",
+      "acceptance": "功能台词每事件 2 条轮换入库（DEC-4 小文本量）；冷却机制防刷屏；实机触发录证",
       "depends_on": ["S1"],
+      "evidence": [
+        "docs/DIALOGUE_POOL.md v0（16 条，含冷却/限流参数表）"
+      ],
       "next_actions": [
-        "台词文案成稿并对卡审查（纯文案，随时可并行，不依赖工程 P2）",
-        "本地台词池数据结构与冷却实现"
+        "台词文案随 SOUL_CARD 终审一并定稿（纯文案，不依赖工程 P2）",
+        "本地台词池数据结构与冷却实现（依赖 P3 指令接线后实机验证）"
       ]
     },
     {
@@ -213,32 +220,33 @@
       "depends_on": ["A2", "M1"]
     }
   ],
-  "decisions_pending": [
+  "decisions_resolved": [
     {
       "id": "DEC-1",
       "question": "形象路线：A 贴图拼装先行 → B 自定义模型，还是一步到位 B？",
-      "recommendation": "A→B（DESIGN_PRODUCT §7.1）",
-      "blocks": ["C1", "C2"]
+      "decision": "A→B：贴图路线先行打通玩法，模型为远期升级",
+      "date": "2026-10-28"
     },
     {
       "id": "DEC-2",
       "question": "她会不会死？系统线主张永不死，叙事线已预埋'鲸落'伏笔",
-      "recommendation": "v1.5 永不死但保留伏笔台词；瞬移挣脱改为高速跑向玩家（不瞬移红线）",
-      "blocks": []
+      "decision": "v1.5 永不死；保留鲸落伏笔台词入库无触发；挣脱改为高速跑向玩家，不瞬移",
+      "date": "2026-10-28"
     },
     {
       "id": "DEC-3",
       "question": "指令形态：右键菜单是否足够？是否加 V 键轮询快捷键？",
-      "recommendation": "右键菜单先行，快捷键视实机手感补",
-      "blocks": ["P3"]
+      "decision": "右键菜单先行，快捷键视实机手感再补",
+      "date": "2026-10-28"
     },
     {
       "id": "DEC-4",
       "question": "台词密度：安静可靠 vs 活泼话痨？",
-      "recommendation": "安静可靠（事件时刻开口+闲聊限流），与'情感放大器'定位一致",
-      "blocks": ["S1", "D2"]
+      "decision": "安静可靠：事件时刻才开口，预设文本量收小（每事件 2 条轮换），闲聊严格限流",
+      "date": "2026-10-28"
     }
   ],
+  "decisions_pending": [],
   "known_debt": [
     "tests/ 中 18 个遗留套件失败（teammate_adapter/ui/package、workshop、chinese_roundtrip），针对已退役旧架构，需专门清理提交",
     "docs/CURRENT_DELIVERY_STATUS.md 与本文件需在每次门禁后同步"
