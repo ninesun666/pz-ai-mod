@@ -99,7 +99,10 @@ public final class CompanionController {
             stuck = false;
         } else {
             stuckTicks++;
-            stuck = stuckTicks >= 3;
+            // 10 ticks (~7.5s at the throttled PATH_TO_OWNER cadence), not 3:
+            // run 20261028-180000 showed the 3-tick cancel killing a live path
+            // ~2.3s after request (finder=found, shouldMove=true, then IdleState).
+            stuck = stuckTicks >= 10;
         }
         lastActorX = ax;
         lastActorY = ay;

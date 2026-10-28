@@ -1,6 +1,6 @@
 {
   "$schema_note": "阶段性目标维护文件。track=engineering|soul|memory|character|dialogue|ai。状态只允许: pending | in_progress | passed | failed | blocked。每个目标必须有可复现验收步骤和证据路径；日志/遥测不算通过，实机可玩才算通过。设计内容类目标以'文档定稿+用户拍板'为通过标准。",
-  "updated": "2026-10-28T18:10:00+08:00",
+  "updated": "2026-10-28T18:20:00+08:00",
   "branch": "rework/standalone-companion",
   "north_star": "游戏里可玩的独立大肥鱼 AI 队友：身份正确、鼠标正常、免打字交互、行为可靠、存档恢复同一伙伴；性格让人想留下她，机制不让人被迫带她",
   "design_sources": [
@@ -42,13 +42,15 @@
       "evidence": [
         "docs/FOLLOW_GATE_EVIDENCE.txt",
         "docs/FOLLOW_GATE_REPORT.json (passed=false, 20261027-230750)",
-        "run 20261028-180000（首次无人值守 follow 门禁）：finder=found hasPath=true shouldMove=true 已达成 → 数百 ms 后 state 回落 IdleState、hasPath=false、坐标不变，round 1 超时 FAIL"
+        "run 20261028-180000（首次无人值守 follow 门禁）：finder=found hasPath=true shouldMove=true 已达成 → 数百 ms 后 state 回落 IdleState、hasPath=false、坐标不变，round 1 超时 FAIL",
+        "run 20261028-180700（堵转取消放宽至 10 tick 后复跑，含自动截图）：同样在 ~f:5050 回落 IdleState、finder=notrunning、坐标不变——自伤假说被排除，回落为引擎侧行为"
       ],
       "root_cause": "待实机定位：当前 B42 IsoPlayer 使用 AIComponent NPC 控制路径；原实现未 setNpc(true)。isPathing=false 本身不能证明未更新或未寻路。",
       "next_actions": [
-        "定位 PathFindState→IdleState 回落原因：优先查 CompanionController 的 3-tick 堵转取消是否在路径生效前误杀（walkTo 后 ~300ms 即 stopWalking）",
-        "若非自伤：反编译 IsoPlayer/IsoGameCharacter 的 NPC 状态机转移，确认 PathFindState 需要的持续条件",
-        "复跑：python standalone/runtime/smoke_game.py --world --gate follow --timeout 420（已全无人值守）"
+        "已排除：自有堵转取消误杀（20261028-180700，阈值 10 后同样回落）",
+        "反编译 IsoPlayer/IsoGameCharacter/StateMachineComponent 的 NPC 状态转移，找 PathFindState→IdleState 的退出条件与所需的持续驱动",
+        "对照 knox IsoNpcPlayer 如何保持 PathFindState 存活（research/decompiled/IsoNpcPlayer.txt）",
+        "复跑：python standalone/runtime/smoke_game.py --world --gate follow --timeout 420（自动截图已内建）"
       ]
     },
     {

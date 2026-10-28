@@ -71,6 +71,15 @@ def main():
     out = run / 'stdout.log'
 
     err = run / 'stderr.log'
+    # Read-only evidence monitor: desktop screenshots every 30s after world
+    # load, transition log, stops at report.json. Bounded by duration.
+    monitor = None
+    if args.world:
+        import sys as _sys
+        monitor = subprocess.Popen(
+            [_sys.executable, str(ROOT / 'standalone/runtime/monitor_run.py'),
+             str(run), str(args.timeout + 90)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     probe_property = '-Ddcai.worldActorProbe=true' if args.gate == 'world-actor' else '-Ddcai.constructorProbe=true'
     if args.gate == 'follow':
         probe_property = '-Ddcai.followProbe=true'
@@ -164,6 +173,8 @@ def main():
     errors = err.read_text(encoding='utf-8', errors='replace')
     result['stderrErrors'] = [line for line in errors.splitlines() if 'ERROR' in line or 'Exception' in line][:20]
     (run / 'report.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
+    if monitor is not None and monitor.poll() is None:
+        monitor.terminate()  # report.json exists; monitor would stop on its own too
     print(json.dumps({'report': str(run / 'report.json'), **result}, ensure_ascii=False, indent=2))
     return 0 if result['passed'] else 1
 
