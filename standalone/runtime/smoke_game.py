@@ -11,42 +11,6 @@ import time
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def _auto_click_daemon(pid, stop):
-    """Dismisses the vanilla 'Click to Start' gate of our own game window.
-
-    Uses PostMessage only; never touches other applications' windows.
-    """
-    import ctypes
-    import threading
-    user32 = ctypes.windll.user32
-    ENUM = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
-    hwnd = None
-    while not stop.is_set() and hwnd is None:
-        found = []
-        def on_window(h, _l):
-            value = ctypes.c_ulong()
-            user32.GetWindowThreadProcessId(h, ctypes.byref(value))
-            if value.value == pid:
-                buf = ctypes.create_unicode_buffer(64)
-                user32.GetClassNameW(h, buf, 64)
-                if buf.value == 'GLFW30':
-                    found.append(h)
-                    return False
-            return True
-        user32.EnumWindows(ENUM(on_window), 0)
-        hwnd = found[0] if found else None
-        if hwnd is None:
-            threading.Event().wait(1.0)
-    if hwnd is None:
-        return
-    lparam = (383 << 16) | 642  # center of the 1284x767 client area
-    while not stop.is_set():
-        user32.PostMessageW(hwnd, 0x0200, 0, lparam)   # WM_MOUSEMOVE
-        user32.PostMessageW(hwnd, 0x0201, 1, lparam)   # WM_LBUTTONDOWN
-        user32.PostMessageW(hwnd, 0x0202, 0, lparam)   # WM_LBUTTONUP
-        threading.Event().wait(3.0)
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--game', type=Path, default=Path(r'D:\SteamLibrary\steamapps\common\ProjectZomboid'))
@@ -122,13 +86,8 @@ def main():
     result = {'command': command, 'scope': f'{args.gate} probe only; no gameplay acceptance',
               'gate': args.gate, 'passed': False, 'profile': str(profile)}
     started = time.monotonic()
-    click_stop = None
     with out.open('wb') as stdout, err.open('wb') as stderr:
         proc = subprocess.Popen(command, cwd=args.game, stdout=stdout, stderr=stderr)
-        if args.interactive:
-            import threading
-            click_stop = threading.Event()
-            threading.Thread(target=_auto_click_daemon, args=(proc.pid, click_stop), daemon=True).start()
         result['pid'] = proc.pid
         try:
             while time.monotonic() - started < args.timeout:
@@ -177,10 +136,16 @@ def main():
                     break
                 time.sleep(0.5)
             else:
-                result['reason'] = 'timeout awaiting standalone Lua OnTick game-thread callback'
+                text = out.read_text(encoding='utf-8', errors='replace') + err.read_text(encoding='utf-8', errors='replace')
+                if args.gate == 'follow' and '[DCStandalone] follow-probe round=' in text:
+                    result['reason'] = 'timeout awaiting follow completion after game-thread probe started'
+                elif '[DCStandalone] first game-thread tick' in text:
+                    result['reason'] = f'timeout awaiting {args.gate} gate after game-thread callback'
+                elif '[DCStandaloneTest] world started' in text:
+                    result['reason'] = 'timeout after world loaded; gameplay callback not observed (check Click to Start)'
+                else:
+                    result['reason'] = 'timeout awaiting standalone Lua OnTick game-thread callback'
         finally:
-            if click_stop is not None:
-                click_stop.set()
             result['terminatedByHarness'] = proc.poll() is None
             if proc.poll() is None:
                 proc.terminate()

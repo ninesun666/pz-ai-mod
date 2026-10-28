@@ -70,6 +70,39 @@ class SmokeProfileTests(unittest.TestCase):
             self.assertFalse((client / 'DCStandaloneTestBootstrap.lua').exists())
             self.assertTrue((client / 'keep.lua').exists())
 
+    def test_interactive_launch_does_not_start_click_thread(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            self.setup_root(root)
+            with patch('threading.Thread') as thread:
+                _, launch = self.run_smoke(root, ['--world', '--interactive', '--gate', 'follow'])
+            thread.assert_not_called()
+            self.assertEqual(launch.call_count, 1)
+            self.assertNotIn('-Djava.awt.headless=true', launch.call_args.args[0])
+
+    def test_timeout_reports_observed_stage(self):
+        stages = (
+            ('[DCStandaloneTest] world started', 'gameplay callback not observed'),
+            ('[DCStandalone] first game-thread tick', 'after game-thread callback'),
+            ('[DCStandalone] follow-probe round=1 dist=14.0', 'after game-thread probe started'),
+        )
+        for text, expected in stages:
+            with self.subTest(stage=text), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                self.setup_root(root)
+                def launch_game(*args, **kwargs):
+                    kwargs['stdout'].write(text.encode('utf-8'))
+                    kwargs['stdout'].flush()
+                    return ExitedProcess()
+                with patch.object(SMOKE, 'ROOT', root), \
+                        patch('sys.argv', ['smoke_game.py', '--world', '--gate', 'follow', '--timeout', '0']), \
+                        patch.object(SMOKE.subprocess, 'Popen', side_effect=launch_game), \
+                        patch.object(SMOKE.time, 'strftime', return_value='test-run'), patch('builtins.print'):
+                    self.assertEqual(SMOKE.main(), 1)
+                report = json.loads((root / 'standalone/runtime/build/runs/test-run/report.json').read_text())
+                self.assertFalse(report['passed'])
+                self.assertIn(expected, report['reason'])
+
     def test_unmarked_profile_is_rejected_before_launch_or_write(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

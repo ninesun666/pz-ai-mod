@@ -1,6 +1,6 @@
 {
   "$schema_note": "阶段性目标维护文件。track=engineering|soul|memory|character|dialogue|ai。状态只允许: pending | in_progress | passed | failed | blocked。每个目标必须有可复现验收步骤和证据路径；日志/遥测不算通过，实机可玩才算通过。设计内容类目标以'文档定稿+用户拍板'为通过标准。",
-  "updated": "2026-10-28T00:40:00+08:00",
+  "updated": "2026-10-28T01:00:00+08:00",
   "branch": "rework/standalone-companion",
   "north_star": "游戏里可玩的独立大肥鱼 AI 队友：身份正确、鼠标正常、免打字交互、行为可靠、存档恢复同一伙伴；性格让人想留下她，机制不让人被迫带她",
   "design_sources": [
@@ -43,11 +43,11 @@
         "docs/FOLLOW_GATE_EVIDENCE.txt",
         "docs/FOLLOW_GATE_REPORT.json (passed=false, 20261027-230750)"
       ],
-      "root_cause": "非本地 IsoPlayer 不在引擎 update 循环；Knox 答案=自有行为树+模拟玩家输入驱动移动",
+      "root_cause": "待实机定位：当前 B42 IsoPlayer 使用 AIComponent NPC 控制路径；原实现未 setNpc(true)。isPathing=false 本身不能证明未更新或未寻路。",
       "next_actions": [
-        "反编译 Knox IsoNpcPlayer/MetaNpcCharacter 移动输入模拟路径，回写 research/decompiled/",
-        "按输入驱动方案重做伙伴移动",
-        "重跑 smoke_game.py --gate follow"
+        "已完成 Knox 与当前 B42 寻路参考核对，见 research/decompiled/P2_NATIVE_LOCOMOTION.md",
+        "已增加 setNpc(true) 与原生寻路诊断；构建探针通过，跟随效果尚未验证",
+        "恢复桌面接管后重跑干净 follow 门禁；本轮运行 20261028-005441 停在点击开始，不算跟随失败或通过"
       ]
     },
     {

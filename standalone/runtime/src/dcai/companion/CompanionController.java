@@ -56,6 +56,7 @@ public final class CompanionController {
             lastDiagMs = now;
             double dist = Math.sqrt(Math.pow(owner.getX() - actor.getX(), 2) + Math.pow(owner.getY() - actor.getY(), 2));
             System.out.println("[DCStandalone] diag " + actor.modelInstanceDiag()
+                + " " + actor.movementDiag()
                 + " dist=" + String.format("%.1f", dist));
         }
         if (lastBehaviorTickMs >= 0 && now - lastBehaviorTickMs < BEHAVIOR_PERIOD_MS) return;
