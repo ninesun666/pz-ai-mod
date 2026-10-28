@@ -31,11 +31,12 @@
 ### 查参考的固定顺序（从快到慢）
 
 1. `research/pz-reverse/cat-*.md` —— 逆向笔记分类库（AI/角色/Lua/原生/输入…）
-2. `research/decompiled/` —— Knox 反编译笔记（行为树、角色管理、生成 API）
-3. `research/*.txt` —— javap 签名库（先 grep 确认方法存在，别猜签名）
-4. `upstream/ZombieBuddy/doc/` + 源码 —— 队友 mod 参考实现（固定提交 7794d9f9）
-5. `research/*.md` 阶段笔记 —— 之前的架构结论
-6. 以上都没有 → 才允许 javap/反编译，且结论必须回写 research/ 对应文件
+2. `research/decompiled/src/` —— **可读 Java 反编译源码库**（Vineflower，引擎定向类 + Knox `knox/event/` 全量，524 文件；查引擎行为先翻这里，配方见 docs/REFERENCES.md §5）
+3. `research/decompiled/*.txt` —— Knox/引擎类的 javap 笔记（关键结论以原始字节码为准）
+4. `research/*.txt` —— javap 签名库（先 grep 确认方法存在，别猜签名）
+5. `upstream/ZombieBuddy/doc/` + 源码 —— 队友 mod 参考实现（固定提交 7794d9f9）
+6. `research/*.md` 阶段笔记 —— 之前的架构结论
+7. 以上都没有 → 才允许 javap/反编译，且结论必须回写 research/ 对应文件
 
 ### 已验证的标准答案表（直接抄，别再试）
 
@@ -50,7 +51,10 @@
 | 角色没有网格（mesh=null） | `dressInRandomOutfit()` + `resetModelNextFrame()`，穿衣触发模型构建 | javap IsoGameCharacter |
 | 菜单中文乱码 | 默认加载 `B42Trans_CN` 汉化 mod + `language=CN` | test-profile 既有配置 |
 | 新 profile 卡条款页 | options.ini 预置 `termsOfServiceVersion=1`（用户已授权，仅限一次性测试 profile） | 2026-10-27 用户明确授权 |
-| 游戏卡"点击开始" | 真实鼠标点击（SetForegroundWindow+mouse_event）；PostMessage 假点击不可靠 | monitor_run.py 同期实测 |
+| 游戏卡"点击开始" | `-Ddcai.autoGate=true` 启用 `AutoInputDriver`：游戏内写 `Mouse.buttonDownStates[0]`（GameLoadingState.update() 读的是物理索引 0，**不是** `Mouse.LMB=10000` 逻辑键码） | 2026-10-28 javap GameLoadingState + Mouse，实机 3 次验证 |
+| 引擎帧截图取证 | Lua `takeScreenshot("相对名.png")` 写入 profile 的 Screenshots/，smoke 自动拷回 run 目录；参数是**相对文件名**（绝对路径会拼成非法路径且失败被静默吞掉）；桌面 GDI 抓屏在锁屏下全黑，禁用 | 2026-10-28 Core.TakeFullScreenshot 字节码 + 实机 |
+| 系统属性布尔开关 | `Boolean.getBoolean` 只认 `"true"`，传 `=1` 是 false | 2026-10-28 实测踩坑 |
+| 无人值守验证怎么跑 | 一条命令：`python standalone/runtime/smoke_game.py --world --gate follow --timeout 420`（自动：建世界→关教学 UI→绕点击开始→门禁→引擎帧截图→report.json→杀进程）。证据在 `standalone/runtime/build/runs/<时间戳>/` | 2026-10-28 建成，多轮使用 |
 
 ### 架构锁定（字节码门禁强制）
 
@@ -161,3 +165,18 @@ python -m unittest discover -s tests -v
 ## 允许灵活处理的部分
 
 实现语言、Java/Lua 分层、热键默认值、测试工具和目录细节可以根据 B42 实际接口调整；不要为了遵守目录或命名而牺牲可玩性。若引擎能力不足，应先做可行性探针并报告限制，不能用假角色、瞬移、全屏覆盖层或人工输入伪装成完成。
+
+## 多会话协作纪律（2026-10-28 混仓提交事故固化）
+
+本仓库可能被多个 AI 会话并行开发（Multica 本会话 + dsh harness 会话）。规则：
+
+1. **改文件前先 `git status`**：发现不是自己改的文件有改动，视为他人未完成工作，不碰、不回退；需要相关改动时只改自己那部分。
+2. **提交用 `git add <明确文件>`，禁用 `git add -A`**——2026-10-28 曾把 dsh 的在途改动误扫进一次提交（d0cf44c），事后靠人肉甄别。
+3. **同一问题域单负责人**：移动/行为由谁主攻，在 issue 里声明；他人只做评审不改代码，避免双头攻坚同一症状。
+4. 提交前 `git diff --cached --stat` 核对文件清单与意图一致。
+
+## 迭代纪律（贵的循环 vs 便宜的循环）
+
+- 新未知问题：先手动/半自动探一次拿到方向（哪怕不可复现），**再**把验证自动化——不要为第一次试探就建全套自动化。
+- 已有自动化门禁的领域（follow/spawn/tick）：直接跑门禁，别手测。
+- 实机一轮 ≈ 3 分钟，是稀缺资源：一轮里只改一个变量，改前先声明预期（"若 X 则应见 Y"），跑完对照。
