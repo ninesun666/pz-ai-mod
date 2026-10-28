@@ -26,5 +26,35 @@ public final class TransformProbe {
         }, 0);
         if (returns[0] == 0 || installs[0] != returns[0]) throw new AssertionError("missing exit hook");
         System.out.println("PASS real LuaManager transformation: returns=" + returns[0] + " hooks=" + installs[0]);
+
+        byte[] stateMachine;
+        try (JarFile game = new JarFile(args[0])) {
+            stateMachine = game.getInputStream(game.getJarEntry("zombie/ai/StateMachine.class")).readAllBytes();
+        }
+        byte[] hooked = CompanionAgent.transformStateMachine(stateMachine);
+        int[] entries = {0};
+        int[] stateHooks = {0};
+        new ClassReader(hooked).accept(new ClassVisitor(Opcodes.ASM9) {
+            @Override public MethodVisitor visitMethod(int a, String n, String d, String s, String[] e) {
+                if (!n.equals("changeState") || !d.equals("(Lzombie/ai/State;Ljava/lang/Iterable;Z)V")) return null;
+                return new MethodVisitor(Opcodes.ASM9) {
+                    @Override public void visitMethodInsn(int op, String owner, String name, String desc, boolean itf) {
+                        if (owner.equals("dcai/companion/CompanionAgent") && name.equals("onStateChange")) {
+                            stateHooks[0]++;
+                        }
+                    }
+                };
+            }
+        }, 0);
+        new ClassReader(hooked).accept(new ClassVisitor(Opcodes.ASM9) {
+            @Override public MethodVisitor visitMethod(int a, String n, String d, String s, String[] e) {
+                if (n.equals("changeState")) entries[0]++;
+                return null;
+            }
+        }, 0);
+        if (entries[0] != 1 || stateHooks[0] != 1) {
+            throw new AssertionError("missing StateMachine.changeState entry hook");
+        }
+        System.out.println("PASS real StateMachine transformation: changeState entry hook=1");
     }
 }

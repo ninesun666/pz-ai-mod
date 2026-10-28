@@ -1,6 +1,6 @@
 {
   "$schema_note": "阶段性目标维护文件。track=engineering|soul|memory|character|dialogue|ai。状态只允许: pending | in_progress | passed | failed | blocked。每个目标必须有可复现验收步骤和证据路径；日志/遥测不算通过，实机可玩才算通过。设计内容类目标以'文档定稿+用户拍板'为通过标准。",
-  "updated": "2026-10-28T19:05:00+08:00",
+  "updated": "2026-10-28T20:50:00+08:00",
   "branch": "rework/standalone-companion",
   "north_star": "游戏里可玩的独立大肥鱼 AI 队友：身份正确、鼠标正常、免打字交互、行为可靠、存档恢复同一伙伴；性格让人想留下她，机制不让人被迫带她",
   "design_sources": [
@@ -44,14 +44,14 @@
         "docs/FOLLOW_GATE_REPORT.json (passed=false, 20261027-230750)",
         "run 20261028-180000（首次无人值守 follow 门禁）：finder=found hasPath=true shouldMove=true 已达成 → 数百 ms 后 state 回落 IdleState、hasPath=false、坐标不变，round 1 超时 FAIL",
         "run 20261028-180700（堵转取消放宽至 10 tick 后复跑，含自动截图）：同样在 ~f:5050 回落 IdleState、finder=notrunning、坐标不变——自伤假说被排除，回落为引擎侧行为",
-        "run 20261028-185648：FAIL 行首次出现 pathing=true——堵转取消放宽后 PathFindState 已能保持，但坐标仍不变；问题收窄为『PFB2 存活但移动不被角色消耗』，指向 NPC 的移动消费路径（与 Knox 输入驱动论点一致）"
+        "run 20261028-185648：FAIL 行首次出现 pathing=true——堵转取消放宽后 PathFindState 已能保持，但坐标仍不变；问题收窄为『PFB2 存活但移动不被角色消耗』，指向 NPC 的移动消费路径（与 Knox 输入驱动论点一致）",
+        "run 20261028-203704：首次记录到伙伴自主位移——round 1 内 dist 14.0→11.0（FAIL 时 pathing=true），移动缓慢/间歇但为真实 A* 消费迹象；同时门禁新增 10s 取证窗口（传送前两人同框截图 game_shot_002）"
       ],
       "root_cause": "待实机定位：当前 B42 IsoPlayer 使用 AIComponent NPC 控制路径；原实现未 setNpc(true)。isPathing=false 本身不能证明未更新或未寻路。",
       "next_actions": [
-        "已排除：自有堵转取消误杀（20261028-180700，阈值 10 后同样回落）",
-        "反编译 IsoPlayer/IsoGameCharacter/StateMachineComponent 的 NPC 状态转移，找 PathFindState→IdleState 的退出条件与所需的持续驱动",
-        "对照 knox IsoNpcPlayer 如何保持 PathFindState 存活（research/decompiled/IsoNpcPlayer.txt）",
-        "复跑：python standalone/runtime/smoke_game.py --world --gate follow --timeout 420（自动截图已内建）"
+        "已排除：自有堵转取消误杀；已证实：PFB2 存活且开始被消费（14→11）",
+        "定位消费为何中断/缓慢：IsoNpcPlayer 的移动消费节奏（research/decompiled/IsoNpcPlayer.txt），对照其每帧推进量与间隔",
+        "复跑：python standalone/runtime/smoke_game.py --world --gate follow --timeout 420"
       ]
     },
     {

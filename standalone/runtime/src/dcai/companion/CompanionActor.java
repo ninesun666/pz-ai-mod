@@ -50,15 +50,114 @@ public final class CompanionActor extends IsoPlayer implements CompanionMotion {
     /** Vanilla A* pathing toward a target. True = request accepted, not arrival proof. */
     public boolean walkTo(IsoPlayer target) {
         if (target == null) return false;
-        if (getCurrentState() == PathFindState.instance()
-            && Math.abs(getPathFindBehavior2().getTargetX() - target.getX()) < 1f
-            && Math.abs(getPathFindBehavior2().getTargetY() - target.getY()) < 1f
-            && (int) getPathFindBehavior2().getTargetZ() == (int) target.getZ()) return true;
+        zombie.pathfind.PathFindBehavior2 pfb = getPathFindBehavior2();
+        if (!pfb.isGoalNone()
+            && Math.abs(pfb.getTargetX() - target.getX()) < 1f
+            && Math.abs(pfb.getTargetY() - target.getY()) < 1f
+            && (int) pfb.getTargetZ() == (int) target.getZ()) return true;
+        localPath = null; // new destination invalidates the retained route
         pathToCharacter(target);
-        // pathToAux only writes animation flags; NPC IdleState does not consume
-        // the request. PathFindState.execute owns the native PFB2.update loop.
-        changeState(PathFindState.instance());
+        // We no longer enter PathFindState: its exit() wipes path2 and the finder
+        // on every engine state churn (~1s), killing the native request mid-flight.
+        // pumpPathfind() drives PFB2.update() per tick instead (Knox's IsoNpcPlayer
+        // pumps it from its own update loop the same way).
         return true;
+    }
+
+    /** Per-tick pump for the native path request; no-op without a goal. */
+    public void pumpPathfind() {
+        if (getPathFindBehavior2().isGoalNone()) return;
+        getPathFindBehavior2().update();
+    }
+
+    public boolean isPathfinding() {
+        return !getPathFindBehavior2().isGoalNone();
+    }
+
+    private zombie.pathfind.Path localPath;
+    private int localPathIndex;
+
+    /**
+     * Keep our own copy of the most recently found path: the engine's state churn
+     * clears path2 on every PathFindState exit, but the route itself stays valid.
+     */
+    private void retainPath() {
+        zombie.pathfind.Path path = getPath2();
+        if (path == null || path.isEmpty()) return;
+        zombie.pathfind.PathNode last = path.getNode(path.size() - 1);
+        if (localPath != null && !localPath.isEmpty()
+                && Math.abs(localPath.getNode(localPath.size() - 1).x - last.x) < 0.01f
+                && Math.abs(localPath.getNode(localPath.size() - 1).y - last.y) < 0.01f) {
+            return; // same route already retained
+        }
+        if (localPath == null) localPath = new zombie.pathfind.Path();
+        localPath.copyFrom(path);
+        localPathIndex = 0;
+    }
+
+    /** AIComponent control vars, or null before setNpc(true) installed the component. */
+    private zombie.ai.AIBrainPlayerControlVars controlVars() {
+        Object component = getECSComponentMap().get(zombie.characters.component.AIComponent.class);
+        return component instanceof zombie.characters.component.AIComponent
+            ? ((zombie.characters.component.AIComponent) component).getHumanControlVars()
+            : null;
+    }
+
+    /**
+     * Per-tick synthetic NPC movement input. B42's official NPC seam: the vanilla
+     * IsoPlayer.updateInternal2() NPC branch reads AIComponent humanControlVars
+     * strafeX/strafeY and writes them into deltaX/deltaY (javap IsoPlayer
+     * 8086-8119, 8200-8205), so the engine moves us exactly like a keyboard-driven
+     * player, with full collision. Direction: first path node further than 0.6
+     * tiles (no corner cutting); straight at the owner only while a requested
+     * path is still pending.
+     */
+    public void driveFollowMovement(IsoPlayer owner, boolean wantMove) {
+        zombie.ai.AIBrainPlayerControlVars vars = controlVars();
+        if (vars == null) return;
+        float strafeX = 0f;
+        float strafeY = 0f;
+        if (wantMove && owner != null) {
+            float tx = owner.getX();
+            float ty = owner.getY();
+            retainPath();
+            if (localPath != null) {
+                while (localPathIndex < localPath.size()) {
+                    zombie.pathfind.PathNode node = localPath.getNode(localPathIndex);
+                    float ndx = node.x - getX();
+                    float ndy = node.y - getY();
+                    if (ndx * ndx + ndy * ndy > 0.36f) {
+                        tx = node.x;
+                        ty = node.y;
+                        break;
+                    }
+                    localPathIndex++;
+                }
+                if (localPathIndex >= localPath.size()) localPath = null; // route exhausted
+            }
+            float dx = tx - getX();
+            float dy = ty - getY();
+            float len = (float) Math.sqrt(dx * dx + dy * dy);
+            if (len > 0.35f && Float.isFinite(len)) {
+                // Strafe input is facing-relative: turn toward the target, then
+                // request pure forward motion.
+                setDirectionAngle((float) Math.atan2(dy, dx));
+                strafeX = 1f;
+                strafeY = 0f;
+            }
+        }
+        vars.strafeX = strafeX;
+        vars.strafeY = strafeY;
+        vars.justMoved = strafeX != 0f || strafeY != 0f;
+    }
+
+    /** Zero the synthetic input so HOLD/arrivals never keep sliding. */
+    public void stopDriveMovement() {
+        zombie.ai.AIBrainPlayerControlVars vars = controlVars();
+        if (vars == null) return;
+        vars.strafeX = 0f;
+        vars.strafeY = 0f;
+        vars.justMoved = false;
     }
 
     public void stopWalking() {
@@ -69,24 +168,54 @@ public final class CompanionActor extends IsoPlayer implements CompanionMotion {
         setPathing(false);
         setVariable("bMoving", false);
         setVariable("bPathfind", false);
+        localPath = null;
+        localPathIndex = 0;
+        stopDriveMovement();
+        if (!stopOriginLogged) {
+            stopOriginLogged = true;
+            new Exception("[DCStandalone] stopWalking call origin (logged once)").printStackTrace();
+        }
     }
 
-    public boolean isPathfinding() {
-        return getCurrentState() == PathFindState.instance();
-    }
+    private boolean stopOriginLogged;
 
     public String movementDiag() {
-        return "npc=" + isNpc() + " state=" + getCurrentState()
+        zombie.ai.AIBrainPlayerControlVars vars = controlVars();
+        String drive = vars == null ? "n/a" : String.format("%.2f,%.2f", vars.strafeX, vars.strafeY);
+        zombie.iso.Vector2 deferred = getDeferredMovement(new zombie.iso.Vector2());
+        zombie.pathfind.Path path = getPath2();
+        return "npc=" + isNpc() + " state=" + shortState()
             + " hasPath=" + hasPath() + " finder=" + getFinder().progress
             + " shouldMove=" + getPathFindBehavior2().shouldBeMoving()
+            + " pathLen=" + (path == null ? -1 : path.size())
+            + " local=" + (localPath == null ? -1 : localPath.size()) + "/" + localPathIndex
+            + " drive=" + drive
+            + " face=" + String.format("%.2f,%.2f",
+                getForwardDirection().x, getForwardDirection().y)
+            + " deferred=" + String.format("%.3f", (float) Math.sqrt(deferred.x * deferred.x + deferred.y * deferred.y))
+            + " moving=" + isMoving()
+            + " animFrame=" + isAnimationUpdatingThisFrame()
             + " pos=" + getX() + "," + getY() + "," + getZ();
+    }
+
+    String shortState() {
+        String name = String.valueOf(getCurrentState());
+        int dot = name.lastIndexOf('.');
+        return dot >= 0 ? name.substring(dot + 1) : name;
     }
 
     /** Render-side diagnostic: is an engine model instance actually bound to us? */
     public String modelInstanceDiag() {
         zombie.core.skinnedmodel.model.ModelInstance mi = getModelInstance();
         if (mi == null) return "instance=null";
-        return "instance=present anim=" + (getAnimationPlayer() != null)
+        zombie.core.skinnedmodel.animation.AnimationPlayer anim = getAnimationPlayer();
+        String set = String.valueOf(GetAnimSetName());
+        String clip = "none";
+        if (anim != null) {
+            clip = anim.getAnimationClip() == null ? "none" : "playing";
+        }
+        return "instance=present anim=" + (anim != null)
+            + " set=" + set + " clip=" + clip
             + " mesh=" + (mi.model != null)
             + " tex=" + (mi.tex != null)
             + " refs=" + mi.renderRefCount;

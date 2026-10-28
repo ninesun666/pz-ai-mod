@@ -44,6 +44,10 @@ public final class CompanionController {
 
     public synchronized void tick() {
         if (!declared) return;
+        if (!agentHookChecked) {
+            agentHookChecked = true;
+            CompanionAgent.ensureStateMachineHooked();
+        }
         if (actor == null && !spawnFailed) trySpawn();
         if (actor == null) return;
         if (!modelConfirmed && actor.modelConfirmed()) {
@@ -53,20 +57,27 @@ public final class CompanionController {
         IsoPlayer owner = IsoPlayer.getInstance();
         if (owner == null || owner.getCurrentSquare() == null) return;
         long now = System.currentTimeMillis();
+        double dx0 = owner.getX() - actor.getX();
+        double dy0 = owner.getY() - actor.getY();
+        double distance = Math.sqrt(dx0 * dx0 + dy0 * dy0);
+        // Per-frame synthetic NPC input (drive), independent of the 100ms behavior gate:
+        // follow hysteresis mirrors BehaviorController (walk while a path exists or the
+        // gap is at least the re-follow start distance; never inside the stop distance).
+        boolean follow = behavior.currentIntent() == BehaviorController.Intent.FOLLOW;
+        actor.pumpPathfind(); // native path requests without PathFindState churn
+        boolean wantMove = follow && distance > 2.0 && (actor.hasPath() || distance >= 4.0);
+        actor.driveFollowMovement(owner, wantMove);
         if (now - lastDiagMs > DIAG_PERIOD_MS) {
             lastDiagMs = now;
-            double dist = Math.sqrt(Math.pow(owner.getX() - actor.getX(), 2) + Math.pow(owner.getY() - actor.getY(), 2));
             System.out.println("[DCStandalone] diag " + actor.modelInstanceDiag()
                 + " " + actor.movementDiag()
-                + " dist=" + String.format("%.1f", dist));
+                + " dist=" + String.format("%.1f", distance));
         }
         if (lastBehaviorTickMs >= 0 && now - lastBehaviorTickMs < BEHAVIOR_PERIOD_MS) return;
         if (lastBehaviorTickMs >= 0 && now < lastBehaviorTickMs) return; // clock went backwards; skip
         lastBehaviorTickMs = now;
-        double dx = owner.getX() - actor.getX();
-        double dy = owner.getY() - actor.getY();
-        double distance = Math.sqrt(dx * dx + dy * dy);
         lastAction = behavior.tick(now, distance, true, true);
+        logStateTransition();
         tree.attach(actor);
         tree.setDistance((float) distance);
         switch (lastAction) {
@@ -89,6 +100,18 @@ public final class CompanionController {
             default: break;
         }
     }
+
+    /** Log every state-machine transition at behavior-tick resolution. */
+    private void logStateTransition() {
+        String state = actor.shortState();
+        if (state.equals(lastStateName)) return;
+        System.out.println("[DCStandalone] state " + lastStateName + " -> " + state
+            + " " + actor.movementDiag());
+        lastStateName = state;
+    }
+
+    private String lastStateName = "null";
+    private boolean agentHookChecked;
 
     /** Three consecutive behavior ticks without position change count as stuck. */
     private void updateStuckState() {

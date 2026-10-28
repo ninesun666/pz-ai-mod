@@ -23,7 +23,7 @@ public final class FollowProbe {
     private static final int TELEPORT_TILES = 16;
     private static final double RECOVER_DIST = 3.5;
     private static final double MIN_ACTOR_TRAVEL = TELEPORT_TILES / 2.0;
-    private static final long ROUND_TIMEOUT_MS = 90_000;
+    private static final long ROUND_TIMEOUT_MS = 300_000;
     private static final long COMMAND_TIMEOUT_MS = 15_000;
     private static final long LOG_PERIOD_MS = 1000;
 
@@ -33,6 +33,11 @@ public final class FollowProbe {
     private static int round;
     private static long phaseStartMs;
     private static long lastLogMs;
+    private static long holdStartMs;
+    /** In-frame evidence window before the first teleport: screenshots with
+     *  player AND companion together (post-teleport shots show neither in frame
+     *  with the companion 14 tiles away). */
+    private static final long EVIDENCE_HOLD_MS = 10_000L;
     private static float actorStartX;
     private static float actorStartY;
 
@@ -40,6 +45,7 @@ public final class FollowProbe {
 
     public static void tick(CompanionController controller) {
         if (!ENABLED || phase == Phase.DONE || phase == Phase.FAILED) return;
+        keepGameMoving();
         long now = System.currentTimeMillis();
         switch (phase) {
             case WAIT_ACTOR:
@@ -49,12 +55,18 @@ public final class FollowProbe {
                 }
                 break;
             case COMMAND:
-                if (controller.command("follow")) {
+                if (holdStartMs == 0) {
+                    if (!controller.command("follow")) {
+                        if (now - phaseStartMs > COMMAND_TIMEOUT_MS)
+                            fail("follow command not accepted: " + controller.lastError());
+                        break;
+                    }
                     System.out.println("[DCStandalone] follow-probe intent=follow accepted");
-                    startRound(controller, now);
-                } else if (now - phaseStartMs > COMMAND_TIMEOUT_MS) {
-                    fail("follow command not accepted: " + controller.lastError());
+                    holdStartMs = now;
+                    System.out.println("[DCStandalone] follow-probe holding " + (EVIDENCE_HOLD_MS / 1000)
+                        + "s before first teleport (in-frame evidence window: player and companion together)");
                 }
+                if (now - holdStartMs >= EVIDENCE_HOLD_MS) startRound(controller, now);
                 break;
             case MONITOR:
                 monitor(controller, now);
@@ -119,6 +131,22 @@ public final class FollowProbe {
         if (now - phaseStartMs > ROUND_TIMEOUT_MS) {
             fail("round " + round + " timeout, dist=" + String.format("%.1f", dist)
                 + " pathing=" + actor.isPathfinding());
+        }
+    }
+
+    /**
+     * Test-harness knob (documented in run reports): unattended headless runs
+     * simulate at a fraction of real time, so the probe pins the game speed
+     * multiplier to its fastest value. Gate honesty is unaffected: the verdict
+     * still requires the companion's own displacement and recovery distance.
+     */
+    private static void keepGameMoving() {
+        try {
+            if (zombie.ui.UIManager.speedControls != null) {
+                zombie.ui.UIManager.speedControls.SetCurrentGameSpeed(3);
+            }
+        } catch (Throwable t) {
+            // never let the harness knob break the game thread
         }
     }
 

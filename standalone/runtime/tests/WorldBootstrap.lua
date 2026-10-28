@@ -52,11 +52,16 @@ local scenario = {
         local tickAcc = 0
         Events.OnTick.Add(function()
             tickAcc = tickAcc + 1
-            if tickAcc % 1200 == 1 then -- first tick, then every ~20s at 60fps
+            -- Dense early shots (300/600) land inside the probe's pre-teleport
+            -- evidence hold, when player and companion are still side by side.
+            if tickAcc % 1200 == 1 or tickAcc == 300 or tickAcc == 600 then
                 shotN = shotN + 1
                 local name = "game_shot_" .. string.format("%03d", shotN) .. ".png"
                 local okS, errS = pcall(takeScreenshot, name)
+                local pl = getPlayer()
+                local px = pl and (math.floor(pl:getX() * 10) / 10 .. "," .. math.floor(pl:getY() * 10) / 10) or "nil"
                 print("[DCStandaloneTest] game screenshot " .. name .. " ok=" .. tostring(okS)
+                    .. " playerXY=" .. px
                     .. (okS and "" or (" err=" .. tostring(errS))))
             end
         end)
