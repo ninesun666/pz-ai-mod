@@ -75,6 +75,11 @@ def main():
     if args.gate == 'follow':
         probe_property = '-Ddcai.followProbe=true'
     command = [str(args.game / 'jre64/bin/java.exe'), f'-javaagent:{jar}', probe_property]
+    if args.world:
+        # Unattended world entry: in-game synthetic LMB dismisses the post-load
+        # "Click to Start" phase via Mouse.buttonDownStates (AutoInputDriver).
+        # NOTE: Boolean.getBoolean needs the literal "true"; "1" is false.
+        command.append('-Ddcai.autoGate=true')
     if not args.interactive:
         command.append('-Djava.awt.headless=true')
     command += ['--enable-native-access=ALL-UNNAMED',

@@ -8,6 +8,7 @@ import org.objectweb.asm.*;
 /** Own narrowly scoped bootstrap. No mod scan, native proxy, updater or HTTP eval. */
 public final class CompanionAgent {
     public static void premain(String args, Instrumentation instrumentation) {
+        AutoInputDriver.startIfEnabled();
         instrumentation.addTransformer(new ClassFileTransformer() {
             @Override public byte[] transform(ClassLoader loader, String name,
                     Class<?> redefined, ProtectionDomain domain, byte[] bytes) {

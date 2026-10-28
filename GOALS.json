@@ -1,6 +1,6 @@
 {
   "$schema_note": "阶段性目标维护文件。track=engineering|soul|memory|character|dialogue|ai。状态只允许: pending | in_progress | passed | failed | blocked。每个目标必须有可复现验收步骤和证据路径；日志/遥测不算通过，实机可玩才算通过。设计内容类目标以'文档定稿+用户拍板'为通过标准。",
-  "updated": "2026-10-28T17:30:00+08:00",
+  "updated": "2026-10-28T18:10:00+08:00",
   "branch": "rework/standalone-companion",
   "north_star": "游戏里可玩的独立大肥鱼 AI 队友：身份正确、鼠标正常、免打字交互、行为可靠、存档恢复同一伙伴；性格让人想留下她，机制不让人被迫带她",
   "design_sources": [
@@ -41,13 +41,14 @@
       "acceptance": "follow 门禁两次通过：玩家传送拉开16格后，伙伴自身 A* 位移过半并回到 3.5 格内；伴随截图",
       "evidence": [
         "docs/FOLLOW_GATE_EVIDENCE.txt",
-        "docs/FOLLOW_GATE_REPORT.json (passed=false, 20261027-230750)"
+        "docs/FOLLOW_GATE_REPORT.json (passed=false, 20261027-230750)",
+        "run 20261028-180000（首次无人值守 follow 门禁）：finder=found hasPath=true shouldMove=true 已达成 → 数百 ms 后 state 回落 IdleState、hasPath=false、坐标不变，round 1 超时 FAIL"
       ],
       "root_cause": "待实机定位：当前 B42 IsoPlayer 使用 AIComponent NPC 控制路径；原实现未 setNpc(true)。isPathing=false 本身不能证明未更新或未寻路。",
       "next_actions": [
-        "已完成 Knox 与当前 B42 寻路参考核对，见 research/decompiled/P2_NATIVE_LOCOMOTION.md",
-        "已增加 setNpc(true) 与原生寻路诊断；构建探针通过，跟随效果尚未验证",
-        "恢复桌面接管后重跑干净 follow 门禁；本轮运行 20261028-005441 停在点击开始，不算跟随失败或通过"
+        "定位 PathFindState→IdleState 回落原因：优先查 CompanionController 的 3-tick 堵转取消是否在路径生效前误杀（walkTo 后 ~300ms 即 stopWalking）",
+        "若非自伤：反编译 IsoPlayer/IsoGameCharacter 的 NPC 状态机转移，确认 PathFindState 需要的持续条件",
+        "复跑：python standalone/runtime/smoke_game.py --world --gate follow --timeout 420（已全无人值守）"
       ]
     },
     {
@@ -262,6 +263,20 @@
         "research/decompiled/（本地参考，不入库分发）"
       ],
       "notes": "用户决策 2026-10-28：ZombieBuddy 能复用直接复用；Knox 1:1 复刻核心结构、抛弃不需要部分。已复刻：BehaviorNode/Sequence/Selector/Inverter/BehaviorTreeBase/NpcBehaviorTree(→CompanionBehaviorTree)/FollowSubTree/StaySubTree/MovementSubTree+actions/conditions+MOVE_*/FOLLOW_DISTANCE/TICKS 数据契约。已抛弃：ActionConstraintResolver 约束机、Lua 节点桥、其余 66 棵子树、farming/fight/reload/driving 等全部。CompanionController 派发改走行为树，gate 标记文本不变。"
+    },
+    {
+      "id": "P-AUTO1",
+      "track": "engineering",
+      "name": "无人值守实机门禁闭环（代码操控机制）",
+      "status": "passed",
+      "acceptance": "一条命令完成：构建→启动游戏→自动进世界（含绕过点击开始）→follow 刺激→判决→report.json→清理，全程无人工输入、无桌面接管",
+      "evidence": [
+        "standalone/runtime/build/runs/20261028-180000/report.json（follow 门禁 FAIL verdict，157s，harness 正常清理）",
+        "同目录 stdout.log：first game-thread tick 出现（Click to Start 已被游戏内合成输入闯过）",
+        "src/dcai/companion/AutoInputDriver.java（GameLoadingState 期间写 Mouse.buttonDownStates[0]）",
+        "docs/AUTOMATED_STANDALONE_GATE.md 2026-10-28 章节"
+      ],
+      "notes": "机制证据（javap B42.21）：GameLoadingState.update() 尾部以 Mouse.isButtonDown(0)（物理索引 0，非 Mouse.LMB=10000 逻辑键码）作为唯一退出条件之一；isButtonDown 是对 public static buttonDownStates 数组的直接读。踩坑记录：Boolean.getProperty 用 '=1' 不生效需 '=true'；写 LMB=10000 越界被静默吞掉。仅一次性 profile 使用，绝不用于真实存档。"
     }
   ],
   "decisions_resolved": [

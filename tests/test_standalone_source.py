@@ -70,3 +70,20 @@ class BehaviorTreeMirrorTests(unittest.TestCase):
         controller = (ROOT / "standalone/runtime/src/dcai/companion/CompanionController.java").read_text(encoding="utf-8")
         self.assertIn("tree.setGoal(CompanionBehaviorTree.GOAL_FOLLOW)", controller)
         self.assertIn("tree.setGoal(CompanionBehaviorTree.GOAL_STAY)", controller)
+
+
+class AutoInputDriverTests(unittest.TestCase):
+    """Unattended world entry: synthetic LMB through the game's own input array."""
+
+    def test_driver_only_touches_loading_state(self):
+        src = (ROOT / "standalone/runtime/src/dcai/companion/AutoInputDriver.java").read_text(encoding="utf-8")
+        self.assertIn("GameLoadingState", src)
+        self.assertIn("Mouse.buttonDownStates", src)
+        self.assertIn('Boolean.getBoolean("dcai.autoGate")', src)
+        # outside the loading state the driver actively releases LMB
+        self.assertIn("buttons[0] = loading", src)
+
+    def test_smoke_passes_auto_gate_for_world_runs(self):
+        src = (ROOT / "standalone/runtime/smoke_game.py").read_text(encoding="utf-8")
+        self.assertIn("-Ddcai.autoGate=true", src)
+        self.assertIn("args.world", src)
