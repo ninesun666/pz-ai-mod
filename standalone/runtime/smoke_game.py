@@ -172,6 +172,12 @@ def main():
             result['elapsedSeconds'] = round(time.monotonic() - started, 2)
     errors = err.read_text(encoding='utf-8', errors='replace')
     result['stderrErrors'] = [line for line in errors.splitlines() if 'ERROR' in line or 'Exception' in line][:20]
+    # In-game framebuffer shots (takeScreenshot writes relative names into the
+    # profile's Screenshots dir); collect them next to report.json.
+    shots = sorted((profile / 'Screenshots').glob('game_shot_*.png')) if args.world else []
+    for i, shot in enumerate(shots, 1):
+        shutil.copyfile(shot, run / f'game_shot_{i:03d}.png')
+    result['gameShots'] = len(shots)
     (run / 'report.json').write_text(json.dumps(result, ensure_ascii=False, indent=2), encoding='utf-8')
     if monitor is not None and monitor.poll() is None:
         monitor.terminate()  # report.json exists; monitor would stop on its own too

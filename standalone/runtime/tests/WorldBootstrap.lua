@@ -15,6 +15,25 @@ local scenario = {
         -- advances; restore normal speed so automated probes keep ticking.
         local ok, err = pcall(setGameSpeed, 1)
         if not ok then print("[DCStandaloneTest] setGameSpeed failed: " .. tostring(err)) end
+        -- In-game evidence capture: the engine dumps its OWN framebuffer via
+        -- takeScreenshot(name). The argument is a RELATIVE filename written
+        -- into the profile's Screenshots dir (Core lambda: getScreenshotDir()
+        -- + separator + name; an absolute path concatenates into an invalid
+        -- path and writePng's failure is swallowed). Desktop capture returns
+        -- black frames on locked/direct-scanout desktops; this path cannot.
+        -- smoke_game.py copies the shots into the run dir afterwards.
+        local shotN = 0
+        local tickAcc = 0
+        Events.OnTick.Add(function()
+            tickAcc = tickAcc + 1
+            if tickAcc % 1200 == 1 then -- first tick, then every ~20s at 60fps
+                shotN = shotN + 1
+                local name = "game_shot_" .. string.format("%03d", shotN) .. ".png"
+                local okS, errS = pcall(takeScreenshot, name)
+                print("[DCStandaloneTest] game screenshot " .. name .. " ok=" .. tostring(okS)
+                    .. (okS and "" or (" err=" .. tostring(errS))))
+            end
+        end)
         local diagDone = {}
         local function probe(name)
             if diagDone[name] then return end
