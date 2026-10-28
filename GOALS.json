@@ -1,6 +1,6 @@
 {
   "$schema_note": "阶段性目标维护文件。track=engineering|soul|memory|character|dialogue|ai。状态只允许: pending | in_progress | passed | failed | blocked。每个目标必须有可复现验收步骤和证据路径；日志/遥测不算通过，实机可玩才算通过。设计内容类目标以'文档定稿+用户拍板'为通过标准。",
-  "updated": "2026-10-28T20:50:00+08:00",
+  "updated": "2026-10-28T21:10:00+08:00",
   "branch": "rework/standalone-companion",
   "north_star": "游戏里可玩的独立大肥鱼 AI 队友：身份正确、鼠标正常、免打字交互、行为可靠、存档恢复同一伙伴；性格让人想留下她，机制不让人被迫带她",
   "design_sources": [
@@ -45,7 +45,8 @@
         "run 20261028-180000（首次无人值守 follow 门禁）：finder=found hasPath=true shouldMove=true 已达成 → 数百 ms 后 state 回落 IdleState、hasPath=false、坐标不变，round 1 超时 FAIL",
         "run 20261028-180700（堵转取消放宽至 10 tick 后复跑，含自动截图）：同样在 ~f:5050 回落 IdleState、finder=notrunning、坐标不变——自伤假说被排除，回落为引擎侧行为",
         "run 20261028-185648：FAIL 行首次出现 pathing=true——堵转取消放宽后 PathFindState 已能保持，但坐标仍不变；问题收窄为『PFB2 存活但移动不被角色消耗』，指向 NPC 的移动消费路径（与 Knox 输入驱动论点一致）",
-        "run 20261028-203704：首次记录到伙伴自主位移——round 1 内 dist 14.0→11.0（FAIL 时 pathing=true），移动缓慢/间歇但为真实 A* 消费迹象；同时门禁新增 10s 取证窗口（传送前两人同框截图 game_shot_002）"
+        "run 20261028-203704：首次记录到伙伴自主位移——round 1 内 dist 14.0→11.0（FAIL 时 pathing=true），移动缓慢/间歇但为真实 A* 消费迹象；同时门禁新增 10s 取证窗口（传送前两人同框截图 game_shot_002）",
+        "run 20261028-210057：FAIL（round 1 超时，14.0→11.0，移动幅度与上轮一致约 3 格；移动消费仍走走停停）"
       ],
       "root_cause": "待实机定位：当前 B42 IsoPlayer 使用 AIComponent NPC 控制路径；原实现未 setNpc(true)。isPathing=false 本身不能证明未更新或未寻路。",
       "next_actions": [
@@ -151,25 +152,31 @@
       "id": "C1",
       "track": "character",
       "name": "角色外观：贴图路线 A（鲸鱼娘主题装）",
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "蓝白配色服装 + 鳍形帽饰在实机可辨认；远处剪影可与普通幸存者区分；贴图资产许可记录完整",
       "depends_on": [
         "P1"
       ],
-      "notes": "DESIGN_PRODUCT 建议 A 先行打通玩法，B 自定义模型为远期升级；需用户拍板",
-      "blocked_on_decision": "DEC-1 形象路线"
+      "notes": "B 路线（自定义模型）仍为远期。鳍形帽饰原版无对应资产，A 路线内以配色+长发表达，帽饰留给 B 或自定义贴图。",
+      "blocked_on_decision": "DEC-1 形象路线",
+      "evidence": [
+        "2026-10-28：Route A 落地——CompanionActor.dressAsWhaleGirl()：Nurse 套装（白大褂+蓝裤，原版蓝白配色）+ Long 长发 + 深海藏青发色 ImmutableColor(0.09,0.16,0.38)；API 逐一 javap 验证（dressInNamedOutfit / setHairModel / setHairColor），名字'大肥鱼'此前已设。实机截图 run 20261028-210057 game_shot_002（传送前与玩家同框）；像素级外观确认待用户目视"
+      ]
     },
     {
       "id": "C2",
       "track": "character",
       "name": "角色外观：自定义模型路线 B",
-      "status": "pending",
+      "status": "in_progress",
       "acceptance": "完整自定义 3D 模型+动画绑定实机通过；方向性行走动画正确",
       "depends_on": [
         "C1",
         "P2"
       ],
-      "notes": "工程量大一个数量级，仅在 A 路线玩法闭环后启动"
+      "notes": "B 路线（自定义模型）仍为远期。鳍形帽饰原版无对应资产，A 路线内以配色+长发表达，帽饰留给 B 或自定义贴图。",
+      "evidence": [
+        "2026-10-28：Route A 落地——CompanionActor.dressAsWhaleGirl()：Nurse 套装（白大褂+蓝裤，原版蓝白配色）+ Long 长发 + 深海藏青发色 ImmutableColor(0.09,0.16,0.38)；API 逐一 javap 验证（dressInNamedOutfit / setHairModel / setHairColor），名字'大肥鱼'此前已设。实机截图 run 20261028-210057 game_shot_002（传送前与玩家同框）；像素级外观确认待用户目视"
+      ]
     },
     {
       "id": "D2",

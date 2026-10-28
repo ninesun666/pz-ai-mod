@@ -29,11 +29,26 @@ public final class CompanionActor extends IsoPlayer implements CompanionMotion {
         // IsoPlayer.updateInternal2() uses this path to obtain movement controls;
         // without it, the private vanilla input updater treats us as a human player.
         setNpc(true);
-        dressInRandomOutfit();
+        dressAsWhaleGirl();
         resetModelNextFrame();
     }
 
     public boolean modelConfirmed() { return modelConfirmed; }
+
+    /**
+     * Route A appearance (DEC-1, docs/DESIGN_PRODUCT.md): blue/white whale-girl
+     * palette assembled from vanilla assets — Nurse outfit (white scrub top +
+     * blue scrub pants, the closest vanilla palette), long hair in deep-sea
+     * navy. APIs verified against B42.21: SurvivorDesc.dressInNamedOutfit,
+     * HumanVisual.setHairModel/setHairColor; "Nurse" is in clothing.xml's
+     * female outfit list, "Long" in hairStyles.xml's female styles.
+     */
+    private void dressAsWhaleGirl() {
+        SurvivorDesc d = getDescriptor();
+        d.dressInNamedOutfit("Nurse");
+        d.getHumanVisual().setHairModel("Long");
+        d.getHumanVisual().setHairColor(new zombie.core.ImmutableColor(0.09f, 0.16f, 0.38f));
+    }
 
     public void confirmModel() { modelConfirmed = true; }
 
