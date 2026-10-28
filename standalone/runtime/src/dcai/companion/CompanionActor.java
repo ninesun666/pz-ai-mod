@@ -37,15 +37,29 @@ public final class CompanionActor extends IsoPlayer implements CompanionMotion {
 
     /**
      * Route A appearance (DEC-1, docs/DESIGN_PRODUCT.md): blue/white whale-girl
-     * palette assembled from vanilla assets — Nurse outfit (white scrub top +
-     * blue scrub pants, the closest vanilla palette), long hair in deep-sea
-     * navy. APIs verified against B42.21: SurvivorDesc.dressInNamedOutfit,
-     * HumanVisual.setHairModel/setHairColor; "Nurse" is in clothing.xml's
-     * female outfit list, "Long" in hairStyles.xml's female styles.
+     * palette. The DCWhaleGirl outfit is our own mod's clothing pipeline
+     * (42/media/clothing + scripts, adapted from the local CosplayShop workshop
+     * mod — see standalone/42/media/ASSET_NOTICE.md for provenance). We dress
+     * the CHARACTER (IsoGameCharacter.dressInNamedOutfit, javap-verified) so
+     * worn items exist immediately; if the outfit is missing (mod assets not
+     * mounted) we fall back to the vanilla Nurse palette. Hair stays deep-sea
+     * navy via HumanVisual.
      */
     private void dressAsWhaleGirl() {
         SurvivorDesc d = getDescriptor();
-        d.dressInNamedOutfit("Nurse");
+        boolean ownOutfit = false;
+        try {
+            dressInNamedOutfit("DCWhaleGirl");
+            ownOutfit = getWornItems() != null && getWornItems().size() > 0;
+        } catch (Throwable t) {
+            System.out.println("[DCStandalone] DCWhaleGirl dressing threw: " + t);
+        }
+        if (!ownOutfit) {
+            System.out.println("[DCStandalone] DCWhaleGirl outfit not resolved, falling back to vanilla Nurse");
+            d.dressInNamedOutfit("Nurse");
+        } else {
+            System.out.println("[DCStandalone] dressed in DCWhaleGirl, wornItems=" + getWornItems().size());
+        }
         d.getHumanVisual().setHairModel("Long");
         d.getHumanVisual().setHairColor(new zombie.core.ImmutableColor(0.09f, 0.16f, 0.38f));
     }

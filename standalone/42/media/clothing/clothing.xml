@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<outfitManager>
+	<m_FemaleOutfits>
+		<m_Name>DCWhaleGirl</m_Name>
+		<m_Guid>7c1f2a64-3d59-4e8a-9b27-15c0d6f0a901</m_Guid>
+		<m_Top>false</m_Top>
+		<m_Pants>false</m_Pants>
+		<m_AllowPantsHue>false</m_AllowPantsHue>
+		<m_AllowTopTint>false</m_AllowTopTint>
+		<m_AllowTShirtDecal>false</m_AllowTShirtDecal>
+		<m_items>
+			<itemGUID>e40fc989-0d1e-4750-8ec9-97ec63d0e435</itemGUID>
+		</m_items>
+		<m_items>
+			<itemGUID>58113b3c-8896-49b2-800b-042eb3ef562b</itemGUID>
+		</m_items>
+		<m_items>
+			<itemGUID>9414f3b4-f0f8-42b1-b38b-8582a3573cb3</itemGUID>
+		</m_items>
+		<m_items>
+			<itemGUID>3ead08a7-be61-48ca-916d-7a3e26ad6615</itemGUID>
+		</m_items>
+	</m_FemaleOutfits>
+</outfitManager>

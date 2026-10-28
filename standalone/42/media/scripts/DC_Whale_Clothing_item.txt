@@ -1,0 +1,70 @@
+module Base
+{
+	item DCWhaleSailorSuit
+	{
+		Type			= Clothing,
+		DisplayName		= DC Whale Sailor Suit,
+		ClothingItem		= DCWhaleSailorSuit,
+		BodyLocation		= Jacket,
+		Icon			= DCWhaleSailorSuit,
+		BloodLocation		= Shirt;ShirtLongSleeves,
+		BiteDefense		= 15,
+		ScratchDefense		= 20,
+		Insulation		= 0.4,
+		WindResistance		= 0.5,
+		WaterResistance		= 0.8,
+		Weight			= 1.5,
+		FabricType		= Cotton,
+	}
+
+	item DCWhaleSailorSkirt
+	{
+		Type			= Clothing,
+		DisplayName		= DC Whale Sailor Skirt,
+		ClothingItem		= DCWhaleSailorSkirt,
+		BodyLocation		= Dress,
+		Icon			= DCWhaleSailorSkirt,
+		BloodLocation		= ShortsShort,
+		BiteDefense		= 15,
+		ScratchDefense		= 20,
+		Insulation		= 0.35,
+		WindResistance		= 0.45,
+		Weight			= 1.5,
+		FabricType		= Cotton,
+	}
+
+	item DCWhaleShoes
+	{
+		Type			= Clothing,
+		DisplayName		= DC Whale Shoes,
+		ClothingItem		= DCWhaleShoes,
+		BodyLocation		= Shoes,
+		Icon			= DCWhaleShoes,
+		BloodLocation		= Shoes,
+		StompPower		= 2.4,
+		RunSpeedModifier	= 1.2,
+		RemoveOnBroken		= false,
+		ScratchDefense		= 100,
+		BiteDefense		= 100,
+		Insulation		= 0.65,
+		WindResistance		= 1.0,
+		WaterResistance		= 1.0,
+		Weight			= 2,
+	}
+
+	item DCWhaleKnickers
+	{
+		Type			= Clothing,
+		DisplayName		= DC Whale Knickers,
+		ClothingItem		= DCWhaleKnickers,
+		BodyLocation		= UnderwearBottom,
+		BloodLocation		= ShortsShort,
+		Icon			= DCWhaleKnickers,
+		BiteDefense		= 5,
+		ScratchDefense		= 10,
+		Insulation		= 0.15,
+		WindResistance		= 0.2,
+		Weight			= 0.2,
+		CanHaveHoles		= false,
+	}
+}
