@@ -1,6 +1,26 @@
 -- TEST ONLY: installed exclusively by smoke_game.py --world.
 require "OptionScreens/MainScreen"
 require "DebugUIs/DebugScenarios"
+
+-- Clear first-run teaching UI so evidence shots show the world: tutorial
+-- modal (MainScreen.checkTutorial -> isTutorialDone), SurvivalGuide window
+-- (getOptionShowSurvivalGuide), and the first-time feature popups.
+local function dismissTeachingUI()
+    local core = getCore()
+    for _, set in ipairs({
+        { "setTutorialDone", true },
+        { "setOptionShowSurvivalGuide", false },
+        { "setShowFirstTimeVehicleTutorial", false },
+        { "setShowFirstTimeWeatherTutorial", false },
+        { "setShowFirstTimeSneakTutorial", false },
+        { "setShowFirstTimeSearchTutorial", false },
+    }) do
+        local ok, err = pcall(function() core[set[1]](core, set[2]) end)
+        if not ok then print("[DCStandaloneTest] " .. set[1] .. " failed: " .. tostring(err)) end
+    end
+end
+dismissTeachingUI()
+
 local launched = false
 local scenario = {
     name = "DC standalone disposable actor probe",
@@ -15,6 +35,12 @@ local scenario = {
         -- advances; restore normal speed so automated probes keep ticking.
         local ok, err = pcall(setGameSpeed, 1)
         if not ok then print("[DCStandaloneTest] setGameSpeed failed: " .. tostring(err)) end
+        -- Belt and braces: close the guide window if a layout restored it.
+        pcall(function()
+            if SurvivalGuide and SurvivalGuide.instance and SurvivalGuide.instance.setVisible then
+                SurvivalGuide.instance:setVisible(false)
+            end
+        end)
         -- In-game evidence capture: the engine dumps its OWN framebuffer via
         -- takeScreenshot(name). The argument is a RELATIVE filename written
         -- into the profile's Screenshots dir (Core lambda: getScreenshotDir()

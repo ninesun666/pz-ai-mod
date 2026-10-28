@@ -1,6 +1,6 @@
 {
   "$schema_note": "阶段性目标维护文件。track=engineering|soul|memory|character|dialogue|ai。状态只允许: pending | in_progress | passed | failed | blocked。每个目标必须有可复现验收步骤和证据路径；日志/遥测不算通过，实机可玩才算通过。设计内容类目标以'文档定稿+用户拍板'为通过标准。",
-  "updated": "2026-10-28T18:20:00+08:00",
+  "updated": "2026-10-28T19:05:00+08:00",
   "branch": "rework/standalone-companion",
   "north_star": "游戏里可玩的独立大肥鱼 AI 队友：身份正确、鼠标正常、免打字交互、行为可靠、存档恢复同一伙伴；性格让人想留下她，机制不让人被迫带她",
   "design_sources": [
@@ -43,7 +43,8 @@
         "docs/FOLLOW_GATE_EVIDENCE.txt",
         "docs/FOLLOW_GATE_REPORT.json (passed=false, 20261027-230750)",
         "run 20261028-180000（首次无人值守 follow 门禁）：finder=found hasPath=true shouldMove=true 已达成 → 数百 ms 后 state 回落 IdleState、hasPath=false、坐标不变，round 1 超时 FAIL",
-        "run 20261028-180700（堵转取消放宽至 10 tick 后复跑，含自动截图）：同样在 ~f:5050 回落 IdleState、finder=notrunning、坐标不变——自伤假说被排除，回落为引擎侧行为"
+        "run 20261028-180700（堵转取消放宽至 10 tick 后复跑，含自动截图）：同样在 ~f:5050 回落 IdleState、finder=notrunning、坐标不变——自伤假说被排除，回落为引擎侧行为",
+        "run 20261028-185648：FAIL 行首次出现 pathing=true——堵转取消放宽后 PathFindState 已能保持，但坐标仍不变；问题收窄为『PFB2 存活但移动不被角色消耗』，指向 NPC 的移动消费路径（与 Knox 输入驱动论点一致）"
       ],
       "root_cause": "待实机定位：当前 B42 IsoPlayer 使用 AIComponent NPC 控制路径；原实现未 setNpc(true)。isPathing=false 本身不能证明未更新或未寻路。",
       "next_actions": [
@@ -278,7 +279,7 @@
         "src/dcai/companion/AutoInputDriver.java（GameLoadingState 期间写 Mouse.buttonDownStates[0]）",
         "docs/AUTOMATED_STANDALONE_GATE.md 2026-10-28 章节"
       ],
-      "notes": "机制证据（javap B42.21）：GameLoadingState.update() 尾部以 Mouse.isButtonDown(0)（物理索引 0，非 Mouse.LMB=10000 逻辑键码）作为唯一退出条件之一；isButtonDown 是对 public static buttonDownStates 数组的直接读。踩坑记录：Boolean.getProperty 用 '=1' 不生效需 '=true'；写 LMB=10000 越界被静默吞掉。仅一次性 profile 使用，绝不用于真实存档。"
+      "notes": "机制证据（javap B42.21）：GameLoadingState.update() 尾部以 Mouse.isButtonDown(0)（物理索引 0，非 Mouse.LMB=10000 逻辑键码）作为唯一退出条件之一；isButtonDown 是对 public static buttonDownStates 数组的直接读。踩坑记录：Boolean.getProperty 用 '=1' 不生效需 '=true'；写 LMB=10000 越界被静默吞掉。仅一次性 profile 使用，绝不用于真实存档。 2026-10-28 补充：一次性世界自动关闭教学 UI（setTutorialDone(true)、setOptionShowSurvivalGuide(false) 及四个 FirstTime 弹窗开关），引擎帧截图不再被生存指南遮挡；像素校验均值/方差确认真实画面（mean~22、stddev~34，暗场景属正常）。"
     }
   ],
   "decisions_resolved": [
