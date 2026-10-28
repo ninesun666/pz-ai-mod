@@ -123,3 +123,24 @@
 1. 反编译输出放 `ai-mod\parking\decompile\`（已 gitignore 区域），**不提交**。
 2. 只反编译 `projectzomboid.jar`；Workshop 第三方 mod 二进制不逆向进仓库。
 3. 每个关键类读完在 PR/commit message 里注明"依据：反编译 IsoXxx@42.21，已用探针 yy 验证"。
+
+## 5. 反编译源码库（一次性固化，避免重复拆解）
+
+`research/decompiled/src/`（本地、gitignore 排除）已固化 524 个可读 Java 源文件：
+引擎定向类集（GameLoadingState/Mouse/IsoPlayer/IsoGameCharacter/PathFindState/
+PathFindBehavior2/SurvivorDesc/HumanVisual/LuaManager 等 + 内部类）与 Knox
+`knox/event/` 全量（行为树 core/actions/conditions/subtrees、npc、api）。
+
+工具：Vineflower 1.11.1（`.local-tools/vineflower.jar`，Maven Central 下载）。
+需要更多类或版本升级后重产出的配方：
+
+```powershell
+# 1) 提取目标类（python zipfile，从 projectzomboid.jar / KnoxEventExpanded.jar）
+# 2) 反编译到 research/decompiled/src
+& "D:\SteamLibrary\steamapps\common\ProjectZomboid\jre64\bin\java.exe" `
+  -jar .local-tools/vineflower.jar --silent `
+  build/decompile-input research/decompiled/src
+```
+
+注意：反编译源仅供理解 API 语义，不作为生产代码来源；关键行为结论仍以
+javap 原始字节码与实机探针为准（反编译器可能重排控制流）。
