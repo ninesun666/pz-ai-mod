@@ -25,3 +25,33 @@ This branch replaces the old Knox/ZombieBuddy runtime dependency with an indepen
 5. Add model/voice reactions as optional event-driven flavor, never as the action executor.
 
 No step is considered complete from log output alone; each requires in-game verification.
+
+## Behavior-tree layer: Knox structural replica (decision 2026-10-28)
+
+User decision: reuse ZombieBuddy where possible; replicate Knox's behavior-tree
+core structure 1:1, discarding what we do not need.
+
+Replicated (our code, Knox's structure; reference dumps stay local under
+`research/decompiled/`):
+
+- `bt/core`: BehaviorNode (+state enum, blackboard with dataParent chain),
+  SequenceNode, SelectorNode, InverterNode, BehaviorTreeBase
+- `bt/CompanionBehaviorTree` (NpcBehaviorTree role) with Knox-style goal
+  switching (`setGoal`, FollowSubTree / StaySubTree)
+- `bt/subtrees`: FollowSubTree (`Inverter(IsFollowing) → SetFollowPoint →
+  Movement`), StaySubTree (`Stay → Movement`), MovementSubTree
+  (`Interpolate → MoveToSquare`) with Knox's MOVE_* / FOLLOW_DISTANCE / TICKS
+  data keys
+- `bt/CompanionMotion` seam so probes drive the structure without the game JVM;
+  CompanionActor implements it
+
+Discarded: ActionConstraintResolver constraint machinery, Lua node bridge, the
+other 66 Knox subtrees (farming/fight/reload/driving/encounter/...), squad/group
+meta, procgen backstory. `InterpolatePathAction` is a structural placeholder
+(interpolation unverified, not claimed).
+
+Controller dispatch now routes through the tree; the follow-gate marker text is
+unchanged. Offline verification: `BehaviorTreeProbe` + `tests/
+test_standalone_source.py::BehaviorTreeMirrorTests`. Live follow acceptance is
+still blocked on the P2 locomotion candidate (see
+`docs/P2_INVESTIGATION_20261028.md`).

@@ -1,5 +1,6 @@
 package dcai.companion;
 
+import dcai.companion.bt.CompanionBehaviorTree;
 import zombie.characters.IsoPlayer;
 import zombie.characters.SurvivorDesc;
 import zombie.iso.IsoCell;
@@ -23,7 +24,7 @@ public final class CompanionController {
     private String lastError;
     private BehaviorController.Action lastAction = BehaviorController.Action.NONE;
     private long lastBehaviorTickMs = -1;
-    private boolean pathWarned;
+    private final CompanionBehaviorTree tree = new CompanionBehaviorTree();
     private Float lastActorX;
     private Float lastActorY;
     private int stuckTicks;
@@ -66,6 +67,8 @@ public final class CompanionController {
         double dy = owner.getY() - actor.getY();
         double distance = Math.sqrt(dx * dx + dy * dy);
         lastAction = behavior.tick(now, distance, true, true);
+        tree.attach(actor);
+        tree.setDistance((float) distance);
         switch (lastAction) {
             case PATH_TO_OWNER:
                 updateStuckState();
@@ -73,15 +76,15 @@ public final class CompanionController {
                     actor.stopWalking(); // A live but unproductive path: cancel before re-request.
                     stuck = false;
                 }
-                if (actor.walkTo(owner) && !pathWarned) {
-                    pathWarned = true;
-                    System.out.println("[DCStandalone] path requested (locomotion arrival unverified)");
-                }
+                tree.setGoal(CompanionBehaviorTree.GOAL_FOLLOW);
+                tree.tick();
                 break;
             case CANCEL_PATH:
                 actor.stopWalking();
                 stuck = false;
                 stuckTicks = 0;
+                tree.setGoal(CompanionBehaviorTree.GOAL_STAY);
+                tree.tick();
                 break;
             default: break;
         }

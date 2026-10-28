@@ -1,5 +1,6 @@
 package dcai.companion;
 
+import dcai.companion.bt.CompanionMotion;
 import zombie.GameWindow;
 import zombie.characters.IsoPlayer;
 import zombie.characters.SurvivorDesc;
@@ -15,7 +16,7 @@ import zombie.ai.states.PathFindState;
  * The constructor builds the actor IN-WORLD (engine registers it), then the
  * caller records lifecycle state. No detached state exists on this class.
  */
-public final class CompanionActor extends IsoPlayer {
+public final class CompanionActor extends IsoPlayer implements CompanionMotion {
     private boolean modelConfirmed;
 
     public CompanionActor(IsoCell cell, SurvivorDesc desc, int x, int y, int z) {
@@ -35,6 +36,16 @@ public final class CompanionActor extends IsoPlayer {
     public boolean modelConfirmed() { return modelConfirmed; }
 
     public void confirmModel() { modelConfirmed = true; }
+
+    @Override
+    public Target ownerTarget() {
+        IsoPlayer owner = IsoPlayer.getInstance();
+        if (owner == null || owner.getCurrentSquare() == null) return new Target(0f, 0f, 0f, false);
+        return new Target(owner.getX(), owner.getY(), owner.getZ(), true);
+    }
+
+    @Override
+    public boolean walkToOwner() { return walkTo(IsoPlayer.getInstance()); }
 
     /** Vanilla A* pathing toward a target. True = request accepted, not arrival proof. */
     public boolean walkTo(IsoPlayer target) {

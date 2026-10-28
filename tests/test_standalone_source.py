@@ -32,3 +32,41 @@ class StandaloneSourceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BehaviorTreeMirrorTests(unittest.TestCase):
+    """1:1 structural replica of Knox's behavior-tree core, scoped to
+    follow/stay/movement (decision 2026-10-28, see STANDALONE_COMPANION_REWORK.md)."""
+
+    BT = "standalone/runtime/src/dcai/companion/bt"
+
+    def test_core_and_subtree_files_exist(self):
+        expected = [
+            "core/BehaviorNode.java", "core/SequenceNode.java", "core/SelectorNode.java",
+            "core/InverterNode.java", "core/BehaviorTreeBase.java",
+            "CompanionBehaviorTree.java", "CompanionMotion.java",
+            "conditions/IsFollowingCondition.java",
+            "actions/SetFollowPointAction.java", "actions/StayAction.java",
+            "actions/InterpolatePathAction.java", "actions/MoveToSquareAction.java",
+            "subtrees/movement/MovementKeys.java", "subtrees/movement/MovementSubTree.java",
+            "subtrees/follow/FollowSubTree.java", "subtrees/stay/StaySubTree.java",
+        ]
+        for rel in expected:
+            self.assertTrue((ROOT / self.BT / rel).is_file(), rel)
+
+    def test_knox_data_keys_mirror(self):
+        movement = (ROOT / self.BT / "subtrees/movement/MovementKeys.java").read_text(encoding="utf-8")
+        for key in ("MOVE_TARGET_X", "MOVE_TARGET_Y", "MOVE_TARGET_Z", "MOVE_PATH", "MOVE_NEEDS_RESTART"):
+            self.assertIn(key, movement)
+        follow = (ROOT / self.BT / "subtrees/follow/FollowSubTree.java").read_text(encoding="utf-8")
+        self.assertIn("FOLLOW_DISTANCE", follow)
+        self.assertIn("TICKS", follow)
+
+    def test_gate_marker_contract_preserved(self):
+        move = (ROOT / self.BT / "actions/MoveToSquareAction.java").read_text(encoding="utf-8")
+        self.assertIn("[DCStandalone] path requested (locomotion arrival unverified)", move)
+
+    def test_controller_dispatches_through_tree(self):
+        controller = (ROOT / "standalone/runtime/src/dcai/companion/CompanionController.java").read_text(encoding="utf-8")
+        self.assertIn("tree.setGoal(CompanionBehaviorTree.GOAL_FOLLOW)", controller)
+        self.assertIn("tree.setGoal(CompanionBehaviorTree.GOAL_STAY)", controller)

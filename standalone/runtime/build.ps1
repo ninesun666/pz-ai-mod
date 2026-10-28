@@ -15,7 +15,7 @@ New-Item -ItemType Directory -Force $out | Out-Null
 $gameJars = (Get-ChildItem $GameDir -Filter "*.jar" | ForEach-Object FullName) -join ";"
 $cp = "$gameJars;$Asm"
 $java = Join-Path $GameDir "jre64\bin\java.exe"
-$files = Get-ChildItem (Join-Path $src "dcai\companion") -Filter "*.java" | ForEach-Object FullName
+$files = Get-ChildItem (Join-Path $src "dcai\companion") -Filter "*.java" -Recurse | ForEach-Object FullName
 & $java -jar $Ecj -17 -proc:none -encoding UTF-8 -classpath $cp -d $out $files
 if ($LASTEXITCODE -ne 0) { throw "ECJ failed: $LASTEXITCODE" }
 $testSrc = Join-Path $root "standalone\runtime\tests"
@@ -29,6 +29,8 @@ $gameJar = Join-Path $GameDir "projectzomboid.jar"
 if ($LASTEXITCODE -ne 0) { throw "Transform probe failed: $LASTEXITCODE" }
 & $java -cp "$out;$cp" dcai.companion.BehaviorProbe
 if ($LASTEXITCODE -ne 0) { throw "Behavior probe failed: $LASTEXITCODE" }
+& $java -cp "$out;$cp" dcai.companion.BehaviorTreeProbe
+if ($LASTEXITCODE -ne 0) { throw "Behavior tree probe failed: $LASTEXITCODE" }
 & $java -cp "$out;$cp" dcai.companion.ModProfileProbe "$PSScriptRoot\build\parser-profile.txt"
 if ($LASTEXITCODE -ne 0) { throw "Profile parser probe failed: $LASTEXITCODE" }
 & $java -cp "$out;$cp" dcai.companion.ActorConstructionProbe

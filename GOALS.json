@@ -1,6 +1,6 @@
 {
   "$schema_note": "阶段性目标维护文件。track=engineering|soul|memory|character|dialogue|ai。状态只允许: pending | in_progress | passed | failed | blocked。每个目标必须有可复现验收步骤和证据路径；日志/遥测不算通过，实机可玩才算通过。设计内容类目标以'文档定稿+用户拍板'为通过标准。",
-  "updated": "2026-10-28T01:00:00+08:00",
+  "updated": "2026-10-28T17:30:00+08:00",
   "branch": "rework/standalone-companion",
   "north_star": "游戏里可玩的独立大肥鱼 AI 队友：身份正确、鼠标正常、免打字交互、行为可靠、存档恢复同一伙伴；性格让人想留下她，机制不让人被迫带她",
   "design_sources": [
@@ -56,7 +56,9 @@
       "name": "停留/撤退/指令切换（免打字）",
       "status": "pending",
       "acceptance": "热键或原生上下文菜单切换 follow/hold/retreat；停留时不自动跟走；普通左右键不被吞；实机操作录证",
-      "depends_on": ["P2"],
+      "depends_on": [
+        "P2"
+      ],
       "next_actions": [
         "接入既有 DCStandaloneCommand 桥到真实输入入口",
         "鼠标保留验收门禁（可复用 follow 门禁框架）"
@@ -68,7 +70,9 @@
       "name": "存档恢复同一伙伴",
       "status": "pending",
       "acceptance": "正常保存、退出、重进后同一 UUID 恢复，无重复伙伴；存档目录无伙伴尸体残留；实机门禁通过",
-      "depends_on": ["P2"],
+      "depends_on": [
+        "P2"
+      ],
       "next_actions": [
         "实机验证 suspend/respawn 方案",
         "新增 save/reload 门禁（可复用 follow 门禁框架 + 存档目录断言）"
@@ -81,7 +85,9 @@
       "name": "卡住恢复与短障碍绕行",
       "status": "pending",
       "acceptance": "绕过短障碍能跟上；卡住检测触发恢复；重复反馈有冷却",
-      "depends_on": ["P2"]
+      "depends_on": [
+        "P2"
+      ]
     },
     {
       "id": "S1",
@@ -128,7 +134,9 @@
           "载体": "ModData 坐标 + 每存档/每周目一次性标记"
         }
       ],
-      "depends_on": ["P4"],
+      "depends_on": [
+        "P4"
+      ],
       "next_actions": [
         "设计 ModData schema（dcai.memory.* 命名空间）并写单元测试",
         "与 DESIGN_AI_LAYER AI-4 对齐：羁绊阶段注入模型上下文"
@@ -141,7 +149,9 @@
       "name": "角色外观：贴图路线 A（鲸鱼娘主题装）",
       "status": "pending",
       "acceptance": "蓝白配色服装 + 鳍形帽饰在实机可辨认；远处剪影可与普通幸存者区分；贴图资产许可记录完整",
-      "depends_on": ["P1"],
+      "depends_on": [
+        "P1"
+      ],
       "notes": "DESIGN_PRODUCT 建议 A 先行打通玩法，B 自定义模型为远期升级；需用户拍板",
       "blocked_on_decision": "DEC-1 形象路线"
     },
@@ -151,7 +161,10 @@
       "name": "角色外观：自定义模型路线 B",
       "status": "pending",
       "acceptance": "完整自定义 3D 模型+动画绑定实机通过；方向性行走动画正确",
-      "depends_on": ["C1", "P2"],
+      "depends_on": [
+        "C1",
+        "P2"
+      ],
       "notes": "工程量大一个数量级，仅在 A 路线玩法闭环后启动"
     },
     {
@@ -160,7 +173,9 @@
       "name": "台词池 + 指令应答",
       "status": "in_progress",
       "acceptance": "功能台词每事件 2 条轮换入库（DEC-4 小文本量）；冷却机制防刷屏；实机触发录证",
-      "depends_on": ["S1"],
+      "depends_on": [
+        "S1"
+      ],
       "evidence": [
         "docs/DIALOGUE_POOL.md v0（16 条，含冷却/限流参数表）"
       ],
@@ -175,7 +190,10 @@
       "name": "涌现时刻 A/B/C",
       "status": "pending",
       "acceptance": "第一次看海/第一次被救/她记得那条路 实机触发各 1 次并录证；频控（每存档/每周目 1 次）生效",
-      "depends_on": ["M1", "P2"],
+      "depends_on": [
+        "M1",
+        "P2"
+      ],
       "notes": "雨夜同行、围困时刻合并入本项第二批"
     },
     {
@@ -184,7 +202,9 @@
       "name": "时间胶囊羁绊",
       "status": "pending",
       "acceptance": "相处每 3 天解锁台词/小动作，不解锁任何能力；读档后天数与解锁状态正确",
-      "depends_on": ["M1"]
+      "depends_on": [
+        "M1"
+      ]
     },
     {
       "id": "A1",
@@ -200,7 +220,12 @@
       "name": "Java 邮箱收发 + Lua 事件接线",
       "status": "pending",
       "acceptance": "实机：事件触发→请求文件→回信→游戏内字幕显示全链路；桥接进程 kill 后 30 分钟游戏无感、降级本地台词池",
-      "depends_on": ["P2", "P3", "A1", "D2"],
+      "depends_on": [
+        "P2",
+        "P3",
+        "A1",
+        "D2"
+      ],
       "notes": "游戏线程永不阻塞：写文件微秒级，tick 非阻塞轮询"
     },
     {
@@ -209,7 +234,9 @@
       "name": "TTS 语音注入",
       "status": "pending",
       "acceptance": "回信→edge-tts→游戏内播放；音色稳定；与 only_when_foreground 逻辑合并",
-      "depends_on": ["A2"]
+      "depends_on": [
+        "A2"
+      ]
     },
     {
       "id": "A4",
@@ -217,7 +244,24 @@
       "name": "羁绊阶段注入模型上下文",
       "status": "pending",
       "acceptance": "同一事件（掉队）在羁绊阶段 0/2 生成台词风格可见差异；上下文仅枚举值无自由文本注入面",
-      "depends_on": ["A2", "M1"]
+      "depends_on": [
+        "A2",
+        "M1"
+      ]
+    },
+    {
+      "id": "P-BT1",
+      "track": "engineering",
+      "name": "Knox 行为树核心结构 1:1 复刻（scoped to follow/stay/movement）",
+      "status": "in_progress",
+      "acceptance": "离线：BehaviorTreeProbe + 源码镜像测试通过；实机：follow 门禁在行为树派发下重跑通过（locomotion 仍待 P2 原生寻路候选实机验证）",
+      "evidence": [
+        "standalone/runtime/src/dcai/companion/bt/（16 个类，结构镜像 Knox behaviortree core+conditions+actions+subtrees）",
+        "standalone/runtime/tests/dcai/companion/BehaviorTreeProbe.java（离线结构探针）",
+        "tests/test_standalone_source.py::BehaviorTreeMirrorTests",
+        "research/decompiled/（本地参考，不入库分发）"
+      ],
+      "notes": "用户决策 2026-10-28：ZombieBuddy 能复用直接复用；Knox 1:1 复刻核心结构、抛弃不需要部分。已复刻：BehaviorNode/Sequence/Selector/Inverter/BehaviorTreeBase/NpcBehaviorTree(→CompanionBehaviorTree)/FollowSubTree/StaySubTree/MovementSubTree+actions/conditions+MOVE_*/FOLLOW_DISTANCE/TICKS 数据契约。已抛弃：ActionConstraintResolver 约束机、Lua 节点桥、其余 66 棵子树、farming/fight/reload/driving 等全部。CompanionController 派发改走行为树，gate 标记文本不变。"
     }
   ],
   "decisions_resolved": [
@@ -243,6 +287,12 @@
       "id": "DEC-4",
       "question": "台词密度：安静可靠 vs 活泼话痨？",
       "decision": "安静可靠：事件时刻才开口，预设文本量收小（每事件 2 条轮换），闲聊严格限流",
+      "date": "2026-10-28"
+    },
+    {
+      "id": "DEC-5",
+      "question": "行为层路线：自研 FSM 之上是否引入 Knox 式行为树结构？",
+      "decision": "1:1 复刻 Knox 行为树核心结构（core 组合节点+黑板+目标切换协议），只保留 follow/stay/movement 三棵子树；ZombieBuddy 依赖化路线另行拍板",
       "date": "2026-10-28"
     }
   ],
